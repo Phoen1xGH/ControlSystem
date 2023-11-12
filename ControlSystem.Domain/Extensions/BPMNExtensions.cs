@@ -4,7 +4,7 @@ using System.Xml.Linq;
 
 namespace ControlSystem.Domain.Extensions
 {
-    internal static class BPMNExtensions
+    public static class BPMNExtensions
     {
         public static void GenerateXmlHeader(this XDocument xml)
         {

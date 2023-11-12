@@ -1,6 +1,10 @@
-﻿using ControlSystem.MainApp.Models;
+﻿using ControlSystem.Domain.Extensions;
+using ControlSystem.Domain.Models.BPMNComponents;
+using ControlSystem.MainApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace ControlSystem.MainApp.Controllers
 {
@@ -11,6 +15,26 @@ namespace ControlSystem.MainApp.Controllers
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
+        }
+
+        [HttpGet]
+        public ActionResult GenerateForms()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult GenerateForms(string allData)
+        {
+            var bpmnElements = JsonConvert.DeserializeObject<BPMNElementsStorage>(allData);
+
+            BPMNExtensions.FillSequenceFlows(bpmnElements.Processes[0]);
+            var xml = new XDocument();
+            xml.GenerateDiagramElements(bpmnElements);
+            xml.SetDiagramOptions(bpmnElements);
+
+            ViewBag.Chart = xml;
+
+            return View("Modeler");
         }
 
         public IActionResult Index()

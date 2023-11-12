@@ -1,0 +1,226 @@
+﻿
+@{
+	Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>КрЫсота</title>
+
+    <!-- required modeler styles -->
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@13.2.2/dist/assets/bpmn-js.css">
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@13.2.2/dist/assets/diagram-js.css">
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@13.2.2/dist/assets/bpmn-font/css/bpmn.css">
+
+    <!-- modeler distro -->
+    <script src="https://unpkg.com/bpmn-js@13.2.2/dist/bpmn-modeler.development.js"></script>
+
+    <!-- needed for this example only -->
+    <script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
+
+    <!-- example styles -->
+    <style>
+        html, body, #canvas {
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        .diagram-note {
+            background-color: rgba(66, 180, 21, 0.7);
+            color: White;
+            border-radius: 5px;
+            font-family: Arial;
+            font-size: 12px;
+            padding: 5px;
+            min-height: 16px;
+            width: 50px;
+            text-align: center;
+        }
+
+        .needs-discussion:not(.djs-connection) .djs-visual > :nth-child(1) {
+            stroke: rgba(66, 180, 21, 0.7) !important; /* color elements as red */
+        }
+
+        #save-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            display: inline-block;
+            margin-right: 10px;
+            z-index: 1; /* Установите z-index на значение больше, чем у другой кнопки */
+        }
+
+        #saveBpmn {
+            position: fixed;
+            bottom: 20px;
+            left: 150px; /* Измените left, чтобы разместить кнопку в другом месте */
+            display: inline-block;
+            margin-right: 10px;
+            z-index: 2; /* Установите z-index на значение больше, чем у первой кнопки */
+        }
+        #export-svg-button{
+            position: fixed;
+            bottom: 20px;
+            left: 300px; /* Измените left, чтобы разместить кнопку в другом месте */
+            display: inline-block;
+            margin-right: 10px;
+            z-index: 3; /* Установите z-index на значение больше, чем у первой кнопки */
+        }
+        
+        a.bjs-powered-by {
+	        display: none;
+        }
+       
+
+    </style>
+</head>
+<body>
+    <div id="canvas"></div>
+
+    <div id="saves">
+        <button id="save-button">print to console</button>
+        <button id="saveBpmn">Сохранить в файл</button>
+        <button id="export-svg-button">Экспорт в SVG</button>
+    </div>
+    <script>
+
+        var xmlChart = `@Html.Raw(ViewBag.Chart)`;
+        // modeler instance
+        var bpmnModeler = new BpmnJS({
+            container: '#canvas',
+            keyboard: {
+                bindTo: window
+            }
+        });
+
+        /**  
+         * Save diagram contents and print them to the console.
+         */
+        async function exportDiagram() {
+
+            try {
+
+                var result = await bpmnModeler.saveXML({ format: true });
+
+                alert('Diagram exported. Check the developer tools!');
+
+                console.log('DIAGRAM', result.xml);
+            } catch (err) {
+
+                console.error('could not save BPMN 2.0 diagram', err);
+            }
+        }
+
+        async function saveDiagramBpmn()
+        {
+            try {
+
+                var result = await bpmnModeler.saveXML({ format: true });
+
+                const xmlData = result.xml;
+                const blob = new Blob([xmlData], { type: 'application/xml' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'diagram.bpmn';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                
+            } catch (err) {
+
+                console.error('could not save BPMN 2.0 diagram', err);
+            }
+        }
+
+        function exportSvg() {
+            bpmnModeler.saveSVG((err, svgData) => {
+                if (err) {
+                    console.error('Не удалось экспортировать BPMN в SVG:', err);
+                } else {
+                    const blob = new Blob([svgData], { type: 'image/svg+xml' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'diagram.svg';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                }
+            });
+        }
+        /**
+         * Open diagram in our modeler instance.
+         *
+         *  {String} bpmnXML diagram to display
+         */
+        async function openDiagram(bpmnXML) {
+           // bpmnXML = `@Html..Raw(ViewBag.Chart)`;
+            // import diagram
+            try {
+
+                await bpmnModeler.importXML(bpmnXML);
+
+                // access modeler components
+                var canvas = bpmnModeler.get('canvas');
+                var overlays = bpmnModeler.get('overlays');
+
+
+                // zoom to fit full viewport
+                canvas.zoom('fit-viewport');
+
+                // attach an overlay to a node
+                overlays.add('SCAN_OK', 'note', {
+                    position: {
+                        bottom: 0,
+                        right: 0
+                    },
+                   // html: '<div class="diagram-note">Mixed up the labels?</div>'
+                });
+
+                // add marker
+                canvas.addMarker('SCAN_OK', 'needs-discussion');
+            } catch (err) {
+
+                console.error('could not import BPMN 2.0 diagram', err);
+            }
+        }
+
+
+        // load external diagram file via AJAX and open it
+       // $.get(diagramUrl, openDiagram, 'text');
+       document.addEventListener('DOMContentLoaded',
+	       function() {
+		       console.log(xmlChart);
+               openDiagram(xmlChart);
+	       });
+        // wire save button
+        $('#save-button').click(exportDiagram);
+        $('#saveBpmn').click(saveDiagramBpmn);
+        $('#export-svg-button').click(exportSvg);
+    </script>
+    <!--
+      Thanks for trying out our BPMN toolkit!
+
+      This example uses the pre-built distribution of the bpmn-js modeler.
+      Consider rolling your own distribution to have more flexibility
+      regarding which features to include.
+
+      Checkout our advanced examples section to learn more:
+      * https://github.com/bpmn-io/bpmn-js-examples#advanced
+
+      To get a bit broader overview over how bpmn-js works,
+      follow our walkthrough:
+      * https://bpmn.io/toolkit/bpmn-js/walkthrough/
+
+      Related starters:
+      * https://raw.githubusercontent.com/bpmn-io/bpmn-js-examples/starter/viewer.html
+    -->
+</body>
+</html>

@@ -1,0 +1,242 @@
+﻿@{
+    ViewData["Title"] = "Генерим помаленьку";
+}
+@model ControlSystem.Domain.Models.BPMNComponents.BPMNElementsStorage
+
+<form method="post" action="/Home/GenerateForms">
+    <input type="hidden" name="allData" id="allData" />
+    <div id="dynamic-fields-container">
+    </div>
+    <button type="button" id="add-field-button">+</button>
+    <p>
+        <input id="submitButton" type="submit" value="Отправить" />
+    </p>
+</form>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const dynamicFieldsContainer = document.getElementById("dynamic-fields-container");
+        const addFieldButton = document.getElementById("add-field-button");
+        let fieldCount = 0;
+
+        let taskCount = 0;/*document.querySelector('[name="taskCount"]').value;*/
+        let exGateCount = 0;/*document.querySelector('[name="exGateCount"]').value;*/
+        let endCount = 0;/*document.querySelector('[name="endCount"]').value;*/
+
+        addFieldButton.addEventListener("click", function () {
+            fieldCount++;
+
+            const newField = document.createElement("div");
+            newField.innerHTML = `
+                    <select name="element-type-${fieldCount}">
+                        <option value="">Выберите тип элемента</option>
+                        <option value="Participants">Отвечающий за этап</option>
+                        <option value="StartEvent">Начальное событие</option>
+                        <option value="Task">Задача</option>
+                        <option value="ExclusiveGateway">Условие</option>
+                        <option value="EndEvent">Конечное событие</option>
+                    </select>
+                    <div class="element-fields" id="element-fields-${fieldCount}"></div>
+                `;
+
+            dynamicFieldsContainer.appendChild(newField);
+
+            const elementFieldsContainer = newField.querySelector(`#element-fields-${fieldCount}`);
+            const elementTypeSelect = newField.querySelector(`select[name="element-type-${fieldCount}"]`);
+
+            elementTypeSelect.addEventListener("change", function () {
+                const selectedElementType = elementTypeSelect.value;
+                elementFieldsContainer.innerHTML = "";
+
+                if (selectedElementType === "Participants") {
+                    elementFieldsContainer.innerHTML = `
+                            <p>
+                                <label>Name</label>
+                                <input type="text" name="ParticipantName" />
+                            </p>
+                        `;
+                }
+                else if (selectedElementType === "StartEvent") {
+                    elementFieldsContainer.innerHTML = `
+                            <p>
+                                <label>Name</label>
+                                <input type="text" name="StartEvent.Name" />
+                            </p>
+                            <p>
+                                <label>out</label>
+                                <input type="text" name="StartEvent.Outgoing" />
+                            </p>
+                        `;
+                }
+                else if (selectedElementType === "Task") {
+                    const taskIndex = taskCount++;
+
+                    elementFieldsContainer.innerHTML =`
+                        <p>
+                            <label>in</label><br/>
+                            <input type="text" name="Task.Incoming"/>
+                        </p>
+                        <p>
+                            <label>Name</label><br/>
+                            <input type="text" name="Task.Name"/>
+                        </p>
+                        <p>
+                            <label>out</label><br/>
+                            <input type="text" name="Task.Outgoing"/>
+                        </p>`;
+
+                }
+                else if (selectedElementType === "ExclusiveGateway") {
+                    const exGateIndex = exGateCount++;
+
+                    elementFieldsContainer.innerHTML = `
+                        <p>
+                            <label>Name</label>
+                                <input type="text" name="ExclusiveGateway.Name"/>
+                            <label>in</label>
+                                <input type="text" name="ExclusiveGateway.Incomings"/>
+                            <label>Out1</label>
+                                <input type="text" name="ExclusiveGateway.OutgoingsY"/>
+                            <label>Out2</label>
+                                <input type="text" name="ExclusiveGateway.OutgoingsN" />
+                        </p>`;
+                }
+                else if(selectedElementType === "EndEvent"){
+                    const endIndex = endCount++;
+
+                    elementFieldsContainer.innerHTML = `
+                        <p>
+                            <label>in</label>
+                            <input type="text" name="EndEvent.Incoming">
+                            <label>Name</label>
+                            <input type="text" name="EndEvent.Name"/>
+                        </p>`;
+                }
+            });
+
+            // Кнопка для удаления поля
+            const removeFieldButton = document.createElement("button");
+            removeFieldButton.type = "button";
+            removeFieldButton.textContent = "Удалить";
+
+            removeFieldButton.addEventListener("click", function () {
+                dynamicFieldsContainer.removeChild(newField);
+            });
+
+            newField.appendChild(removeFieldButton);
+        });
+    });
+
+    let tasks = [];
+    let ends = [];
+    let exgates = [];
+
+    let allData = {
+        Collaboration: {
+            Participants: []
+        },
+        Processes: []
+    };
+
+    function getTasksData(){
+
+        const inputIncoming = document.querySelectorAll('input[name^="Task.Incoming"]');
+        const inputNames = document.querySelectorAll('input[name^="Task.Name"]');
+        const inputOutgoing = document.querySelectorAll('input[name^="Task.Outgoing"]');
+
+        if (inputIncoming.length === inputNames.length && inputNames.length === inputOutgoing.length) {
+            for (let i = 0; i < inputIncoming.length; i++) {
+                tasks.push({
+                    Incoming: inputIncoming[i].value,
+                    Name: inputNames[i].value,
+                    Outgoing: inputOutgoing[i].value
+                });
+            }
+        }
+    }
+
+    function getEndEventsData(){
+        const inputIncoming = document.querySelectorAll('input[name^="EndEvent.Incoming"]');
+        const inputNames = document.querySelectorAll('input[name^="EndEvent.Name"]');
+
+        if (inputIncoming.length === inputNames.length) {
+            for (let i = 0; i < inputIncoming.length; i++) {
+                ends.push({
+                    Incoming: inputIncoming[i].value,
+                    Name: inputNames[i].value,
+                });
+            }
+        }
+    }
+
+    function getExclusiveGatewaysData() {
+        const inputIncoming = document.querySelectorAll('input[name^="ExclusiveGateway.Incomings"]');
+        const inputNames = document.querySelectorAll('input[name^="ExclusiveGateway.Name"]');
+        const inputOutgoingY = document.querySelectorAll('input[name^="ExclusiveGateway.OutgoingsY"]');
+        const inputOutgoingN = document.querySelectorAll('input[name^="ExclusiveGateway.OutgoingsN"]');
+
+        if (inputIncoming.length === inputNames.length) {
+            for (let i = 0; i < inputIncoming.length; i++) {
+                const incomingList = [];
+                const outgoingList = [];
+
+                incomingList.push(inputIncoming[i].value);
+                // Добавляем значения в порядке: OutgoingY, затем OutgoingN
+                outgoingList.push(inputOutgoingY[i].value);
+                outgoingList.push(inputOutgoingN[i].value);
+
+                exgates.push({
+                    Incomings: incomingList,
+                    Name: inputNames[i].value,
+                    Outgoings: outgoingList
+                });
+            }
+        }
+    }
+
+    function getAllData(){
+        getTasksData();
+        getExclusiveGatewaysData();
+        getEndEventsData();
+        let participant = document.querySelector('input[name^="ParticipantName"]').value;
+        let startName = document.querySelector('input[name^="StartEvent.Name"]').value;
+        let startOut = document.querySelector('input[name^="StartEvent.Outgoing"]').value;
+
+        let startEvent = {
+            Name: startName,
+            Outgoing: startOut
+        }
+
+        let processes = {
+            TaskList: [],
+            StartEvent: null,
+            EndEventList: [],
+            ExclusiveGatewayList: []
+        }
+
+        processes.StartEvent = startEvent;
+        processes.TaskList = tasks;
+        processes.ExclusiveGatewayList = exgates;
+        processes.EndEventList = ends;
+
+        let participantEl = {
+            Name: participant
+        }
+        allData.Collaboration.Participants.push(participantEl);
+       // allData.Collaboration = collaboration;
+        allData.Processes.push(processes);
+    }
+
+    document.getElementById("submitButton").addEventListener("click", function () {
+
+        getAllData();
+
+        // Преобразование списка в JSON строку
+        var jsonData = JSON.stringify(allData);
+
+        // Заполнение скрытого поля формы
+        document.getElementById("allData").value = jsonData;
+    });
+</script>
+
