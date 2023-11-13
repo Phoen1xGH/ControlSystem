@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ControlSystem.Domain\ControlSystem.Domain.csproj" />
+    <ProjectReference Include="..\ControlSystem.Services\ControlSystem.Services.csproj" />
   </ItemGroup>
 
 </Project>

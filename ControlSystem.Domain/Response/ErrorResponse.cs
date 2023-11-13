@@ -1,9 +1,12 @@
-﻿namespace ControlSystem.Domain.Response
-{
-    public class ErrorResponse<T> : IErrorResponse<T>
-    {
-        public string Description { get; set; }
+﻿using ControlSystem.Domain.Enums;
 
-        public T Data { get; set; }
+namespace ControlSystem.Domain.Response
+{
+    public class BaseResponse<T> : IErrorResponse<T>
+    {
+        public string? Description { get; set; }
+
+        public StatusCode StatusCode { get; set; }
+        public T? Data { get; set; }
     }
 }

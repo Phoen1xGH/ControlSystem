@@ -6,8 +6,8 @@ namespace ControlSystem.Services.Interfaces
 {
     public interface IUserAccountService
     {
-        Task<ErrorResponse<ClaimsIdentity>> Register(RegisterViewModel model);
+        Task<BaseResponse<ClaimsIdentity>> Register(RegisterViewModel model);
 
-        Task<ErrorResponse<ClaimsIdentity>> Login(LoginViewModel model);
+        Task<BaseResponse<ClaimsIdentity>> Login(LoginViewModel model);
     }
 }

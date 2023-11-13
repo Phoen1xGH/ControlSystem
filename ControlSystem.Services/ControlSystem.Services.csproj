@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ControlSystem.DAL\ControlSystem.DAL.csproj" />
     <ProjectReference Include="..\ControlSystem.Domain\ControlSystem.Domain.csproj" />
   </ItemGroup>
 
