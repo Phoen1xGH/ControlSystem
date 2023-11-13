@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ControlSystem.DAL
 {
-    internal class ControlSystemContext : DbContext
+    public class ControlSystemContext : DbContext
     {
         public ControlSystemContext(DbContextOptions<ControlSystemContext> options)
             : base(options)

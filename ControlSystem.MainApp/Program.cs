@@ -1,7 +1,25 @@
+using ControlSystem.DAL;
+using ControlSystem.MainApp.Helpers;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+string connectionToDb = builder.Configuration.GetConnectionString("DefaultDatabase")!;
+builder.Services.AddDbContext<ControlSystemContext>(options => options.UseNpgsql(connectionToDb));
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = new PathString("/Account/Login");
+        options.AccessDeniedPath = new PathString("/Account/Login");
+    });
+
+builder.Services.InitializeRepositories();
+builder.Services.InitializeServices();
 
 var app = builder.Build();
 
@@ -13,11 +31,16 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

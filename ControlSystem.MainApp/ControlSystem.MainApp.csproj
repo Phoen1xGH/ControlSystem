@@ -7,10 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.13">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.11" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ControlSystem.DAL\ControlSystem.DAL.csproj" />
     <ProjectReference Include="..\ControlSystem.Domain\ControlSystem.Domain.csproj" />
     <ProjectReference Include="..\ControlSystem.Services\ControlSystem.Services.csproj" />
   </ItemGroup>

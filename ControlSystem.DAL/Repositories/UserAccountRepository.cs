@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ControlSystem.DAL.Repositories
 {
-    internal class UserAccountRepository : IRepository<UserAccount>
+    public class UserAccountRepository : IRepository<UserAccount>
     {
         private readonly ControlSystemContext _context;
 
