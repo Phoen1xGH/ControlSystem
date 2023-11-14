@@ -6,7 +6,7 @@ using ControlSystem.Services.Interfaces;
 
 namespace ControlSystem.MainApp.Helpers
 {
-    public static class InirializeHelper
+    public static class InitializeHelper
     {
         public static void InitializeRepositories(this IServiceCollection services)
         {
@@ -16,6 +16,7 @@ namespace ControlSystem.MainApp.Helpers
         public static void InitializeServices(this IServiceCollection services)
         {
             services.AddScoped<IUserAccountService, UserAccountService>();
+            services.AddScoped<IBPMNGenerateService, BPMNGenerateService>();
         }
     }
 }

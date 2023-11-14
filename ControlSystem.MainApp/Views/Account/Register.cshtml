@@ -2,30 +2,13 @@
 
 @{
     ViewData["Title"] = "Регистрация";
-
-    var modelErrors = ViewData.ModelState.Values
-                       .SelectMany(v => v.Errors)
-                       .Where(e => !string.IsNullOrEmpty(e.ErrorMessage))
-                       .Select(e => e.ErrorMessage)
-                       .ToList();
 }
 
 <div class="text-center">
     <h2>@ViewData["Title"]</h2>
 
     <form asp-controller="Account" asp-action="Register" method="post" class="form-signin mx-auto" style="max-width: 400px;">
-        @if (modelErrors.Any())
-        {
-                <div class="alert alert-danger">
-                    <ul>
-                    @foreach (var error in modelErrors)
-                    {
-                                <li>@error</li>
-                    }
-                    </ul>
-                </div>
-        }
-        @*<div asp-validation-summary="All" class="text-danger"></div>*@
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
         <div>
             <div class="form-group mb-3">
                 <input asp-for="Name" class="form-control" placeholder="Введите имя" />

@@ -18,9 +18,8 @@ namespace ControlSystem.Domain.ViewModels
         [Compare(nameof(Password), ErrorMessage = "Пароли не совпадают")]
         public string PasswordConfirm { get; set; }
 
-        [DataType(DataType.EmailAddress)]
         [Required(ErrorMessage = "Введите адрес электронной почты")]
-        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Введите корректный адрес почты")]
         public string Email { get; set; }
     }
 }

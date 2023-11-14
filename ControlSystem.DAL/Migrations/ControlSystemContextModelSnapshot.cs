@@ -45,7 +45,7 @@ namespace ControlSystem.DAL.Migrations
 
                     b.HasIndex("WorkspaceId");
 
-                    b.ToTable("Boards");
+                    b.ToTable("Boards", (string)null);
                 });
 
             modelBuilder.Entity("ControlSystem.Domain.Entities.Chart", b =>
@@ -71,7 +71,7 @@ namespace ControlSystem.DAL.Migrations
 
                     b.HasIndex("UserAccountId");
 
-                    b.ToTable("Charts");
+                    b.ToTable("Charts", (string)null);
                 });
 
             modelBuilder.Entity("ControlSystem.Domain.Entities.Comment", b =>
@@ -93,7 +93,7 @@ namespace ControlSystem.DAL.Migrations
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("ControlSystem.Domain.Entities.FileAttachment", b =>
@@ -120,7 +120,7 @@ namespace ControlSystem.DAL.Migrations
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("Attachments");
+                    b.ToTable("Attachments", (string)null);
                 });
 
             modelBuilder.Entity("ControlSystem.Domain.Entities.FileContent", b =>
@@ -137,7 +137,7 @@ namespace ControlSystem.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FilesContent");
+                    b.ToTable("FilesContent", (string)null);
                 });
 
             modelBuilder.Entity("ControlSystem.Domain.Entities.Link", b =>
@@ -163,7 +163,7 @@ namespace ControlSystem.DAL.Migrations
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("Links");
+                    b.ToTable("Links", (string)null);
                 });
 
             modelBuilder.Entity("ControlSystem.Domain.Entities.Priority", b =>
@@ -184,7 +184,7 @@ namespace ControlSystem.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Priorities");
+                    b.ToTable("Priorities", (string)null);
                 });
 
             modelBuilder.Entity("ControlSystem.Domain.Entities.Tag", b =>
@@ -210,7 +210,7 @@ namespace ControlSystem.DAL.Migrations
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("Tags");
+                    b.ToTable("Tags", (string)null);
                 });
 
             modelBuilder.Entity("ControlSystem.Domain.Entities.Ticket", b =>
@@ -263,7 +263,7 @@ namespace ControlSystem.DAL.Migrations
 
                     b.HasIndex("StatusId");
 
-                    b.ToTable("Tickets");
+                    b.ToTable("Tickets", (string)null);
                 });
 
             modelBuilder.Entity("ControlSystem.Domain.Entities.UserAccount", b =>
@@ -293,7 +293,7 @@ namespace ControlSystem.DAL.Migrations
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("UserAccounts");
+                    b.ToTable("UserAccounts", (string)null);
                 });
 
             modelBuilder.Entity("ControlSystem.Domain.Entities.Workspace", b =>
@@ -310,7 +310,7 @@ namespace ControlSystem.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Workspaces");
+                    b.ToTable("Workspaces", (string)null);
                 });
 
             modelBuilder.Entity("UserAccountWorkspace", b =>
@@ -325,7 +325,7 @@ namespace ControlSystem.DAL.Migrations
 
                     b.HasIndex("WorkspacesId");
 
-                    b.ToTable("UserAccountWorkspace");
+                    b.ToTable("UserAccountWorkspace", (string)null);
                 });
 
             modelBuilder.Entity("ControlSystem.Domain.Entities.Board", b =>

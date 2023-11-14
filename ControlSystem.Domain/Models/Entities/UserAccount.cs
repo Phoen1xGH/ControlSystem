@@ -8,8 +8,8 @@
         public string Password { get; set; }
         public string Email { get; set; }
 
-        public ICollection<Chart>? Charts { get; set; }
-        public ICollection<Workspace>? Workspaces { get; set; }
+        public ICollection<Chart> Charts { get; set; } = new List<Chart>();
+        public ICollection<Workspace> Workspaces { get; set; } = new List<Workspace>();
 
     }
 }

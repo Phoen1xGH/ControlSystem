@@ -8,6 +8,6 @@
         public string ColorHex { get; set; }
 
         public Workspace Workspace { get; set; }
-        public ICollection<Ticket>? Tickets { get; set; }
+        public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
     }
 }

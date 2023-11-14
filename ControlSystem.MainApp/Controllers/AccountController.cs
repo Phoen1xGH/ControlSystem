@@ -62,7 +62,6 @@ namespace ControlSystem.MainApp.Controllers
             return View(model);
         }
 
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> LogOut()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
