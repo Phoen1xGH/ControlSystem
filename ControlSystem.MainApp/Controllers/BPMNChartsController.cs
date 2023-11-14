@@ -1,6 +1,8 @@
-﻿using ControlSystem.Services.Interfaces;
+﻿using ControlSystem.Domain.Entities;
+using ControlSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace ControlSystem.MainApp.Controllers
 {
@@ -29,6 +31,24 @@ namespace ControlSystem.MainApp.Controllers
                 {
                     ViewBag.Chart = response.Data;
 
+                    return View("Modeler");
+                }
+                ModelState.AddModelError("", response.Description);
+            }
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddChartToDb(string jsonChart)
+        {
+            var chart = JsonConvert.DeserializeObject<Chart>(jsonChart);
+            if (ModelState.IsValid)
+            {
+                var currentUserName = User.Identity!.Name!;
+                var response = await _accountService.SaveBPMNToDB(currentUserName, chart);
+
+                if (response.StatusCode == Domain.Enums.StatusCode.OK)
+                {
                     return View("Modeler");
                 }
                 ModelState.AddModelError("", response.Description);
