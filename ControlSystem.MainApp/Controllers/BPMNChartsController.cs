@@ -49,6 +49,7 @@ namespace ControlSystem.MainApp.Controllers
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
+                    ViewBag.Chart = chart.XmlData;
                     return View("Modeler");
                 }
                 ModelState.AddModelError("", response.Description);

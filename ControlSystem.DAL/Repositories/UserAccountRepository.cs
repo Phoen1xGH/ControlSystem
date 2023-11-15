@@ -42,5 +42,16 @@ namespace ControlSystem.DAL.Repositories
             entity.Charts.Add(chart);
             await _context.SaveChangesAsync();
         }
+        public async Task AddWorkspaceToUser(UserAccount entity, Workspace workspace)
+        {
+            entity.Workspaces.Add(workspace);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteWorkspace(UserAccount entity, Workspace workspace)
+        {
+            entity.Workspaces.Remove(workspace);
+            await _context.SaveChangesAsync();
+        }
     }
 }

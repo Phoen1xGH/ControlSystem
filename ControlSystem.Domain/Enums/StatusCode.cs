@@ -12,6 +12,9 @@ namespace ControlSystem.Domain.Enums
         [Description("Пользователь с таким логином уже существует")]
         UserAlreadyExists = 1,
 
+        [Description("Рабочее пространство не найдено")]
+        WorkspaceNotFound = 2,
+
         #endregion
 
         #region Http statuses
