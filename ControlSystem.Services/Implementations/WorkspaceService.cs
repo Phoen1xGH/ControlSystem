@@ -140,18 +140,27 @@ namespace ControlSystem.Services.Implementations
             }
         }
 
-        public async Task<BaseResponse<bool>> DeleteWorkspace(string username, Workspace workspace)
+        public async Task<BaseResponse<bool>> DeleteWorkspace(string username, int workspaceId)
         {
             try
             {
                 var user = await _userRpository.GetAll().FirstOrDefaultAsync(x => x.Username == username);
-
+                var workspace = await _workspaceRepository.GetAll().FirstOrDefaultAsync(x => x.Id == workspaceId);
                 if (user is null)
                 {
                     return new BaseResponse<bool>
                     {
                         StatusCode = StatusCode.UserNotFound,
                         Description = StatusCode.UserNotFound.GetDescriptionValue(),
+                        Data = false
+                    };
+                }
+                if (workspace == null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.WorkspaceNotFound,
+                        Description = StatusCode.WorkspaceNotFound.GetDescriptionValue(),
                         Data = false
                     };
                 }
@@ -173,6 +182,31 @@ namespace ControlSystem.Services.Implementations
                     StatusCode = StatusCode.InternalServerError,
                     Description = ex.Message,
                     Data = false
+                };
+            }
+        }
+
+        public BaseResponse<List<Workspace>> GetWorkspaces(string username)
+        {
+            try
+            {
+                var workspaces = _userRpository.GetAll().FirstOrDefault(x => x.Username == username)!.Workspaces.ToList();
+
+                return new BaseResponse<List<Workspace>>()
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = workspaces
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[GetWorkspaces]: {ex.Message}");
+
+                return new BaseResponse<List<Workspace>>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
                 };
             }
         }

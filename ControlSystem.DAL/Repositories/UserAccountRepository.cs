@@ -51,6 +51,11 @@ namespace ControlSystem.DAL.Repositories
         public async Task DeleteWorkspace(UserAccount entity, Workspace workspace)
         {
             entity.Workspaces.Remove(workspace);
+            workspace.Participants.Remove(entity);
+
+            if (workspace.Participants.Count == 0)
+                _context.Workspaces.Remove(workspace);
+
             await _context.SaveChangesAsync();
         }
     }

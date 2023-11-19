@@ -1,0 +1,156 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+        }
+
+        #outer-container {
+            height: 100%;
+            display: flex;
+        }
+
+        #left-column {
+            width: 15%;
+            background-color: #f0f0f0; /* Цвет фона левого столбца */
+        }
+
+        #top-box {
+            height: 40%;
+            background-color: #c0c0c0; /* Цвет фона верхнего блока */
+        }
+
+        #bottom-box {
+            flex: 1;
+            background-color: #a0a0a0; /* Цвет фона нижнего блока */
+        }
+
+        #right-column {
+            flex: 1; /* Занимает все доступное пространство после левого столбца */
+            background-color: #808080; /* Цвет фона правого столбца */
+        }
+
+        #myModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 30px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 4;
+            border-radius: 20px;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 3;
+        }
+
+        #closeBtn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+
+        #modalButton {
+            display: block;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        #modalInput {
+            display: block;
+            margin-top: 10px;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+    <title>Вертикальные блоки</title>
+</head>
+<body>
+    <div id="outer-container">
+        <div id="left-column">
+            <div id="top-box">
+                <!-- Верхний блок в левом столбце -->
+            </div>
+            <div id="bottom-box">
+                <div>
+                    @foreach (var workspace in ViewBag.Workspaces)
+                    {
+                        <form method="post" action="/Workspace/DeleteWorkspace">
+                            <div style="display: flex;  flex-direction: row;">
+                                <input type="hidden" name="id" value="@workspace.Id"/>
+                                <label>@workspace.Name</label><br/>
+                                <button type="submit" style="margin-left: 10px;">-</button>
+                                <button type="button" style="margin-left: 10px;" onclick="editWorkspace(@workspace.Id)">edit</button>
+                            </div>
+                        </form>
+                         
+                    }
+                </div>
+                <button onclick="openModal()">+</button>
+                <!-- Нижний блок в левом столбце -->
+            </div>
+        </div>
+        <div id="right-column">
+            <!-- Блок справа от левого столбца -->
+        </div>
+    </div>
+
+    <div id="myModal">
+        <form method="post" action="/Workspace/CreateWorkspace">
+            <span id="closeBtn" onclick="closeModal()">&times;</span>
+            <input type="hidden" name="id" value="" />
+            <p>Введите название рабочего пространства</p>
+            <input type="text" id="modalInput" name="workspaceName" placeholder="Название">
+            <input id="modalButton" type="submit" value="Сохранить" />
+        </form>
+    </div>
+    <div id="overlay" onclick="closeModal()"></div>
+
+</body>
+</html>
+<script>
+    function openModal() {
+            document.getElementById('myModal').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('myModal').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+    }
+
+    function editWorkspace(id){
+        var modal = document.getElementById('myModal');
+
+        // Находим форму внутри модального окна
+        var form = modal.querySelector('form');
+        form.action = '/Workspace/RenameWorkspace';
+        form.querySelector('input[name="id"]').value = id;
+
+        openModal();
+    }
+
+</script>
