@@ -34,7 +34,7 @@
             background-color: #808080; /* Цвет фона правого столбца */
         }
 
-        #myModal {
+        .myModal {
             display: none;
             position: fixed;
             top: 50%;
@@ -47,7 +47,7 @@
             border-radius: 20px;
         }
 
-        #overlay {
+        .overlay {
             display: none;
             position: fixed;
             top: 0;
@@ -58,14 +58,14 @@
             z-index: 3;
         }
 
-        #closeBtn {
+        .closeBtn {
             position: absolute;
             top: 10px;
             right: 10px;
             cursor: pointer;
         }
 
-        #modalButton {
+        .modalButton {
             display: block;
             margin-top: 20px;
             padding: 10px;
@@ -76,7 +76,7 @@
             cursor: pointer;
         }
 
-        #modalInput {
+        .modalInput {
             display: block;
             margin-top: 10px;
             padding: 10px;
@@ -95,13 +95,14 @@
                 <!-- Верхний блок в левом столбце -->
             </div>
             <div id="bottom-box">
-                <div>
+                <div id="workspaces">
+                    <input type="hidden" name="currentWorkspace" value="@ViewBag.CurrentWorkspaceId" />
                     @foreach (var workspace in ViewBag.Workspaces)
                     {
                         <form method="post" action="/Workspace/DeleteWorkspace">
                             <div style="display: flex;  flex-direction: row;">
                                 <input type="hidden" name="id" value="@workspace.Id"/>
-                                <label>@workspace.Name</label><br/>
+                                <a asp-action="Workspaces" asp-controller="Workspace" asp-route-id="@workspace.Id" onclick="setCurrentWorkspace(@workspace.Id)">@workspace.Name</a><br />
                                 <button type="submit" style="margin-left: 10px;">-</button>
                                 <button type="button" style="margin-left: 10px;" onclick="editWorkspace(@workspace.Id)">edit</button>
                             </div>
@@ -115,26 +116,58 @@
         </div>
         <div id="right-column">
             <!-- Блок справа от левого столбца -->
+            @if (ViewBag.Boards != null) 
+            {
+                foreach (var board in ViewBag.Boards)
+                {
+                    <div style="display: flex;  flex-direction: row;">
+                        <label style="color: @board.ColorHex">@board.Name</label>
+                    </div>
+                }
+            }
+            <button onclick="openModalBoard()">+</button>
         </div>
     </div>
 
-    <div id="myModal">
+    <div id="myModal" class="myModal">
         <form method="post" action="/Workspace/CreateWorkspace">
-            <span id="closeBtn" onclick="closeModal()">&times;</span>
+            <span class="closeBtn" onclick="closeModal()">&times;</span>
             <input type="hidden" name="id" value="" />
             <p>Введите название рабочего пространства</p>
-            <input type="text" id="modalInput" name="workspaceName" placeholder="Название">
-            <input id="modalButton" type="submit" value="Сохранить" />
+            <input type="text" class="modalInput" name="workspaceName" placeholder="Название">
+            <input class="modalButton" type="submit" value="Сохранить" />
         </form>
     </div>
-    <div id="overlay" onclick="closeModal()"></div>
+    <div id="overlay" class="overlay" onclick="closeModal()"></div>
+
+
+    <div id="myModalBoard" class="myModal">
+        <form method="post" action="/Workspace/CreateBoard">
+            <span class="closeBtn" onclick="closeModalBoard()">&times;</span>
+            <input type="hidden" name="workspaceId" value="" />
+            <p>Введите название доски</p>
+            <input type="text" class="modalInput" name="Name" placeholder="Название">
+            <p>Выберете цвет</p>
+            <input type="color" name="ColorHex"/>
+            <input class="modalButton" type="submit" onclick="getWorkspaceId()" value="Сохранить" />
+        </form>
+    </div>
+    <div id="overlayBoard" class="overlay" onclick="closeModalBoard()"></div>
 
 </body>
 </html>
 <script>
+    //----------------------------------------------------------------------------------
     function openModal() {
-            document.getElementById('myModal').style.display = 'block';
-            document.getElementById('overlay').style.display = 'block';
+        //ПОСЛЕ ДОБАВЛЕНИЯ AJAX
+        //РАСКОММЕНТИТЬ ЭТО:
+
+        //var modal = document.getElementById('myModal');
+        //var form = modal.querySelector('form');
+        //form.action = '/Workspace/CreateWorkspace';
+
+        document.getElementById('myModal').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
     }
 
     function closeModal() {
@@ -153,4 +186,33 @@
         openModal();
     }
 
+    //----------------------------------------------------------------------------------
+    function openModalBoard() {
+        //ПОСЛЕ ДОБАВЛЕНИЯ AJAX
+        //РАСКОММЕНТИТЬ ЭТО:
+
+        //var modal = document.getElementById('myModal');
+        //var form = modal.querySelector('form');
+        //form.action = '/Workspace/CreateWorkspace';
+
+        document.getElementById('myModalBoard').style.display = 'block';
+        document.getElementById('overlayBoard').style.display = 'block';
+    }
+
+    function closeModalBoard() {
+        document.getElementById('myModalBoard').style.display = 'none';
+        document.getElementById('overlayBoard').style.display = 'none';
+    }
+
+    function setCurrentWorkspace(id){
+        document.querySelector('input[name="currentWorkspace"]').value = id;
+    }
+
+    function getWorkspaceId(){
+        var modal = document.getElementById('myModalBoard');
+
+        // Находим форму внутри модального окна
+        var form = modal.querySelector('form');
+        form.querySelector('input[name="workspaceId"]').value = document.querySelector('input[name="currentWorkspace"]').value;
+    }
 </script>

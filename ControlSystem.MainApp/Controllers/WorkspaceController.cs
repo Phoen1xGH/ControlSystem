@@ -1,4 +1,5 @@
-﻿using ControlSystem.Services.Interfaces;
+﻿using ControlSystem.Domain.ViewModels;
+using ControlSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,9 +16,11 @@ namespace ControlSystem.MainApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult Workspaces()
+        public IActionResult Workspaces(int id = 1)
         {
             ViewBag.Workspaces = _workspaceService.GetWorkspaces(User.Identity!.Name!).Data!;
+            ViewBag.CurrentWorkspaceId = id;
+            ViewBag.Boards = _workspaceService.GetBoards(id).Data;
 
             return View();
         }
@@ -73,6 +76,22 @@ namespace ControlSystem.MainApp.Controllers
                 ModelState.AddModelError("", response.Description);
             }
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateBoard(int workspaceId, BoardViewModel board)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _workspaceService.CreateBoard(workspaceId, board);
+
+                if (response.StatusCode == Domain.Enums.StatusCode.OK)
+                {
+                    return RedirectToAction("Workspaces", new { id = workspaceId });
+                }
+                ModelState.AddModelError("", response.Description);
+            }
+            return RedirectToAction("Workspaces", new { id = workspaceId });
         }
     }
 }

@@ -4,6 +4,7 @@ using ControlSystem.Domain.Entities;
 using ControlSystem.Domain.Enums;
 using ControlSystem.Domain.Extensions;
 using ControlSystem.Domain.Response;
+using ControlSystem.Domain.ViewModels;
 using ControlSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -103,7 +104,7 @@ namespace ControlSystem.Services.Implementations
             }
         }
 
-        public async Task<BaseResponse<bool>> CreateBoard(int id, Board board)
+        public async Task<BaseResponse<bool>> CreateBoard(int id, BoardViewModel boardVM)
         {
             try
             {
@@ -118,6 +119,8 @@ namespace ControlSystem.Services.Implementations
                         Data = false
                     };
                 }
+
+                Board board = new Board { Name = boardVM.Name, ColorHex = boardVM.ColorHex };
 
                 await (_workspaceRepository as WorkspaceRepository)!.AddBoard(workspace, board);
 
@@ -204,6 +207,31 @@ namespace ControlSystem.Services.Implementations
                 _logger.LogError(ex, $"[GetWorkspaces]: {ex.Message}");
 
                 return new BaseResponse<List<Workspace>>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                };
+            }
+        }
+
+        public BaseResponse<List<Board>> GetBoards(int workspaceId)
+        {
+            try
+            {
+                var boards = _workspaceRepository.GetAll().FirstOrDefault(x => x.Id == workspaceId)!.Boards.ToList();
+
+                return new BaseResponse<List<Board>>()
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = boards
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[GetBoards]: {ex.Message}");
+
+                return new BaseResponse<List<Board>>()
                 {
                     StatusCode = StatusCode.InternalServerError,
                     Description = ex.Message,
