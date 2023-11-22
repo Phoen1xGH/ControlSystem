@@ -15,24 +15,28 @@ namespace ControlSystem.Services.Implementations
     {
         private readonly ILogger<UserAccountService> _logger;
 
-        private readonly IRepository<UserAccount> _userRpository;
+        private readonly IRepository<UserAccount> _userRepository;
 
         private readonly IRepository<Workspace> _workspaceRepository;
 
+        private readonly IRepository<Board> _boardRepository;
+
         public WorkspaceService(ILogger<UserAccountService> logger,
             IRepository<UserAccount> repository,
-            IRepository<Workspace> workspaceRepository)
+            IRepository<Workspace> workspaceRepository,
+            IRepository<Board> boardRepository)
         {
             _logger = logger;
-            _userRpository = repository;
+            _userRepository = repository;
             _workspaceRepository = workspaceRepository;
+            _boardRepository = boardRepository;
         }
 
         public async Task<BaseResponse<bool>> CreateWorkspace(string username, string workspaceName)
         {
             try
             {
-                var user = await _userRpository.GetAll().FirstOrDefaultAsync(x => x.Username == username);
+                var user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Username == username);
 
                 if (user is null)
                 {
@@ -44,7 +48,7 @@ namespace ControlSystem.Services.Implementations
                     };
                 }
 
-                await (_userRpository as UserAccountRepository)!.AddWorkspaceToUser(user, new Workspace { Name = workspaceName });
+                await (_userRepository as UserAccountRepository)!.AddWorkspaceToUser(user, new Workspace { Name = workspaceName });
 
                 return new BaseResponse<bool>
                 {
@@ -143,11 +147,50 @@ namespace ControlSystem.Services.Implementations
             }
         }
 
+        public async Task<BaseResponse<int>> EditBoard(int id, BoardViewModel boardViewModel)
+        {
+            try
+            {
+                var board = await _boardRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
+
+                if (board == null)
+                {
+                    return new BaseResponse<int>
+                    {
+                        StatusCode = StatusCode.BoardNotFound,
+                        Description = StatusCode.BoardNotFound.GetDescriptionValue(),
+                        Data = -1
+                    };
+                }
+
+                board.Name = boardViewModel.Name;
+                board.ColorHex = boardViewModel.ColorHex;
+
+                await _boardRepository.Update(board);
+
+                return new BaseResponse<int>
+                {
+                    StatusCode = StatusCode.OK,
+                    Data = board.Workspace.Id,
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[EditBoard]: {ex.Message}");
+
+                return new BaseResponse<int>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = -1
+                };
+            }
+        }
         public async Task<BaseResponse<bool>> DeleteWorkspace(string username, int workspaceId)
         {
             try
             {
-                var user = await _userRpository.GetAll().FirstOrDefaultAsync(x => x.Username == username);
+                var user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Username == username);
                 var workspace = await _workspaceRepository.GetAll().FirstOrDefaultAsync(x => x.Id == workspaceId);
                 if (user is null)
                 {
@@ -168,7 +211,7 @@ namespace ControlSystem.Services.Implementations
                     };
                 }
 
-                await (_userRpository as UserAccountRepository)!.DeleteWorkspace(user, workspace);
+                await (_userRepository as UserAccountRepository)!.DeleteWorkspace(user, workspace);
 
                 return new BaseResponse<bool>
                 {
@@ -189,11 +232,48 @@ namespace ControlSystem.Services.Implementations
             }
         }
 
+        public async Task<BaseResponse<int>> DeleteBoard(int id)
+        {
+            try
+            {
+                var boardToDelete = await _boardRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
+
+                if (boardToDelete is null)
+                {
+                    return new BaseResponse<int>
+                    {
+                        StatusCode = StatusCode.BoardNotFound,
+                        Description = StatusCode.BoardNotFound.GetDescriptionValue(),
+                        Data = -1
+                    };
+                }
+
+                await _boardRepository.Delete(boardToDelete);
+
+                return new BaseResponse<int>
+                {
+                    StatusCode = StatusCode.OK,
+                    Data = boardToDelete.Workspace.Id
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[DeleteBoard]: {ex.Message}");
+
+                return new BaseResponse<int>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = -1
+                };
+            }
+        }
+
         public BaseResponse<List<Workspace>> GetWorkspaces(string username)
         {
             try
             {
-                var workspaces = _userRpository.GetAll().FirstOrDefault(x => x.Username == username)!.Workspaces.ToList();
+                var workspaces = _userRepository.GetAll().FirstOrDefault(x => x.Username == username)!.Workspaces.ToList();
 
                 return new BaseResponse<List<Workspace>>()
                 {

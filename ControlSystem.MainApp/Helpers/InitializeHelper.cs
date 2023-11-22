@@ -12,6 +12,7 @@ namespace ControlSystem.MainApp.Helpers
         {
             services.AddScoped<IRepository<UserAccount>, UserAccountRepository>();
             services.AddScoped<IRepository<Workspace>, WorkspaceRepository>();
+            services.AddScoped<IRepository<Board>, BoardRepository>();
         }
 
         public static void InitializeServices(this IServiceCollection services)

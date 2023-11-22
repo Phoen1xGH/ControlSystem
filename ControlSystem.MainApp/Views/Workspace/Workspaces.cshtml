@@ -121,7 +121,13 @@
                 foreach (var board in ViewBag.Boards)
                 {
                     <div style="display: flex;  flex-direction: row;">
-                        <label style="color: @board.ColorHex">@board.Name</label>
+                        <input type="hidden" name="id" value="@board.Id" />
+                        <label id="board" style="color: @board.ColorHex">@board.Name</label>
+                        <form method="post" action="/Workspace/DeleteBoard">
+                            <input type="hidden" name="id" value="@board.Id"/>
+                            <button type="submit">-</button>
+                        </form>
+                        <button onclick="editBoard(@(board.Id), `@(board.ColorHex)`)">edit</button>
                     </div>
                 }
             }
@@ -145,10 +151,11 @@
         <form method="post" action="/Workspace/CreateBoard">
             <span class="closeBtn" onclick="closeModalBoard()">&times;</span>
             <input type="hidden" name="workspaceId" value="" />
+            <input type="hidden" name="boardId" value=""/>
             <p>Введите название доски</p>
             <input type="text" class="modalInput" name="Name" placeholder="Название">
             <p>Выберете цвет</p>
-            <input type="color" name="ColorHex"/>
+            <input type="color" name="ColorHex" value=""/>
             <input class="modalButton" type="submit" onclick="getWorkspaceId()" value="Сохранить" />
         </form>
     </div>
@@ -214,5 +221,15 @@
         // Находим форму внутри модального окна
         var form = modal.querySelector('form');
         form.querySelector('input[name="workspaceId"]').value = document.querySelector('input[name="currentWorkspace"]').value;
+    }
+
+    function editBoard(id, color){
+        var modal = document.getElementById('myModalBoard');
+        var form = modal.querySelector('form');
+        form.action = '/Workspace/EditBoard';
+        form.querySelector('input[name="boardId"]').value = id;
+        form.querySelector('input[name="ColorHex"]').value = color;
+
+        openModalBoard();
     }
 </script>

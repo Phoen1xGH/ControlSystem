@@ -17,5 +17,9 @@ namespace ControlSystem.Services.Interfaces
         BaseResponse<List<Workspace>> GetWorkspaces(string username);
 
         BaseResponse<List<Board>> GetBoards(int workspaceId);
+
+        Task<BaseResponse<int>> EditBoard(int id, BoardViewModel boardViewModel);
+
+        Task<BaseResponse<int>> DeleteBoard(int id);
     }
 }

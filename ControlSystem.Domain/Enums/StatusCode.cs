@@ -15,6 +15,9 @@ namespace ControlSystem.Domain.Enums
         [Description("Рабочее пространство не найдено")]
         WorkspaceNotFound = 2,
 
+        [Description("Доска не найдена")]
+        BoardNotFound = 3,
+
         #endregion
 
         #region Http statuses

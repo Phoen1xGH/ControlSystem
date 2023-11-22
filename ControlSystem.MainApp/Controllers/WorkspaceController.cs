@@ -93,5 +93,37 @@ namespace ControlSystem.MainApp.Controllers
             }
             return RedirectToAction("Workspaces", new { id = workspaceId });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> EditBoard(int boardId, BoardViewModel boardViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _workspaceService.EditBoard(boardId, boardViewModel);
+
+                if (response.StatusCode == Domain.Enums.StatusCode.OK)
+                {
+                    return RedirectToAction("Workspaces", new { id = response.Data });
+                }
+                ModelState.AddModelError("", response.Description);
+            }
+            return RedirectToAction("Workspaces");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteBoard(int id)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _workspaceService.DeleteBoard(id);
+
+                if (response.StatusCode == Domain.Enums.StatusCode.OK)
+                {
+                    return RedirectToAction("Workspaces", new { id = response.Data });
+                }
+                ModelState.AddModelError("", response.Description);
+            }
+            return RedirectToAction("Workspaces");
+        }
     }
 }
