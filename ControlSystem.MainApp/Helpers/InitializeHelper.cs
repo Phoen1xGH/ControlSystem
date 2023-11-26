@@ -13,6 +13,7 @@ namespace ControlSystem.MainApp.Helpers
             services.AddScoped<IRepository<UserAccount>, UserAccountRepository>();
             services.AddScoped<IRepository<Workspace>, WorkspaceRepository>();
             services.AddScoped<IRepository<Board>, BoardRepository>();
+            services.AddScoped<IRepository<Ticket>, TicketRepository>();
         }
 
         public static void InitializeServices(this IServiceCollection services)
@@ -20,6 +21,7 @@ namespace ControlSystem.MainApp.Helpers
             services.AddScoped<IUserAccountService, UserAccountService>();
             services.AddScoped<IBPMNGenerateService, BPMNGenerateService>();
             services.AddScoped<IWorkspaceService, WorkspaceService>();
+            services.AddScoped<IBoardService, BoardService>();
         }
     }
 }

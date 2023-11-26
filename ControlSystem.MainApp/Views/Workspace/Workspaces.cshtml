@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using ControlSystem.Domain.Entities;
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -74,6 +75,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             z-index: 4;
             border-radius: 20px;
+            background-color: #30353c;
         }
 
         .overlay {
@@ -146,6 +148,9 @@
             background-color: #30353c; 
             border-right: 1px solid #3c414a;
             border-left: 1px solid #3c414a;
+            align-items: center !important;
+            display: flex;
+            flex-direction: column;
         }
 
         #board{
@@ -204,12 +209,15 @@
 
         .button-container {
             display: flex;
+            align-items: center !important;
         }
 
+        /*ВОЗМОЖНО УБРАТЬ ------------------------------------------------------------*/
         .button-container button {
             opacity: 0;
             transition: opacity 0.5s !important;
         }
+        /*ВОЗМОЖНО УБРАТЬ ------------------------------------------------------------*/
 
         #add-button-image{
             fill: #15c118;
@@ -248,10 +256,33 @@
             align-items: center;
             border-radius: 10px;
         }
+        #open-modal-ticket{
+            margin-right: 2px;
+            min-height: 25px !important;
+            min-width: 25px !important;
+            max-height: 25px !important;
+            max-width: 25px !important;
+            background-color: transparent;
+            border: none;
+            display: flex;
+            align-items: center;
+            border-radius: 10px;
+        }
 
         #open-modal:hover,
-        #open-modal-board:hover {
+        #open-modal-board:hover,
+        #open-modal-ticket:hover{
             background-color: #4f5762; /* Цвет подсветки при наведении */
+        }
+        
+        .ticket{
+            width: 210px;
+            border-radius: 20px;
+            min-height: 50px;
+            margin-top: 18px;
+            background-color:  #3c414a;
+            border: 1px solid #87909e;
+            text-align: center;
         }
         
     </style>
@@ -305,20 +336,16 @@
             {
                 foreach (var board in ViewBag.Boards)
                 {
-                    @*<div style="display: flex;  flex-direction: row;">
-                        <input type="hidden" name="id" value="@board.Id" />
-                        <label id="board" style="color: @board.ColorHex">@board.Name</label>
-                        <form method="post" action="/Workspace/DeleteBoard">
-                            <input type="hidden" name="id" value="@board.Id"/>
-                            <button type="submit">-</button>
-                        </form>
-                        <button onclick="editBoard(@(board.Id), `@(board.ColorHex)`)">edit</button>
-                    </div>*@
                     <div class="board-container">
                         <div class="header-container" style="border-bottom: 4px solid @board.ColorHex; ">
                             <input type="hidden" name="id" value="@board.Id" />
                             <label id="board">@board.Name</label>
                              <div class="button-container">
+                                 <button id="open-modal-ticket" onclick="openModalTicket(@board.Id)">
+                                    <svg id="add-button-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                        <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
+                                    </svg>
+                                 </button>
                                 <form id="delete-form" method="post" action="/Workspace/DeleteBoard">
                                     <input type="hidden" name="id" value="@board.Id" />
                                     <button id="delete-board" type="submit">
@@ -328,14 +355,26 @@
                                     </button>
                                 </form>
                                 <button id="edit-board" onclick="editBoard(@(board.Id), `@(board.ColorHex)`)">
-                                   @*<svg id="edit-board-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z"/></svg>*@
                                     <svg id="edit-board-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                                         <path d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z" />
                                     </svg>
                                 </button>
                             </div>
                         </div>
-                        <div class="content-container"></div>
+                        <div class="content-container">
+                            @if (ViewBag.Tickets != null)
+                            {
+                                foreach (List<Ticket> tickets in ((Dictionary<int, List<Ticket>>)ViewBag.Tickets).Where(x => x.Key == board.Id).Select(x => x.Value))
+                                {
+                                    foreach (var ticket in tickets)
+                                    {
+                                        <div class="ticket">
+                                            <label style="color: #d8d8d8">@ticket.Title</label>
+                                        </div>
+                                    }
+                                }
+                            }
+                        </div>
                     </div>
                 }
             }
@@ -346,6 +385,8 @@
             </button>
         </div>
     </div>
+
+<!---------------------------------------- модальные окна ------------------------------------------>
 
     <div id="myModal" class="myModal">
         <form method="post" action="/Workspace/CreateWorkspace">
@@ -372,6 +413,20 @@
         </form>
     </div>
     <div id="overlayBoard" class="overlay" onclick="closeModalBoard()"></div>
+
+
+    <div id="myModalTicket" class="myModal">
+        <form method="post" action="/Workspace/CreateTicket">
+            <span class="closeBtn" onclick="closeModalTicket()">&times;</span>
+            <input type="hidden" name="boardId" value="" />
+            <p>Введите название задачи</p>
+            <input type="text" class="modalInput" name="title" placeholder="Название">
+            <input class="modalButton" type="submit" value="Сохранить" />
+        </form>
+    </div>
+    <div id="overlayTicket" class="overlay" onclick="closeModalTicket()"></div>
+
+<!----------------------------------------------------------------------------------------------->
 
 </body>
 </html>
@@ -444,4 +499,18 @@
 
         openModalBoard();
     }
+
+    function openModalTicket(id){
+        var modal = document.getElementById('myModalTicket');
+        var form = modal.querySelector('form');
+        form.querySelector('input[name="boardId"]').value = id;
+        document.getElementById('myModalTicket').style.display = 'block';
+        document.getElementById('overlayTicket').style.display = 'block';
+    }
+
+    function closeModalTicket(){
+        document.getElementById('myModalTicket').style.display = 'none';
+        document.getElementById('overlayTicket').style.display = 'none';
+    }
+
 </script>

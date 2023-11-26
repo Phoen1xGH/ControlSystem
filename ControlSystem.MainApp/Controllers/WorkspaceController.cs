@@ -1,4 +1,5 @@
-﻿using ControlSystem.Domain.ViewModels;
+﻿using ControlSystem.Domain.Entities;
+using ControlSystem.Domain.ViewModels;
 using ControlSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,10 +10,12 @@ namespace ControlSystem.MainApp.Controllers
     public class WorkspaceController : Controller
     {
         private readonly IWorkspaceService _workspaceService;
+        private readonly IBoardService _boardService;
 
-        public WorkspaceController(IWorkspaceService workspaceService)
+        public WorkspaceController(IWorkspaceService workspaceService, IBoardService boardService)
         {
             _workspaceService = workspaceService;
+            _boardService = boardService;
         }
 
         [HttpGet]
@@ -21,6 +24,12 @@ namespace ControlSystem.MainApp.Controllers
             ViewBag.Workspaces = _workspaceService.GetWorkspaces(User.Identity!.Name!).Data!;
             ViewBag.CurrentWorkspaceId = id;
             ViewBag.Boards = _workspaceService.GetBoards(id).Data;
+            var tickets = new Dictionary<int, List<Ticket>>();
+            foreach (var board in _workspaceService.GetBoards(id).Data)
+            {
+                tickets[board.Id] = _boardService.GetTickets(board.Id).Data!;
+            }
+            ViewBag.Tickets = tickets;
 
             return View();
         }
@@ -125,5 +134,24 @@ namespace ControlSystem.MainApp.Controllers
             }
             return RedirectToAction("Workspaces");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateTicket(int boardId, string title)
+        {
+            var username = User.Identity!.Name!;
+
+            if (ModelState.IsValid)
+            {
+                var response = await _boardService.CreateTicket(username, boardId, title);
+
+                if (response.StatusCode == Domain.Enums.StatusCode.OK)
+                {
+                    return RedirectToAction("Workspaces", new { id = 1 });
+                }
+                ModelState.AddModelError("", response.Description);
+            }
+            return RedirectToAction("Workspaces");
+        }
+
     }
 }

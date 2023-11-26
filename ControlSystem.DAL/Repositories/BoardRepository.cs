@@ -35,5 +35,11 @@ namespace ControlSystem.DAL.Repositories
             _context.Boards.Update(entity);
             await _context.SaveChangesAsync();
         }
+
+        public async Task AddTicket(Board board, Ticket ticket)
+        {
+            board.Tickets.Add(ticket);
+            await _context.SaveChangesAsync();
+        }
     }
 }
