@@ -5,7 +5,7 @@ namespace ControlSystem.Services.Interfaces
 {
     public interface IBoardService
     {
-        Task<BaseResponse<bool>> CreateTicket(string username, int boardId, string title);
+        Task<BaseResponse<int>> CreateTicket(string username, Ticket ticket);
 
         Task<BaseResponse<bool>> RenameTicket(int ticketId, string newTitle);
 

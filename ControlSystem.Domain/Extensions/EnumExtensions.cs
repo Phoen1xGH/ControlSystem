@@ -5,7 +5,7 @@ namespace ControlSystem.Domain.Extensions
 {
     public static class EnumExtensions
     {
-        public static string GetDescriptionValue<T>(this T source)
+        public static string GetDescriptionValue<T>(this T source) where T : struct, Enum
         {
             FieldInfo fi = source!.GetType().GetField(source.ToString()!)!;
 

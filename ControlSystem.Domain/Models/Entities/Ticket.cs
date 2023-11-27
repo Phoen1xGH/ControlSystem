@@ -17,7 +17,6 @@
         public ICollection<FileAttachment> Attachments { get; set; } = new List<FileAttachment>();
         public ICollection<Link> Links { get; set; } = new List<Link>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
-        public Link ShareLink { get; set; }
 
         public Priority? Priority { get; set; }
         public Board Status { get; set; }

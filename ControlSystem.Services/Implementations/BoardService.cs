@@ -31,38 +31,34 @@ namespace ControlSystem.Services.Implementations
             _ticketRepository = ticketRepository;
         }
 
-        public async Task<BaseResponse<bool>> CreateTicket(string username, int boardId, string title)
+        public async Task<BaseResponse<int>> CreateTicket(string username, Ticket ticket)
         {
             try
             {
-                var board = await _boardRepository.GetAll().FirstOrDefaultAsync(x => x.Id == boardId);
+                var board = await _boardRepository.GetAll().FirstOrDefaultAsync(x => x.Id == ticket.Status.Id);
 
                 if (board is null)
                 {
-                    return new BaseResponse<bool>
+                    return new BaseResponse<int>
                     {
                         StatusCode = StatusCode.BoardNotFound,
                         Description = StatusCode.BoardNotFound.GetDescriptionValue(),
-                        Data = false
+                        Data = -1
                     };
                 }
 
                 var author = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Username == username);
 
-                var ticket = new Ticket
-                {
-                    Title = title,
-                    Author = author!,
-                    ShareLink = new() { Name = "", Source =$"/Workspaces/{board.Workspace.Id}/card{board.Tickets.Count + 1}" },
-                    Status = board
-                };
+                var participants = ticket.Participants is not null ? ticket.Participants : board.Workspace.Participants;
+
+                ticket.Participants = participants;
 
                 await (_boardRepository as BoardRepository)!.AddTicket(board, ticket);
 
-                return new BaseResponse<bool>
+                return new BaseResponse<int>
                 {
                     StatusCode = StatusCode.OK,
-                    Data = true,
+                    Data = board.Id,
                 };
 
             }
@@ -70,11 +66,11 @@ namespace ControlSystem.Services.Implementations
             {
                 _logger.LogError(ex, $"[CreateTicket]: {ex.Message}");
 
-                return new BaseResponse<bool>()
+                return new BaseResponse<int>()
                 {
                     StatusCode = StatusCode.InternalServerError,
                     Description = ex.Message,
-                    Data = false
+                    Data = -1
                 };
             }
         }

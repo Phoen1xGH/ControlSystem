@@ -136,17 +136,17 @@ namespace ControlSystem.MainApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTicket(int boardId, string title)
+        public async Task<IActionResult> CreateTicket(Ticket ticket)
         {
             var username = User.Identity!.Name!;
 
             if (ModelState.IsValid)
             {
-                var response = await _boardService.CreateTicket(username, boardId, title);
+                var response = await _boardService.CreateTicket(username, ticket);
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
-                    return RedirectToAction("Workspaces", new { id = 1 });
+                    return RedirectToAction("Workspaces", new { id = response.Data });
                 }
                 ModelState.AddModelError("", response.Description);
             }
