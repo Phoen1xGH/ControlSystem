@@ -21,8 +21,4 @@
     <ProjectReference Include="..\ControlSystem.Services\ControlSystem.Services.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\Icons\" />
-  </ItemGroup>
-
 </Project>

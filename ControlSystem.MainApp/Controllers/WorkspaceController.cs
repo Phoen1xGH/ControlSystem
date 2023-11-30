@@ -24,13 +24,26 @@ namespace ControlSystem.MainApp.Controllers
             ViewBag.Workspaces = _workspaceService.GetWorkspaces(User.Identity!.Name!).Data!;
             ViewBag.CurrentWorkspaceId = id;
             ViewBag.Boards = _workspaceService.GetBoards(id).Data;
+
             var tickets = new Dictionary<int, List<Ticket>>();
             foreach (var board in _workspaceService.GetBoards(id).Data)
             {
                 tickets[board.Id] = _boardService.GetTickets(board.Id).Data!;
             }
             ViewBag.Tickets = tickets;
-
+            List<Comment> comments = new();
+            comments.Add(new Comment
+            {
+                Author = new UserAccount { Username = "Daniel" },
+                Content = "features/addingServices.\r\nНачал добавление стилей для модального окна создания и редактирования тикетов."
+            });
+            var tags = new List<Tag>
+            {
+                new Tag { ColorHex = "#fc1c03", Name = "#BUG" },
+                new Tag { ColorHex = "#0ffc03", Name = "#front-end" }
+            };
+            ViewBag.Tags = tags;
+            ViewBag.Comments = comments;
             return View();
         }
 
@@ -152,6 +165,5 @@ namespace ControlSystem.MainApp.Controllers
             }
             return RedirectToAction("Workspaces");
         }
-
     }
 }
