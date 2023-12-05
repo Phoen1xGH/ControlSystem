@@ -44,6 +44,13 @@ namespace ControlSystem.MainApp.Controllers
             };
             ViewBag.Tags = tags;
             ViewBag.Comments = comments;
+            ViewBag.Author = User.Identity.Name;
+            ViewBag.UpdatedDate = DateTime.Now.ToString("dd.MM.yyyy  HH:mm");
+            ViewBag.CreateDate = new DateTime(1999, 3, 4, 1, 45, 33);
+            ViewBag.DeadlineDate = DateTime.Now.ToString("dd.MM.yyyy  HH:mm");
+            ViewBag.Executor = "FeDDoS";
+            ViewBag.Priority = new Priority { ColorHex = "#fc1c03", Name = "СРОЧНО" };
+
             return View();
         }
 

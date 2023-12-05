@@ -103,7 +103,7 @@
             padding: 10px;
             background-color: transparent;
             color: #15c118;
-            border: none;
+            border: 1px solid #15c118;
             border-radius: 20px;
             cursor: pointer;
         }
@@ -276,6 +276,22 @@
             border-radius: 10px;
         }
 
+        #send-comment-button {
+            min-height: 50px !important;
+            min-width: 50px !important;
+            max-height: 50px !important;
+            max-width: 50px !important;
+            background-color: transparent;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50px;
+            padding: 0 !important;
+            margin-top: auto;
+        }
+
+        #send-comment-button:hover,
         #add-button:hover,
         #open-modal:hover,
         #open-modal-board:hover,
@@ -314,7 +330,7 @@
         }
 
         .ticket-title{
-            margin: 20px 20px 20px 0;
+            margin:0 20px 20px 0;
             background-color: transparent;
             color: #d8d8d8;
             border: none;
@@ -348,11 +364,21 @@
             width: 100%;
         }
 
+        .priority-container,
         .tags,
         .info-card {
             display: flex;
             flex-direction: row;
+            /*justify-content: center;*/
+            align-items: center;
             /*padding: 10px;*/
+        }
+
+        .priority-container {
+            margin-top: 10px;
+        }
+        .info-card{
+           /* padding-bottom: 10px;*/
         }
        /* 
         .description-container{
@@ -362,6 +388,7 @@
         .description-container{
             margin-top: 20px;
         }
+
         .description-body{
             margin-top: 10px;
             margin-right: 20px !important;
@@ -398,35 +425,35 @@
             max-width: 3em !important;
         }
 
-        .left-ticket-modal::-webkit-scrollbar {
+        ::-webkit-scrollbar {
             width: 7px; /* Ширина скролла */
             background-color: transparent; /* Прозрачный фон */
         }
 
-        .left-ticket-modal::-webkit-scrollbar-thumb {
+        ::-webkit-scrollbar-thumb {
             background-color: #87909e; /* Цвет скролла */
             border-radius: 6px; /* Радиус скролла */
         }
 
-        .left-ticket-modal::-webkit-scrollbar-track {
+       ::-webkit-scrollbar-track {
             background-color: transparent; /* Прозрачный трек */
         }
 
-        .left-ticket-modal::-o-scrollbar-thumb {
+        ::-o-scrollbar-thumb {
             background-color: #87909e;
             border-radius: 6px;
         }
 
-        .left-ticket-modal::-o-scrollbar {
+        ::-o-scrollbar {
             width: 12px;
             background-color: transparent;
         }
 
-        .left-ticket-modal::-o-scrollbar-track {
+        ::-o-scrollbar-track {
             background-color: transparent;
         }
 
-        .left-ticket-modal {
+        #myModalTicket {
             scrollbar-width: thin;
             scrollbar-color: #87909e transparent;
         }
@@ -445,11 +472,13 @@
         }
 
         .comments-container{
+            display: flex;
+            flex-direction: column;
             background-color: #2a2e34;
             border: 1px solid #87909e !important;
             border-radius: 20px;
             padding: 10px;
-            height: 600px;
+            height: 550px;
             
         }
 
@@ -528,6 +557,72 @@
             align-items: center;
         }
         
+        .prio-image,
+        .tags-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2px;
+        }
+        
+        .prio-image {
+            margin-left: -2px;
+        }
+
+        .comment-header,
+        .info-card-date,
+        .info-card-author {
+            color: #d8d8d8;
+        }
+        
+        .info-card-date{
+            margin-left: auto;
+            margin-right: 20px;
+        }
+
+        .deadline-div{
+            margin-left: auto;
+            margin-bottom: 10px;
+        }
+        
+        .send-comment-container {
+            margin: 0 20px 20px 20px;
+            padding-top: 7px;
+            border-top: 1px solid #d8d8d8;
+            margin-top: auto;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .comment-enter {
+            width: 100%;
+            border: 1px solid #87909e !important;
+            border-radius: 20px;
+            padding: 10px !important;
+            min-height: 50px;
+            cursor: text;
+            background-color: #30353c;
+            color: #d8d8d8;
+            max-height: 150px !important;
+            overflow: auto;  
+            resize: none;
+            height: 50px; 
+            /*height: 50px;*/
+            
+        }
+
+        .comment-wrapper {
+            overflow: hidden;
+            border-radius: 20px;
+            display: flex;
+/*            box-sizing: border-box;*/
+            width: 100%;
+            margin-right: 10px;
+        }
+
+
     </style>
     <title>Вертикальные блоки</title>
 </head>
@@ -665,10 +760,37 @@
                     <input type="hidden" name="boardId" value="" />
                     <input type="text" class="ticket-title" name="Title" placeholder="Название">
                     
+                    <div class="info-card">
+                        <label class="info-card-author">Заказчик: <a href="#" style="color: #d8d8d8">@ViewBag.Author</a></label>
+                        <label class="info-card-author" style="margin-left: auto;">Отвественнный: <a href="#" style="color: #d8d8d8">@ViewBag.Executor</a></label>
+                        @if (!ViewBag.UpdatedDate.Equals(ViewBag.CreateDate))
+                        {
+                            <div style="margin-left: auto">
+                                <label class="info-card-date" style="font-style: italic; margin-right: 4px">Обновлено:</label>
+
+                                <label class="info-card-date"> @ViewBag.UpdatedDate</label>
+                            </div>
+                        }
+                        else
+                        {
+                            <label class="info-card-date">Создано: @ViewBag.CreateDate</label>
+                        }
+                    </div>
+                    <div class="deadline-div">
+                        @if (ViewBag.DeadlineDate != null)
+                        {
+
+                            <label class="info-card-date">
+                                <label style="font-style: italic; margin-right: 4px">
+                                    Срок сдачи:  
+                                </label>
+                            @ViewBag.DeadlineDate</label>
+                        }
+                    </div>
                     <div class="tags">
                         @if(ViewBag.Tags != null)
                         {
-                            <svg fill="#d8d8d8" width="24px" height="24px" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+                            <svg class="tags-image" fill="#d8d8d8" width="20px" height="20px" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M246.65625,132.43713l-45.625,68.43848.001-.001a15.96649,15.96649,0,0,1-13.31348,7.125H40a16.01833,16.01833,0,0,1-16-16v-128a16.01833,16.01833,0,0,1,16-16H187.71875a15.9687,15.9687,0,0,1,13.31348,7.126l45.624,68.43652A7.99771,7.99771,0,0,1,246.65625,132.43713Z" />
                             </svg>
                             <label style="color: #d8d8d8; padding-left: 7px; padding-right: 7px">Теги:</label>
@@ -689,12 +811,19 @@
 
                     </div>
 
-                    <div class="info-card">
-                        <label>@ViewBag.Author</label>
-                        <label>@ViewBag.UpdatedDate</label>
-                        @if (ViewBag.DeadlineDate != null)
+                    <div class="priority-container">
+                        @if(ViewBag.Priority != null)
                         {
-                            <label>@ViewBag.DeadlineDate</label>
+                           @* <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" fill="#d8d8d8">
+                                <path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z" />
+                            </svg>*@
+                            <svg class="prio-image" width="20px" height="20px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                                <path fill="#d8d8d8" d="M288 128h608L736 384l160 256H288v320h-96V64h96v64z" />
+                            </svg>
+                            <label style="color: #d8d8d8; margin-left: 7px;" >Приоритет: </label>
+                            <div style="margin-left: 7px; padding-left: 7px; padding-right: 7px; background-color: @ViewBag.Priority.ColorHex; border-radius: 20px;">
+                                <label style="font-weight: bold">@ViewBag.Priority.Name</label>
+                            </div>
                         }
                     </div>
                     <div class="description-container">
@@ -702,7 +831,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512" fill="#d8d8d8">
                                 <path d="M288 64c0 17.7-14.3 32-32 32H32C14.3 96 0 81.7 0 64S14.3 32 32 32H256c17.7 0 32 14.3 32 32zm0 256c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H256c17.7 0 32 14.3 32 32zM0 192c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 448c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z" />
                             </svg>
-                            <label style="color: #d8d8d8">Описание</label>
+                            <label style="color: #d8d8d8; margin-left: 7px">Описание</label>
                         </div>
                         <div class="description-body">
                             <div class="description-text-container" contenteditable="true">@ViewBag.Description</div>
@@ -789,9 +918,10 @@
                 <div class="right-ticket-modal">
 
                     <div style="margin-left: 7px;">
-                        @if(ViewBag.Comments != null)
-                        {
-                            <div class="comments-container">
+                        <h4 class="comment-header">Комментарии</h4>
+                        <div class="comments-container">
+                            @if (ViewBag.Comments != null)
+                            {
                                 @foreach (var commentary in ViewBag.Comments)
                                 {
                                     <div class="comment-content">
@@ -799,9 +929,24 @@
                                         <div class="comment-text">@commentary.Content</div>
                                     </div>
                                 }
+                            }
+                            else
+                            {
+                                <h4>Комментариев пока нет</h4>
+                            }
+
+                            <div class="send-comment-container">
+                                <div class="comment-wrapper">
+                                    <textarea class="comment-enter" id="inner-textarea" placeholder="Введите текст" oninput="auroResize()" ></textarea>
+                                </div>
+                                <button id="send-comment-button"> 
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="50px" viewBox="0 0 512 512" fill="#15c118">
+                                        <path d="M464 256A208 208 0 1 1 48 256a208 208 0 1 1 416 0zM0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256zM294.6 135.1c-4.2-4.5-10.1-7.1-16.3-7.1C266 128 256 138 256 150.3V208H160c-17.7 0-32 14.3-32 32v32c0 17.7 14.3 32 32 32h96v57.7c0 12.3 10 22.3 22.3 22.3c6.2 0 12.1-2.6 16.3-7.1l99.9-107.1c3.5-3.8 5.5-8.7 5.5-13.8s-2-10.1-5.5-13.8L294.6 135.1z" />
+                                    </svg>
+                                </button>
                             </div>
-                        }
-                        
+
+                        </div>
                     </div>
                     <input class="modalButton" type="submit" value="Сохранить" />
                 </div>
@@ -920,4 +1065,29 @@
         });
     });
 
+    
+    //function auroResize() {
+    //    const textarea = document.getElementById("inner-textarea");
+    //    textarea.style.height = 'auto';
+    //    textarea.style.height = (textarea.scrollHeight <= 150) ? textarea.scrollHeight + 'px' : '150px';
+    //}
+    
+     function auroResize() {
+        const textarea = document.getElementById("inner-textarea");
+
+        // Получаем количество строк в textarea
+        const numberOfLines = (textarea.value.match(/\n/g) || []).length + 1;
+
+        // Устанавливаем высоту только если количество строк больше 1
+        textarea.style.height = (numberOfLines > 1) ? 'auto' : '50px';
+
+        // Если количество строк больше 1, устанавливаем высоту в соответствии с содержимым
+        if (numberOfLines > 1) {
+            const scrollHeight = textarea.scrollHeight;
+            textarea.style.height = (scrollHeight <= 150) ? scrollHeight + 'px' : '150px';
+
+            // Принудительно обновляем значение textarea
+            textarea.value = textarea.value;
+        }
+    }
 </script>
