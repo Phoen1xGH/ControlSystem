@@ -75,9 +75,42 @@ namespace ControlSystem.Services.Implementations
             }
         }
 
-        public Task<BaseResponse<bool>> DeleteTicket(int ticketId)
+        public async Task<BaseResponse<bool>> DeleteTicket(int ticketId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var ticket = await _ticketRepository.GetAll().FirstOrDefaultAsync(x => x.Id == ticketId);
+
+                if (ticket is null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.TicketNotFound,
+                        Description = StatusCode.TicketNotFound.GetDescriptionValue(),
+                        Data = false
+                    };
+                }
+
+                await (_ticketRepository as TicketRepository)!.Delete(ticket);
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[DeleteTicket]: {ex.Message}");
+
+                return new BaseResponse<bool>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = false
+                };
+            }
         }
 
         public BaseResponse<List<Ticket>> GetTickets(int boardId)
@@ -105,9 +138,57 @@ namespace ControlSystem.Services.Implementations
             }
         }
 
-        public Task<BaseResponse<bool>> RenameTicket(int ticketId, string newTitle)
+        public async Task<BaseResponse<bool>> EditTicket(int ticketId, Ticket newTicketData)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var ticket = await _ticketRepository.GetAll().FirstOrDefaultAsync(x => x.Id == ticketId);
+
+                if (ticket is null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.TicketNotFound,
+                        Description = StatusCode.TicketNotFound.GetDescriptionValue(),
+                        Data = false
+                    };
+                }
+
+                ticket.Status = newTicketData.Status;
+                ticket.Author = newTicketData.Author;
+                ticket.Description = newTicketData.Description;
+                ticket.Priority = newTicketData.Priority;
+                ticket.Attachments = newTicketData.Attachments;
+                ticket.Participants = newTicketData.Participants;
+                ticket.Comments = newTicketData.Comments;
+                ticket.Tags = newTicketData.Tags;
+                ticket.Links = newTicketData.Links;
+                ticket.DeadlineDate = newTicketData.DeadlineDate;
+                ticket.Executor = newTicketData.Executor;
+                ticket.Title = newTicketData.Title;
+
+                await (_ticketRepository as TicketRepository)!.Update(ticket);
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = true
+                };
+
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[EditTicket]: {ex.Message}");
+
+                return new BaseResponse<bool>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = false
+                };
+            }
         }
     }
 }

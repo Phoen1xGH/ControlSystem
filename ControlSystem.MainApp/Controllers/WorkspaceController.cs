@@ -19,10 +19,15 @@ namespace ControlSystem.MainApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult Workspaces(int id = 1)
+        public IActionResult Workspaces(int id = 0)
         {
             ViewBag.Workspaces = _workspaceService.GetWorkspaces(User.Identity!.Name!).Data!;
-            ViewBag.CurrentWorkspaceId = id;
+
+            if (id == 0)
+                ViewBag.CurrentWorkspaceId = ViewBag.Workspaces[0].Id;
+            else
+                ViewBag.CurrentWorkspaceId = id;
+
             ViewBag.Boards = _workspaceService.GetBoards(id).Data;
 
             var tickets = new Dictionary<int, List<Ticket>>();

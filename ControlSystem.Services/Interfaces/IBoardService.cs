@@ -7,7 +7,7 @@ namespace ControlSystem.Services.Interfaces
     {
         Task<BaseResponse<int>> CreateTicket(string username, Ticket ticket);
 
-        Task<BaseResponse<bool>> RenameTicket(int ticketId, string newTitle);
+        Task<BaseResponse<bool>> EditTicket(int ticketId, Ticket newTicketData);
 
         Task<BaseResponse<bool>> DeleteTicket(int ticketId);
 

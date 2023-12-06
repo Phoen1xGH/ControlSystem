@@ -14,6 +14,8 @@ namespace ControlSystem.MainApp.Helpers
             services.AddScoped<IRepository<Workspace>, WorkspaceRepository>();
             services.AddScoped<IRepository<Board>, BoardRepository>();
             services.AddScoped<IRepository<Ticket>, TicketRepository>();
+            services.AddScoped<IRepository<Tag>, TagsRepository>();
+            services.AddScoped<IRepository<Priority>, PriorityRepository>();
         }
 
         public static void InitializeServices(this IServiceCollection services)
@@ -22,6 +24,7 @@ namespace ControlSystem.MainApp.Helpers
             services.AddScoped<IBPMNGenerateService, BPMNGenerateService>();
             services.AddScoped<IWorkspaceService, WorkspaceService>();
             services.AddScoped<IBoardService, BoardService>();
+            services.AddScoped<ITagService, TagService>();
         }
     }
 }

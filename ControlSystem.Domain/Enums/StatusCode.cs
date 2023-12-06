@@ -18,6 +18,12 @@ namespace ControlSystem.Domain.Enums
         [Description("Доска не найдена")]
         BoardNotFound = 3,
 
+        [Description("Задача не найдена")]
+        TicketNotFound = 4,
+
+        [Description("Тег не найден")]
+        TagNotFound = 5,
+
         #endregion
 
         #region Http statuses
