@@ -1,5 +1,4 @@
 ﻿using ControlSystem.DAL.Interfaces;
-using ControlSystem.DAL.Repositories;
 using ControlSystem.Domain.Entities;
 using ControlSystem.Domain.Enums;
 using ControlSystem.Domain.Extensions;
@@ -10,25 +9,23 @@ using Microsoft.Extensions.Logging;
 
 namespace ControlSystem.Services.Implementations
 {
-    public class TagService : ITagService
+    public class PriorityService : IPriorityService
     {
-        private readonly ILogger<TagService> _logger;
+        private readonly ILogger<PriorityService> _logger;
 
-        private IRepository<Tag> _tagRepository;
+        private readonly IRepository<Priority> _priorityRepository;
 
-        public TagService(
-            ILogger<TagService> logger,
-            IRepository<Tag> tagRepository)
+        public PriorityService(ILogger<PriorityService> logger, IRepository<Priority> priorityRepo)
         {
             _logger = logger;
-            _tagRepository = tagRepository;
+            _priorityRepository = priorityRepo;
         }
 
-        public async Task<BaseResponse<bool>> CreateTag(Tag tag)
+        public async Task<BaseResponse<bool>> CreatePriority(Priority priority)
         {
             try
             {
-                await (_tagRepository as TagsRepository)!.Create(tag);
+                await _priorityRepository.Create(priority);
 
                 return new BaseResponse<bool>
                 {
@@ -39,7 +36,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[CreateTag]: {ex.Message}");
+                _logger.LogError(ex, $"[CreatePriority]: {ex.Message}");
 
                 return new BaseResponse<bool>()
                 {
@@ -50,23 +47,23 @@ namespace ControlSystem.Services.Implementations
             }
         }
 
-        public async Task<BaseResponse<bool>> DeleteTag(int tagId)
+        public async Task<BaseResponse<bool>> DeletePriority(int priorityId)
         {
             try
             {
-                var tag = await _tagRepository.GetAll().FirstOrDefaultAsync(x => x.Id == tagId);
+                var priority = await _priorityRepository.GetAll().FirstOrDefaultAsync(x => x.Id == priorityId);
 
-                if (tag == null)
+                if (priority is null)
                 {
                     return new BaseResponse<bool>()
                     {
-                        StatusCode = StatusCode.TagNotFound,
-                        Description = StatusCode.TagNotFound.GetDescriptionValue(),
+                        StatusCode = StatusCode.PriorityNotFound,
+                        Description = StatusCode.PriorityNotFound.GetDescriptionValue(),
                         Data = false
                     };
                 }
 
-                await (_tagRepository as TagsRepository)!.Delete(tag);
+                await _priorityRepository.Delete(priority);
 
                 return new BaseResponse<bool>
                 {
@@ -77,7 +74,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[DeleteTag]: {ex.Message}");
+                _logger.LogError(ex, $"[DeletePriority]: {ex.Message}");
 
                 return new BaseResponse<bool>()
                 {
@@ -88,69 +85,66 @@ namespace ControlSystem.Services.Implementations
             }
         }
 
-        public async Task<BaseResponse<bool>> EditTag(int tagId, Tag newTagData)
+        public BaseResponse<List<Priority>> GetPriorities()
         {
             try
             {
-                var tag = await _tagRepository.GetAll().FirstOrDefaultAsync(x => x.Id == tagId);
+                var priorities = _priorityRepository.GetAll().ToList();
 
-                if (tag == null)
-                {
-                    return new BaseResponse<bool>()
-                    {
-                        StatusCode = StatusCode.TagNotFound,
-                        Description = StatusCode.TagNotFound.GetDescriptionValue(),
-                        Data = false
-                    };
-                }
-
-                tag.Name = newTagData.Name;
-                tag.ColorHex = newTagData.ColorHex;
-
-                await _tagRepository.Update(tag);
-
-                return new BaseResponse<bool>
+                return new BaseResponse<List<Priority>>
                 {
                     StatusCode = StatusCode.OK,
                     Description = StatusCode.OK.GetDescriptionValue(),
-                    Data = true
+                    Data = priorities
                 };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[EditTag]: {ex.Message}");
+                _logger.LogError(ex, $"[GetPriorities]: {ex.Message}");
 
-                return new BaseResponse<bool>()
-                {
-                    StatusCode = StatusCode.InternalServerError,
-                    Description = ex.Message,
-                    Data = false
-                };
-            }
-        }
-
-        public BaseResponse<List<Tag>> GetAllTags()
-        {
-            try
-            {
-                var tags = _tagRepository.GetAll().ToList();
-
-                return new BaseResponse<List<Tag>>
-                {
-                    StatusCode = StatusCode.OK,
-                    Description = StatusCode.OK.GetDescriptionValue(),
-                    Data = tags
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"[GetAllTags]: {ex.Message}");
-
-                return new BaseResponse<List<Tag>>()
+                return new BaseResponse<List<Priority>>()
                 {
                     StatusCode = StatusCode.InternalServerError,
                     Description = ex.Message,
                     Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<bool>> EditPriority(int priorityId, Priority newDataPriority)
+        {
+            try
+            {
+                var priority = await _priorityRepository.GetAll().FirstOrDefaultAsync();
+
+                if (priority is null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.PriorityNotFound,
+                        Description = StatusCode.PriorityNotFound.GetDescriptionValue(),
+                        Data = false
+                    };
+                }
+
+                await _priorityRepository.Update(priority);
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[EditPriority]: {ex.Message}");
+
+                return new BaseResponse<bool>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = false
                 };
             }
         }

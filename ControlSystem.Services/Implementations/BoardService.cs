@@ -12,7 +12,7 @@ namespace ControlSystem.Services.Implementations
 {
     public class BoardService : IBoardService
     {
-        private readonly ILogger<UserAccountService> _logger;
+        private readonly ILogger<BoardService> _logger;
 
         private readonly IRepository<UserAccount> _userRepository;
 
@@ -20,7 +20,7 @@ namespace ControlSystem.Services.Implementations
 
         private readonly IRepository<Ticket> _ticketRepository;
 
-        public BoardService(ILogger<UserAccountService> logger,
+        public BoardService(ILogger<BoardService> logger,
             IRepository<UserAccount> userRepository,
             IRepository<Board> boardRepository,
             IRepository<Ticket> ticketRepository)

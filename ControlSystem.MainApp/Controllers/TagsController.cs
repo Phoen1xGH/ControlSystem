@@ -14,6 +14,14 @@ namespace ControlSystem.MainApp.Controllers
             _tagsService = tagsService;
         }
 
+
+        public ActionResult Tags()
+        {
+            var tags = _tagsService.GetAllTags().Data;
+
+            return Json(tags);
+        }
+
         public async Task<ActionResult> CreateTag(Tag tag)
         {
             if (ModelState.IsValid)
@@ -26,7 +34,37 @@ namespace ControlSystem.MainApp.Controllers
                 }
                 ModelState.AddModelError("", response.Description);
             }
-            return View();
+            return View("Tags");
+        }
+
+        public async Task<ActionResult> EditTag(int id, Tag tag)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _tagsService.EditTag(id, tag);
+
+                if (response.StatusCode == Domain.Enums.StatusCode.OK)
+                {
+                    return View("Tags");
+                }
+                ModelState.AddModelError("", response.Description);
+            }
+            return View("Tags");
+        }
+
+        public async Task<ActionResult> DeleteTag(int id)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _tagsService.DeleteTag(id);
+
+                if (response.StatusCode == Domain.Enums.StatusCode.OK)
+                {
+                    return View("Tags");
+                }
+                ModelState.AddModelError("", response.Description);
+            }
+            return View("Tags");
         }
     }
 }

@@ -13,7 +13,7 @@ namespace ControlSystem.Services.Implementations
 {
     public class WorkspaceService : IWorkspaceService
     {
-        private readonly ILogger<UserAccountService> _logger;
+        private readonly ILogger<WorkspaceService> _logger;
 
         private readonly IRepository<UserAccount> _userRepository;
 
@@ -21,7 +21,7 @@ namespace ControlSystem.Services.Implementations
 
         private readonly IRepository<Board> _boardRepository;
 
-        public WorkspaceService(ILogger<UserAccountService> logger,
+        public WorkspaceService(ILogger<WorkspaceService> logger,
             IRepository<UserAccount> repository,
             IRepository<Workspace> workspaceRepository,
             IRepository<Board> boardRepository)

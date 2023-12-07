@@ -24,6 +24,9 @@ namespace ControlSystem.Domain.Enums
         [Description("Тег не найден")]
         TagNotFound = 5,
 
+        [Description("Приотритет не найден")]
+        PriorityNotFound = 6,
+
         #endregion
 
         #region Http statuses

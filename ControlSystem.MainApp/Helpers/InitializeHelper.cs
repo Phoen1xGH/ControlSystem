@@ -25,6 +25,7 @@ namespace ControlSystem.MainApp.Helpers
             services.AddScoped<IWorkspaceService, WorkspaceService>();
             services.AddScoped<IBoardService, BoardService>();
             services.AddScoped<ITagService, TagService>();
+            services.AddScoped<IPriorityService, PriorityService>();
         }
     }
 }
