@@ -14,11 +14,16 @@ namespace ControlSystem.Services.Implementations
         private readonly ILogger<PriorityService> _logger;
 
         private readonly IRepository<Priority> _priorityRepository;
+        private readonly IRepository<Ticket> _ticketRepository;
 
-        public PriorityService(ILogger<PriorityService> logger, IRepository<Priority> priorityRepo)
+        public PriorityService(
+            ILogger<PriorityService> logger,
+            IRepository<Priority> priorityRepo,
+            IRepository<Ticket> ticketRepo)
         {
             _logger = logger;
             _priorityRepository = priorityRepo;
+            _ticketRepository = ticketRepo;
         }
 
         public async Task<BaseResponse<bool>> CreatePriority(Priority priority)
@@ -111,6 +116,42 @@ namespace ControlSystem.Services.Implementations
             }
         }
 
+        public BaseResponse<Priority> GetPriorityByTicket(int ticketId)
+        {
+            try
+            {
+                var ticket = _ticketRepository.GetAll().FirstOrDefault(x => x.Id == ticketId);
+
+                if (ticket is null)
+                {
+                    return new BaseResponse<Priority>
+                    {
+                        StatusCode = StatusCode.TicketNotFound,
+                        Description = StatusCode.TicketNotFound.GetDescriptionValue(),
+                    };
+                }
+                var priority = ticket.Priority;
+
+                return new BaseResponse<Priority>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = priority
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[GetPriorityByTicket]: {ex.Message}");
+
+                return new BaseResponse<Priority>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = null
+                };
+            }
+        }
+
         public async Task<BaseResponse<bool>> EditPriority(int priorityId, Priority newDataPriority)
         {
             try
@@ -145,6 +186,54 @@ namespace ControlSystem.Services.Implementations
                     StatusCode = StatusCode.InternalServerError,
                     Description = ex.Message,
                     Data = false
+                };
+            }
+        }
+
+        public async Task<BaseResponse<Priority>> AddPriorityToTicket(int ticketId, int priorityId)
+        {
+            try
+            {
+                var ticket = await _ticketRepository.GetAll().FirstOrDefaultAsync(x => x.Id == ticketId);
+
+                if (ticket is null)
+                {
+                    return new BaseResponse<Priority>
+                    {
+                        StatusCode = StatusCode.TicketNotFound,
+                        Description = StatusCode.TicketNotFound.GetDescriptionValue(),
+                    };
+                }
+
+                var priority = await _priorityRepository.GetAll().FirstOrDefaultAsync(x => x.Id == priorityId);
+
+                if (ticket is null)
+                {
+                    return new BaseResponse<Priority>
+                    {
+                        StatusCode = StatusCode.PriorityNotFound,
+                        Description = StatusCode.PriorityNotFound.GetDescriptionValue(),
+                    };
+                }
+
+                ticket.Priority = priority;
+
+                return new BaseResponse<Priority>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = priority
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[AddPriorityToTicket]: {ex.Message}");
+
+                return new BaseResponse<Priority>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = null
                 };
             }
         }

@@ -21,6 +21,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.InitializeRepositories();
 builder.Services.InitializeServices();
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

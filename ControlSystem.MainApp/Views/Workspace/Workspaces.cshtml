@@ -4,6 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
+
    @* <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>*@
     <style>
         body, html {
@@ -156,6 +161,7 @@
             align-items: center !important;
             display: flex;
             flex-direction: column;
+            overflow: auto;
         }
 
         #board{
@@ -622,6 +628,9 @@
             margin-right: 10px;
         }
 
+        
+
+
 
     </style>
     <title>Вертикальные блоки</title>
@@ -699,7 +708,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="content-container">
+                        <div class="content-container" id="board-@board.Id">
                             @if (ViewBag.Tickets != null)
                             {
                                 foreach (List<Ticket> tickets in ((Dictionary<int, List<Ticket>>)ViewBag.Tickets).Where(x => x.Key == board.Id).Select(x => x.Value))
@@ -754,13 +763,15 @@
 
 
     <div id="myModalTicket" class="myModal-ticket">
-        <form method="post" action="/Workspace/CreateTicket">
+        <form id="formTicket">
+            @*method="post" action="/Workspace/CreateTicket"*@
             <div class="ticket-container">
                 <div class="left-ticket-modal">
-                    <input type="hidden" name="boardId" value="" />
-                    <input type="text" class="ticket-title" name="Title" placeholder="Название">
+                    <input type="hidden" name="StatusId" value="" />
+                    <textarea type="text" class="ticket-title" name="Title" placeholder="Название"></textarea>
                     
                     <div class="info-card">
+                        <input type="hidden" name="AuthorName" value="@ViewBag.Author" />
                         <label class="info-card-author">Заказчик: <a href="#" style="color: #d8d8d8">@ViewBag.Author</a></label>
                         <label class="info-card-author" style="margin-left: auto;">Отвественнный: <a href="#" style="color: #d8d8d8">@ViewBag.Executor</a></label>
                         @if (!ViewBag.UpdatedDate.Equals(ViewBag.CreateDate))
@@ -834,7 +845,8 @@
                             <label style="color: #d8d8d8; margin-left: 7px">Описание</label>
                         </div>
                         <div class="description-body">
-                            <div class="description-text-container" contenteditable="true">@ViewBag.Description</div>
+                            <input id="hiddenDescription" type="hidden" name="Description" value =""/>
+                            <div class="description-text-container" name="Description" contenteditable="true">@ViewBag.Description</div>
                         </div>
                     </div>
                     <div class="attachments-container">
@@ -948,7 +960,8 @@
 
                         </div>
                     </div>
-                    <input class="modalButton" type="submit" value="Сохранить" />
+                    @*<input class="modalButton" type="submit" value="Сохранить" />*@
+                    <input class="modalButton" type="button" onclick="createTicket()" value="Сохранить" />
                 </div>
             </div>
         </form>
@@ -1023,7 +1036,7 @@
         var modal = document.getElementById('myModalBoard');
         var form = modal.querySelector('form');
         form.action = '/Workspace/EditBoard';
-        form.querySelector('input[name="boardId"]').value = id;
+        form.querySelector('input[name="StatusId"]').value = id;
         form.querySelector('input[name="ColorHex"]').value = color;
 
         openModalBoard();
@@ -1032,7 +1045,7 @@
     function openModalTicket(id){
         var modal = document.getElementById('myModalTicket');
         var form = modal.querySelector('form');
-        form.querySelector('input[name="boardId"]').value = id;
+        form.querySelector('input[name="StatusId"]').value = id;
         document.getElementById('myModalTicket').style.display = 'block';
         document.getElementById('overlayTicket').style.display = 'block';
     }
@@ -1090,4 +1103,57 @@
             textarea.value = textarea.value;
         }
     }
+
+
+    function setupDescriptionInput() {
+        var descriptionDiv = document.querySelector('.description-text-container');
+        var descriptionHidden = document.getElementById('hiddenDescription');
+
+        descriptionDiv.addEventListener('input', function () {
+            descriptionHidden.value = descriptionDiv.innerHTML;
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        setupDescriptionInput();
+    });
+
+
+    // Ajax-------------------------------------------------------------------------------
+    
+    toastr.options = {
+        "positionClass": "toast-bottom-right", // Устанавливаем позицию в нижний правый угол
+    };
+
+    function createTicket() {
+        var formData = $("#formTicket").serialize();
+
+        $.ajax({
+            type: 'POST',
+            url: '/Ticket/CreateTicket', 
+           contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+           dataType: 'json',
+            data: formData,
+            success: function (result) {
+
+                var ticketsDiv = $('#board-' + result[0].statusId);
+                ticketsDiv.empty();
+                result.forEach(function (ticket) {
+                    ticketsDiv.append('<div class="ticket"><label style="color: #d8d8d8">' + ticket.title + '</label></div>');
+                });
+
+                toastr.success('Тикет успешно создан!');
+            },
+            error: function (xhr, status, error) {
+                //console.error('HTTP error occurred:', status, error);
+                //console.error('Response Text:', xhr.responseText);
+                //console.error('Status Text:', xhr.statusText);
+                //console.error('Full response:', xhr);
+                toastr.error(JSON.parse(xhr.responseText).trim() || 'Произошла ошибка!');
+                //toastr.error('Произошла ошибка при создании тикета.');
+            }
+        });
+    }
+
+    //-------------------------------------------------------------------------------
 </script>

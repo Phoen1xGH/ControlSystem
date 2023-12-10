@@ -9,6 +9,8 @@ namespace ControlSystem.Services.Interfaces
         Task<BaseResponse<bool>> EditPriority(int priorityId, Priority newDataPriority);
         Task<BaseResponse<bool>> DeletePriority(int priorityId);
         BaseResponse<List<Priority>> GetPriorities();
+        BaseResponse<Priority> GetPriorityByTicket(int ticketId);
+        Task<BaseResponse<Priority>> AddPriorityToTicket(int ticketId, int priorityId);
 
     }
 }

@@ -4,6 +4,7 @@ using ControlSystem.Domain.Entities;
 using ControlSystem.Domain.Enums;
 using ControlSystem.Domain.Extensions;
 using ControlSystem.Domain.Response;
+using ControlSystem.Domain.ViewModels;
 using ControlSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -31,11 +32,11 @@ namespace ControlSystem.Services.Implementations
             _ticketRepository = ticketRepository;
         }
 
-        public async Task<BaseResponse<int>> CreateTicket(string username, Ticket ticket)
+        public async Task<BaseResponse<int>> CreateTicket(string username, TicketViewModel ticketVM)
         {
             try
             {
-                var board = await _boardRepository.GetAll().FirstOrDefaultAsync(x => x.Id == ticket.Status.Id);
+                var board = await _boardRepository.GetAll().FirstOrDefaultAsync(x => x.Id == ticketVM.StatusId);
 
                 if (board is null)
                 {
@@ -49,9 +50,26 @@ namespace ControlSystem.Services.Implementations
 
                 var author = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Username == username);
 
-                var participants = ticket.Participants is not null ? ticket.Participants : board.Workspace.Participants;
+                var participants = ticketVM.Participants is not null ? ticketVM.Participants : board.Workspace.Participants;
 
-                ticket.Participants = participants;
+                var ticket = new Ticket
+                {
+                    Author = author!,
+                    Executor = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Username == ticketVM.ExecutorName),
+                    Participants = participants,
+                    Title = ticketVM.Title,
+                    Description = ticketVM.Description,
+                    CreationDate = ticketVM.CreationDate,
+                    UpdatedDate = ticketVM.UpdatedDate,
+                    DeadlineDate = ticketVM.DeadlineDate,
+                    Attachments = ticketVM.Attachments,
+                    Links = ticketVM.Links,
+                    Comments = ticketVM.Comments,
+                    Priority = ticketVM.Priority,
+                    Status = board,
+                    Tags = ticketVM.Tags,
+
+                };
 
                 await (_boardRepository as BoardRepository)!.AddTicket(board, ticket);
 
@@ -138,7 +156,7 @@ namespace ControlSystem.Services.Implementations
             }
         }
 
-        public async Task<BaseResponse<bool>> EditTicket(int ticketId, Ticket newTicketData)
+        public async Task<BaseResponse<bool>> EditTicket(int ticketId, TicketViewModel newTicketData)
         {
             try
             {
@@ -154,8 +172,12 @@ namespace ControlSystem.Services.Implementations
                     };
                 }
 
-                ticket.Status = newTicketData.Status;
-                ticket.Author = newTicketData.Author;
+                var status = await _boardRepository.GetAll().FirstOrDefaultAsync(x => x.Id == newTicketData.StatusId);
+                var author = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Username == newTicketData.AuthorName);
+                var executor = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Username == newTicketData.ExecutorName);
+
+                ticket.Status = status!;
+                ticket.Author = author!;
                 ticket.Description = newTicketData.Description;
                 ticket.Priority = newTicketData.Priority;
                 ticket.Attachments = newTicketData.Attachments;
@@ -164,7 +186,7 @@ namespace ControlSystem.Services.Implementations
                 ticket.Tags = newTicketData.Tags;
                 ticket.Links = newTicketData.Links;
                 ticket.DeadlineDate = newTicketData.DeadlineDate;
-                ticket.Executor = newTicketData.Executor;
+                ticket.Executor = executor;
                 ticket.Title = newTicketData.Title;
 
                 await (_ticketRepository as TicketRepository)!.Update(ticket);

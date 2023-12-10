@@ -14,14 +14,7 @@ namespace ControlSystem.MainApp.Controllers
             _tagsService = tagsService;
         }
 
-
-        public ActionResult Tags()
-        {
-            var tags = _tagsService.GetAllTags().Data;
-
-            return Json(tags);
-        }
-
+        [HttpPost]
         public async Task<ActionResult> CreateTag(Tag tag)
         {
             if (ModelState.IsValid)
@@ -30,13 +23,16 @@ namespace ControlSystem.MainApp.Controllers
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
-                    return View("Tags");
+                    var tags = _tagsService.GetAllTags().Data;
+
+                    return Json(tags);
                 }
                 ModelState.AddModelError("", response.Description);
             }
-            return View("Tags");
+            return BadRequest("Ошибка при создании тега");
         }
 
+        [HttpPost]
         public async Task<ActionResult> EditTag(int id, Tag tag)
         {
             if (ModelState.IsValid)
@@ -45,13 +41,16 @@ namespace ControlSystem.MainApp.Controllers
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
-                    return View("Tags");
+                    var tags = _tagsService.GetAllTags().Data;
+
+                    return Json(tags);
                 }
                 ModelState.AddModelError("", response.Description);
             }
-            return View("Tags");
+            return BadRequest("Ошибка при редактировании тега");
         }
 
+        [HttpPost]
         public async Task<ActionResult> DeleteTag(int id)
         {
             if (ModelState.IsValid)
@@ -60,11 +59,13 @@ namespace ControlSystem.MainApp.Controllers
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
-                    return View("Tags");
+                    var tags = _tagsService.GetAllTags().Data;
+
+                    return Json(tags);
                 }
                 ModelState.AddModelError("", response.Description);
             }
-            return View("Tags");
+            return BadRequest("Ошибка при удалении тега");
         }
     }
 }

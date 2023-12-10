@@ -16,12 +16,16 @@ namespace ControlSystem.Services.Implementations
 
         private IRepository<Tag> _tagRepository;
 
+        private readonly IRepository<Ticket> _ticketRepository;
+
         public TagService(
             ILogger<TagService> logger,
-            IRepository<Tag> tagRepository)
+            IRepository<Tag> tagRepository,
+            IRepository<Ticket> ticketRepository)
         {
             _logger = logger;
             _tagRepository = tagRepository;
+            _ticketRepository = ticketRepository;
         }
 
         public async Task<BaseResponse<bool>> CreateTag(Tag tag)
@@ -145,6 +149,89 @@ namespace ControlSystem.Services.Implementations
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"[GetAllTags]: {ex.Message}");
+
+                return new BaseResponse<List<Tag>>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+        public BaseResponse<List<Tag>> GetTagsByTicket(int ticketId)
+        {
+            try
+            {
+                var ticket = _ticketRepository.GetAll().FirstOrDefault(x => x.Id == ticketId);
+
+                if (ticket is null)
+                {
+                    return new BaseResponse<List<Tag>>
+                    {
+                        StatusCode = StatusCode.TicketNotFound,
+                        Description = StatusCode.TicketNotFound.GetDescriptionValue(),
+                    };
+                }
+
+                var tags = ticket.Tags.ToList();
+
+                return new BaseResponse<List<Tag>>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = tags
+                };
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[GetTagsByTicket]: {ex.Message}");
+
+                return new BaseResponse<List<Tag>>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<List<Tag>>> AddTagsToTicket(int ticketId, List<int> tagIds)
+        {
+            try
+            {
+                var ticket = await _ticketRepository.GetAll().FirstOrDefaultAsync(x => x.Id == ticketId);
+
+                if (ticket is null)
+                {
+                    return new BaseResponse<List<Tag>>
+                    {
+                        StatusCode = StatusCode.TicketNotFound,
+                        Description = StatusCode.TicketNotFound.GetDescriptionValue(),
+                    };
+                }
+
+                var tags = _tagRepository.GetAll();
+
+                foreach (var tagId in tagIds)
+                {
+                    var tag = tags.FirstOrDefault(t => t.Id == tagId);
+                    if (tag != null)
+                        ticket.Tags.Add(tag);
+                }
+
+                return new BaseResponse<List<Tag>>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = tags.ToList()
+                };
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[AddTagsToTicket]: {ex.Message}");
 
                 return new BaseResponse<List<Tag>>()
                 {

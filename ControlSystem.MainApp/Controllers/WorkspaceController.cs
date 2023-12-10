@@ -11,11 +11,16 @@ namespace ControlSystem.MainApp.Controllers
     {
         private readonly IWorkspaceService _workspaceService;
         private readonly IBoardService _boardService;
+        private readonly IUserAccountService _userService;
 
-        public WorkspaceController(IWorkspaceService workspaceService, IBoardService boardService)
+        public WorkspaceController(
+            IWorkspaceService workspaceService,
+            IBoardService boardService,
+            IUserAccountService userService)
         {
             _workspaceService = workspaceService;
             _boardService = boardService;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -28,7 +33,7 @@ namespace ControlSystem.MainApp.Controllers
             else
                 ViewBag.CurrentWorkspaceId = id;
 
-            ViewBag.Boards = _workspaceService.GetBoards(id).Data;
+            ViewBag.Boards = _workspaceService.GetBoards(ViewBag.CurrentWorkspaceId).Data;
 
             var tickets = new Dictionary<int, List<Ticket>>();
             foreach (var board in _workspaceService.GetBoards(id).Data)
@@ -49,7 +54,7 @@ namespace ControlSystem.MainApp.Controllers
             };
             ViewBag.Tags = tags;
             ViewBag.Comments = comments;
-            ViewBag.Author = User.Identity.Name;
+            ViewBag.Author = User.Identity.Name!;
             ViewBag.UpdatedDate = DateTime.Now.ToString("dd.MM.yyyy  HH:mm");
             ViewBag.CreateDate = new DateTime(1999, 3, 4, 1, 45, 33);
             ViewBag.DeadlineDate = DateTime.Now.ToString("dd.MM.yyyy  HH:mm");
@@ -161,13 +166,13 @@ namespace ControlSystem.MainApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTicket(Ticket ticket)
+        public async Task<IActionResult> CreateTicket(TicketViewModel ticketVM)
         {
             var username = User.Identity!.Name!;
 
             if (ModelState.IsValid)
             {
-                var response = await _boardService.CreateTicket(username, ticket);
+                var response = await _boardService.CreateTicket(username, ticketVM);
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {

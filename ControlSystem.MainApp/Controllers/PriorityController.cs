@@ -13,13 +13,6 @@ namespace ControlSystem.MainApp.Controllers
             _priorityService = priorityService;
         }
 
-        public ActionResult Priorities()
-        {
-            var priorities = _priorityService.GetPriorities();
-
-            return Json(priorities);
-        }
-
         public async Task<ActionResult> CreatePriority(Priority priority)
         {
             if (ModelState.IsValid)
@@ -28,11 +21,13 @@ namespace ControlSystem.MainApp.Controllers
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
-                    return View("Priorities");
+                    var priorities = _priorityService.GetPriorities().Data;
+
+                    return Json(priorities);
                 }
                 ModelState.AddModelError("", response.Description);
             }
-            return View("Priorities");
+            return BadRequest("Ошибка при создании приоритетности");
         }
 
         public async Task<ActionResult> EditPriority(int id, Priority priority)
@@ -43,11 +38,13 @@ namespace ControlSystem.MainApp.Controllers
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
-                    return View("Priorities");
+                    var priorities = _priorityService.GetPriorities().Data;
+
+                    return Json(priorities);
                 }
                 ModelState.AddModelError("", response.Description);
             }
-            return View("Priorities");
+            return BadRequest("Ошибка при редактировании приоритетности");
         }
 
         public async Task<ActionResult> DeletePriority(int id)
@@ -58,11 +55,29 @@ namespace ControlSystem.MainApp.Controllers
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
-                    return View("Priorities");
+                    var priorities = _priorityService.GetPriorities().Data;
+
+                    return Json(priorities);
                 }
                 ModelState.AddModelError("", response.Description);
             }
-            return View("Priorities");
+            return BadRequest("Ошибка при удалении приоритетности");
+        }
+
+        public async Task<ActionResult> AddPriorityToTicket(int ticketId, int priorityId)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _priorityService.AddPriorityToTicket(ticketId, priorityId);
+
+                if (response.StatusCode == Domain.Enums.StatusCode.OK)
+                {
+                    var priotity = _priorityService.GetPriorityByTicket(ticketId);
+
+                    return Json(priotity);
+                }
+            }
+            return BadRequest("Ошибка при добавлении приоритета для задачи");
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using ControlSystem.Domain.Response;
+﻿using ControlSystem.Domain.Entities;
+using ControlSystem.Domain.Response;
 using ControlSystem.Domain.ViewModels;
 using System.Security.Claims;
 
@@ -9,5 +10,7 @@ namespace ControlSystem.Services.Interfaces
         Task<BaseResponse<ClaimsIdentity>> Register(RegisterViewModel model);
 
         Task<BaseResponse<ClaimsIdentity>> Login(LoginViewModel model);
+
+        UserAccount GetUser(string username);
     }
 }

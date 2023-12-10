@@ -1,13 +1,14 @@
 ﻿using ControlSystem.Domain.Entities;
 using ControlSystem.Domain.Response;
+using ControlSystem.Domain.ViewModels;
 
 namespace ControlSystem.Services.Interfaces
 {
     public interface IBoardService
     {
-        Task<BaseResponse<int>> CreateTicket(string username, Ticket ticket);
+        Task<BaseResponse<int>> CreateTicket(string username, TicketViewModel ticketVM);
 
-        Task<BaseResponse<bool>> EditTicket(int ticketId, Ticket newTicketData);
+        Task<BaseResponse<bool>> EditTicket(int ticketId, TicketViewModel newTicketData);
 
         Task<BaseResponse<bool>> DeleteTicket(int ticketId);
 

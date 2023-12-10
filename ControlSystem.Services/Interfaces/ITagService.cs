@@ -12,5 +12,9 @@ namespace ControlSystem.Services.Interfaces
         Task<BaseResponse<bool>> EditTag(int tagId, Tag newTagData);
 
         BaseResponse<List<Tag>> GetAllTags();
+
+        BaseResponse<List<Tag>> GetTagsByTicket(int ticketId);
+
+        Task<BaseResponse<List<Tag>>> AddTagsToTicket(int ticketId, List<int> tagIds);
     }
 }

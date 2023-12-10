@@ -122,5 +122,10 @@ namespace ControlSystem.Services.Implementations
             return new ClaimsIdentity(claims, "ApplicationCookie",
                 ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
         }
+
+        public UserAccount GetUser(string username)
+            => _repository.GetAll()
+            .FirstOrDefault(x => x.Username == username);
+
     }
 }
