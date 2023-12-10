@@ -314,6 +314,7 @@
             background-color:  #3c414a;
             border: 1px solid #87909e;
             text-align: center;
+            color: #d8d8d8;
         }
 
         .myModal-ticket {
@@ -688,7 +689,7 @@
                             <input type="hidden" name="id" value="@board.Id" />
                             <label id="board">@board.Name</label>
                              <div class="button-container">
-                                 <button id="open-modal-ticket" onclick="openModalTicket(@board.Id)">
+                                <button id="open-modal-ticket" onclick="addNewTicket(@board.Id)" @*onclick="openModalTicket(@board.Id)"*@>
                                     <svg id="add-button-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
                                         <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
                                     </svg>
@@ -1156,4 +1157,69 @@
     }
 
     //-------------------------------------------------------------------------------
+
+    //function addNewTicket(id) {
+    //    var newTicketHtml = '<div class="ticket" contenteditable="true" onkeydown="handleKeyDown(event)"></div>';
+    //    $("#board-" + id).prepend(newTicketHtml);
+    //    //requestAnimationFrame(function () {
+    //    //    $("#board" + id +" div:first-child").focus();
+    //    //});
+    //    $("#board-" + id).on("DOMSubtreeModified", function () {
+    //        //$(".ticket").off("DOMSubtreeModified"); // Отключаем обработчик, чтобы избежать повторных вызовов
+    //        $(".ticket:first").focus();
+    //    });
+
+    //}
+    function addNewTicket(id) {
+        var newTicketHtml = '<div class="ticket" contenteditable="true" onkeydown="handleKeyDown(event, ' + id + ')"></div>';
+        var $board = $("#board-" + id);
+
+        $board.prepend(newTicketHtml).promise().done(function () {
+            $board.find(".ticket:first").focus();
+        });
+    }
+
+
+    function handleKeyDown(event, id) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            $(event.target).blur();
+            var text = event.target.innerText.trim();
+            
+
+            if (text !== "") {
+                createTicketV2(text, id);
+                //console.log("Выполнить AJAX-запрос с текстом:", text);
+            }
+        }
+    }
+
+    function createTicketV2(text, boardId) {
+       
+        $.ajax({
+            type: 'POST',
+            url: '/Ticket/CreateTicket',
+            contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+            dataType: 'json',
+            data: { title: text, boardId: boardId },
+            success: function (result) {
+
+                var ticketsDiv = $('#board-' + result[0].statusId);
+                ticketsDiv.empty();
+                result.forEach(function (ticket) {
+                    ticketsDiv.append('<div class="ticket"><label style="color: #d8d8d8">' + ticket.title + '</label></div>');
+                });
+
+                toastr.success('Тикет успешно создан!');
+            },
+            error: function (xhr, status, error) {
+                //console.error('HTTP error occurred:', status, error);
+                //console.error('Response Text:', xhr.responseText);
+                //console.error('Status Text:', xhr.statusText);
+                //console.error('Full response:', xhr);
+                toastr.error(JSON.parse(xhr.responseText).trim() || 'Произошла ошибка!');
+                //toastr.error('Произошла ошибка при создании тикета.');
+            }
+        });
+    }
 </script>

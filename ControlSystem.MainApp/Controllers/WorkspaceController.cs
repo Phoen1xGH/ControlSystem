@@ -39,8 +39,10 @@ namespace ControlSystem.MainApp.Controllers
             foreach (var board in _workspaceService.GetBoards(id).Data)
             {
                 tickets[board.Id] = _boardService.GetTickets(board.Id).Data!;
+                tickets[board.Id].Reverse();
             }
             ViewBag.Tickets = tickets;
+
             List<Comment> comments = new();
             comments.Add(new Comment
             {

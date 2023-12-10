@@ -15,18 +15,18 @@ namespace ControlSystem.MainApp.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreateTicket(TicketViewModel ticketVM)
+        public async Task<ActionResult> CreateTicket(string title, int boardId)
         {
             var username = User.Identity!.Name!;
 
             if (ModelState.IsValid)
             {
-                var response = await _boardService.CreateTicket(username, ticketVM);
+                var response = await _boardService.CreateTicket(username, title, boardId);
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
-                    var tickets = _boardService.GetTickets(ticketVM.StatusId);
-
+                    var tickets = _boardService.GetTickets(boardId);
+                    tickets.Data.Reverse();
                     var ticketsToJson = tickets.Data.Select(ticket => new TicketPreviewDTO { Title = ticket.Title, StatusId = ticket.Status.Id }).ToList();
 
                     return Json(ticketsToJson);
@@ -35,6 +35,28 @@ namespace ControlSystem.MainApp.Controllers
 
             return BadRequest("Ошибка при создании тикета");
         }
+
+        //[HttpPost]
+        //public async Task<ActionResult> CreateTicket(TicketViewModel ticketVM)
+        //{
+        //    var username = User.Identity!.Name!;
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        var response = await _boardService.CreateTicket(username, ticketVM);
+
+        //        if (response.StatusCode == Domain.Enums.StatusCode.OK)
+        //        {
+        //            var tickets = _boardService.GetTickets(ticketVM.StatusId);
+
+        //            var ticketsToJson = tickets.Data.Select(ticket => new TicketPreviewDTO { Title = ticket.Title, StatusId = ticket.Status.Id }).ToList();
+
+        //            return Json(ticketsToJson);
+        //        }
+        //    }
+
+        //    return BadRequest("Ошибка при создании тикета");
+        //}
 
 
         [HttpPost]

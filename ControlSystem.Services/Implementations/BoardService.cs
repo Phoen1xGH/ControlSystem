@@ -93,6 +93,47 @@ namespace ControlSystem.Services.Implementations
             }
         }
 
+        public async Task<BaseResponse<int>> CreateTicket(string username, string title, int boardId)
+        {
+            try
+            {
+                var board = await _boardRepository.GetAll().FirstOrDefaultAsync(x => x.Id == boardId);
+
+                if (board is null)
+                {
+                    return new BaseResponse<int>
+                    {
+                        StatusCode = StatusCode.BoardNotFound,
+                        Description = StatusCode.BoardNotFound.GetDescriptionValue(),
+                        Data = -1
+                    };
+                }
+
+                var author = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Username == username);
+
+                var ticket = new Ticket { Title = title, Author = author };
+
+                await (_boardRepository as BoardRepository)!.AddTicket(board, ticket);
+
+                return new BaseResponse<int>
+                {
+                    StatusCode = StatusCode.OK,
+                    Data = board.Id,
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[CreateTicket]: {ex.Message}");
+
+                return new BaseResponse<int>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = -1
+                };
+            }
+        }
+
         public async Task<BaseResponse<bool>> DeleteTicket(int ticketId)
         {
             try
