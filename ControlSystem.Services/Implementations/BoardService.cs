@@ -253,5 +253,42 @@ namespace ControlSystem.Services.Implementations
                 };
             }
         }
+
+        public async Task<BaseResponse<Ticket>> GetTicketById(int ticketId)
+        {
+            try
+            {
+                var ticket = await _ticketRepository.GetAll().FirstOrDefaultAsync(x => x.Id == ticketId);
+
+                if (ticket is null)
+                {
+                    return new BaseResponse<Ticket>
+                    {
+                        StatusCode = StatusCode.TicketNotFound,
+                        Description = StatusCode.TicketNotFound.GetDescriptionValue(),
+                        Data = null
+                    };
+                }
+
+                return new BaseResponse<Ticket>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = ticket
+                };
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[GetTicketById]: {ex.Message}");
+
+                return new BaseResponse<Ticket>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = null
+                };
+            }
+        }
     }
 }

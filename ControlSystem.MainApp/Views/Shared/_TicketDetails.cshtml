@@ -1,0 +1,205 @@
+﻿@using ControlSystem.Domain.ViewModels;
+
+@model TicketViewModel
+@if (Model != null)
+{
+    <form id="formTicket">
+        <div class="ticket-container">
+            <div class="left-ticket-modal">
+                <input type="hidden" name="StatusId" value="" />
+                <textarea type="text" class="ticket-title" name="Title" placeholder="Название">@Model.Title</textarea>
+
+                <div class="info-card">
+                    <input type="hidden" name="AuthorName" value="@Model.AuthorName" />
+                    <label class="info-card-author">Заказчик: <a href="#" style="color: #d8d8d8">@Model.AuthorName</a></label>
+                    <label class="info-card-author" style="margin-left: auto;">Отвественнный: <a href="#" style="color: #d8d8d8">@Model.ExecutorName</a></label>
+                    @if (!Model.UpdatedDate.Equals(Model.CreationDate))
+                    {
+                        <div style="margin-left: auto">
+                            <label class="info-card-date" style="font-style: italic; margin-right: 4px">Обновлено:</label>
+
+                            <label class="info-card-date"> @Model.UpdatedDate.ToString("dd.MM.yyyy  HH:mm")</label>
+                        </div>
+                    }
+                    else
+                    {
+                        <label class="info-card-date">Создано: @Model.CreationDate.ToString("dd.MM.yyyy  HH:mm")</label>
+                    }
+                </div>
+                <div class="deadline-div">
+                    @if (Model.DeadlineDate != null)
+                    {
+
+                        <label class="info-card-date">
+                            <label style="font-style: italic; margin-right: 4px">
+                                Срок сдачи:
+                            </label>
+                            @Model.DeadlineDate.Value.ToString("dd.MM.yyyy  HH:mm")
+                        </label>
+                    }
+                </div>
+                <div class="tags">
+                    @if (Model.Tags != null)
+                    {
+                        <svg class="tags-image" fill="#d8d8d8" width="20px" height="20px" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M246.65625,132.43713l-45.625,68.43848.001-.001a15.96649,15.96649,0,0,1-13.31348,7.125H40a16.01833,16.01833,0,0,1-16-16v-128a16.01833,16.01833,0,0,1,16-16H187.71875a15.9687,15.9687,0,0,1,13.31348,7.126l45.624,68.43652A7.99771,7.99771,0,0,1,246.65625,132.43713Z" />
+                        </svg>
+                        <label style="color: #d8d8d8; padding-left: 7px; padding-right: 7px">Теги:</label>
+
+                        foreach (var tag in Model.Tags)
+                        {
+                            <div class="tag" style="background-color: @tag.ColorHex; border-radius: 20px 20px 20px 20px; padding-right: 15px; padding-left:15px; margin-left: 7px;">
+
+                                <label style="font-weight: bold">@tag.Name</label>
+                            </div>
+                        }
+                        <button id="add-button" style="margin-left: 7px">
+                            <svg id="add-button-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
+                            </svg>
+                        </button>
+                    }
+
+                </div>
+
+                <div class="priority-container">
+                    @if (Model.Priority != null)
+                    {
+                        <svg class="prio-image" width="20px" height="20px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#d8d8d8" d="M288 128h608L736 384l160 256H288v320h-96V64h96v64z" />
+                        </svg>
+                        <label style="color: #d8d8d8; margin-left: 7px;">Приоритет: </label>
+                        <div style="margin-left: 7px; padding-left: 7px; padding-right: 7px; background-color: @Model.Priority.ColorHex; border-radius: 20px;">
+                            <label style="font-weight: bold">@Model.Priority.Name</label>
+                        </div>
+                    }
+                </div>
+                <div class="description-container">
+                    <div class="description-header">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512" fill="#d8d8d8">
+                            <path d="M288 64c0 17.7-14.3 32-32 32H32C14.3 96 0 81.7 0 64S14.3 32 32 32H256c17.7 0 32 14.3 32 32zm0 256c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H256c17.7 0 32 14.3 32 32zM0 192c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 448c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z" />
+                        </svg>
+                        <label style="color: #d8d8d8; margin-left: 7px">Описание</label>
+                    </div>
+                    <div class="description-body">
+                        <input id="hiddenDescription" type="hidden" name="Description" value="" />
+                        <div class="description-text-container" name="Description" contenteditable="true">@Model.Description</div>
+                    </div>
+                </div>
+                <div class="attachments-container">
+                    <div class="tab-container">
+                        <ul class="tabs">
+                            <li class="tab active" data-tab="files">Файлы</li>
+                            <li class="tab" data-tab="links">Ссылки</li>
+                            <li class="tab" data-tab="participants">Участники</li>
+                        </ul>
+
+                        <div class="tab-content active" id="files">
+                            <div class="inner-tab-content">
+                                @if (Model.Attachments.Count > 0)
+                                {
+                                    @foreach (var file in Model.Attachments)
+                                    {
+                                        <p>@file.FileName</p>
+                                    }
+                                }
+                                else
+                                {
+                                    <h4 style="color: #d8d8d8">Нет файлов в карточке</h4>
+                                }
+                            </div>
+                            <div class="add-button-tab-container">
+                                <button id="add-button" style="margin-left: 7px">
+                                    <svg id="add-button-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                        <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="tab-content" id="links">
+                            <div class="inner-tab-content">
+                                @if (Model.Links.Count > 0)
+                                {
+                                    foreach (var link in Model.Links)
+                                    {
+                                        <a href="@link.Source">@link.Name</a>
+                                    }
+                                }
+                                else
+                                {
+                                    <h4 style="color: #d8d8d8">Нет ссылок в карточке</h4>
+                                }
+                            </div>
+                            <div class="add-button-tab-container">
+                                <button id="add-button" style="margin-left: 7px">
+                                    <svg id="add-button-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                        <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="tab-content" id="participants">
+                            <div class="inner-tab-content">
+                                @if (Model.Participants.Count > 0)
+                                {
+                                    foreach (var part in Model.Participants)
+                                    {
+                                        <a>@part.Username</a>
+                                    }
+                                }
+                                else
+                                {
+                                    <h4 style="color: #d8d8d8">Нет участников в карточке</h4>
+                                }
+                            </div>
+                            <div class="add-button-tab-container">
+                                <button id="add-button" style="margin-left: 7px">
+                                    <svg id="add-button-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                        <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="right-ticket-modal">
+
+                <div style="margin-left: 7px;">
+                    <h4 class="comment-header">Комментарии</h4>
+                    <div class="comments-container">
+                        @if (Model.Comments != null)
+                        {
+                            @foreach (var commentary in Model.Comments)
+                            {
+                                <div class="comment-content">
+                                    <label>@commentary.Author.Username</label>
+                                    <div class="comment-text">@commentary.Content</div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <h4>Комментариев пока нет</h4>
+                        }
+
+                        <div class="send-comment-container">
+                            <div class="comment-wrapper">
+                                <textarea class="comment-enter" id="inner-textarea" placeholder="Введите текст" oninput="auroResize()"></textarea>
+                            </div>
+                            <button id="send-comment-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="50px" viewBox="0 0 512 512" fill="#15c118">
+                                    <path d="M464 256A208 208 0 1 1 48 256a208 208 0 1 1 416 0zM0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256zM294.6 135.1c-4.2-4.5-10.1-7.1-16.3-7.1C266 128 256 138 256 150.3V208H160c-17.7 0-32 14.3-32 32v32c0 17.7 14.3 32 32 32h96v57.7c0 12.3 10 22.3 22.3 22.3c6.2 0 12.1-2.6 16.3-7.1l99.9-107.1c3.5-3.8 5.5-8.7 5.5-13.8s-2-10.1-5.5-13.8L294.6 135.1z" />
+                                </svg>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+}
+
+

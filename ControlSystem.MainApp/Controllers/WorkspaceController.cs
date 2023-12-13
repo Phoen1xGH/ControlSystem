@@ -23,8 +23,8 @@ namespace ControlSystem.MainApp.Controllers
             _userService = userService;
         }
 
-        [HttpGet]
-        public IActionResult Workspaces(int id = 0)
+        [HttpGet("Workspace/Workspaces/{id?}/{ticketId?}")]
+        public IActionResult Workspaces(int id = 0, int ticketId = 0)
         {
             ViewBag.Workspaces = _workspaceService.GetWorkspaces(User.Identity!.Name!).Data!;
 
@@ -62,6 +62,11 @@ namespace ControlSystem.MainApp.Controllers
             ViewBag.DeadlineDate = DateTime.Now.ToString("dd.MM.yyyy  HH:mm");
             ViewBag.Executor = "FeDDoS";
             ViewBag.Priority = new Priority { ColorHex = "#fc1c03", Name = "СРОЧНО" };
+
+            ViewBag.TicketId = ticketId;
+            ViewBag.Id = id;
+
+
 
             return View();
         }

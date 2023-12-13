@@ -28,6 +28,7 @@ namespace ControlSystem.DAL.Repositories
         public IQueryable<Ticket> GetAll()
         {
             return _context.Tickets
+                .Include(x => x.Author)
                 .Include(x => x.Participants)
                 .Include(x => x.Tags)
                 .Include(x => x.Links)
