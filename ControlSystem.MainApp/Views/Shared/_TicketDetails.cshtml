@@ -1,6 +1,6 @@
-﻿@using ControlSystem.Domain.ViewModels;
+﻿@using ControlSystem.MainApp.ViewModels;
 
-@model TicketViewModel
+@model FullTicketViewModel
 @if (Model != null)
 {
     <form id="formTicket">
@@ -10,9 +10,12 @@
                 <textarea type="text" class="ticket-title" name="Title" placeholder="Название">@Model.Title</textarea>
 
                 <div class="info-card">
-                    <input type="hidden" name="AuthorName" value="@Model.AuthorName" />
-                    <label class="info-card-author">Заказчик: <a href="#" style="color: #d8d8d8">@Model.AuthorName</a></label>
-                    <label class="info-card-author" style="margin-left: auto;">Отвественнный: <a href="#" style="color: #d8d8d8">@Model.ExecutorName</a></label>
+                    <input type="hidden" name="AuthorName" value="@Model.Author.Name" />
+                    <label class="info-card-author">Заказчик: <a href="#" style="color: #d8d8d8">@Model.Author.Name</a></label>
+                    @if(Model.Executor != null)
+                    {
+                        <label class="info-card-author" style="margin-left: auto;">Отвественнный: <a href="#" style="color: #d8d8d8">@Model.Executor.Name</a></label>
+                    }
                     @if (!Model.UpdatedDate.Equals(Model.CreationDate))
                     {
                         <div style="margin-left: auto">
@@ -96,11 +99,11 @@
 
                         <div class="tab-content active" id="files">
                             <div class="inner-tab-content">
-                                @if (Model.Attachments.Count > 0)
+                                @if (Model.Files!.Count > 0)
                                 {
-                                    @foreach (var file in Model.Attachments)
+                                    @foreach (var file in Model.Files)
                                     {
-                                        <p>@file.FileName</p>
+                                        <p>@file.Name</p>
                                     }
                                 }
                                 else
@@ -118,7 +121,7 @@
                         </div>
                         <div class="tab-content" id="links">
                             <div class="inner-tab-content">
-                                @if (Model.Links.Count > 0)
+                                @if (Model.Links!.Count > 0)
                                 {
                                     foreach (var link in Model.Links)
                                     {
@@ -144,7 +147,7 @@
                                 {
                                     foreach (var part in Model.Participants)
                                     {
-                                        <a>@part.Username</a>
+                                        <a>@part.Name</a>
                                     }
                                 }
                                 else
@@ -174,7 +177,7 @@
                             @foreach (var commentary in Model.Comments)
                             {
                                 <div class="comment-content">
-                                    <label>@commentary.Author.Username</label>
+                                    <label>@commentary.AuthorName</label>
                                     <div class="comment-text">@commentary.Content</div>
                                 </div>
                             }

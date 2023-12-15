@@ -1,6 +1,6 @@
 ﻿namespace ControlSystem.MainApp.DTO
 {
-    public class TicketPreviewDTO
+    public class TicketPreviewViewModel
     {
         public int Id { get; set; }
         public string Title { get; set; }

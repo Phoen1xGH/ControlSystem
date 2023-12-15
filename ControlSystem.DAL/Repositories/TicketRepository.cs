@@ -34,7 +34,8 @@ namespace ControlSystem.DAL.Repositories
                 .Include(x => x.Links)
                 .Include(x => x.Attachments)
                     .ThenInclude(x => x.FileContent)
-                .Include(x => x.Comments);
+                .Include(x => x.Comments)
+                .Include(x => x.Status);
         }
 
         public IQueryable<Ticket> GetAllWithoutFiles()

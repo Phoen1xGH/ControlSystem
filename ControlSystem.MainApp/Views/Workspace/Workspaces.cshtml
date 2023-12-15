@@ -15,6 +15,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
+            overflow: hidden;
         }
 
         #outer-container {
@@ -162,6 +163,7 @@
             display: flex;
             flex-direction: column;
             overflow: auto;
+            padding-bottom: 18px;
         }
 
         #board{
@@ -1066,7 +1068,7 @@
                 openModal(data);
             },
             error: function () {
-                console.error('Ошибка при загрузке данных о тикете.');
+                toastr.error(JSON.parse(xhr.responseText).trim() || 'Произошла ошибка!');
             }
         });
     }

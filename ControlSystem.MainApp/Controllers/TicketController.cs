@@ -1,5 +1,6 @@
 ﻿using ControlSystem.Domain.ViewModels;
 using ControlSystem.MainApp.DTO;
+using ControlSystem.MainApp.ViewModels;
 using ControlSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,7 +28,7 @@ namespace ControlSystem.MainApp.Controllers
                 {
                     var tickets = _boardService.GetTickets(boardId);
                     tickets.Data.Reverse();
-                    var ticketsToJson = tickets.Data.Select(ticket => new TicketPreviewDTO
+                    var ticketsToJson = tickets.Data.Select(ticket => new TicketPreviewViewModel
                     {
                         Id = ticket.Id,
                         Title = ticket.Title,
@@ -54,7 +55,7 @@ namespace ControlSystem.MainApp.Controllers
                 {
                     var tickets = _boardService.GetTickets(boardId);
 
-                    var ticketsToJson = tickets.Data.Select(ticket => new TicketPreviewDTO
+                    var ticketsToJson = tickets.Data.Select(ticket => new TicketPreviewViewModel
                     {
                         Id = ticket.Id,
                         Title = ticket.Title,
@@ -81,7 +82,7 @@ namespace ControlSystem.MainApp.Controllers
                 {
                     var tickets = _boardService.GetTickets(newTicketData.StatusId);
 
-                    var ticketsToJson = tickets.Data.Select(ticket => new TicketPreviewDTO
+                    var ticketsToJson = tickets.Data.Select(ticket => new TicketPreviewViewModel
                     {
                         Id = ticket.Id,
                         Title = ticket.Title,
@@ -106,14 +107,7 @@ namespace ControlSystem.MainApp.Controllers
                 {
                     var ticket = response.Data;
 
-                    var model = new TicketViewModel
-                    {
-                        AuthorName = ticket.Author.Username,
-                        Description = ticket.Description,
-                        Title = ticket.Title,
-                        UpdatedDate = ticket.UpdatedDate,
-                        CreationDate = ticket.CreationDate,
-                    };
+                    var model = new FullTicketViewModel(ticket!);
 
                     return PartialView("_TicketDetails", model);
                 }
