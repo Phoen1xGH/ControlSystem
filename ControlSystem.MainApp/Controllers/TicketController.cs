@@ -1,6 +1,5 @@
-﻿using ControlSystem.Domain.ViewModels;
-using ControlSystem.MainApp.DTO;
-using ControlSystem.MainApp.ViewModels;
+﻿using ControlSystem.MainApp.DTO;
+using ControlSystem.Services.DTO;
 using ControlSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -63,6 +62,8 @@ namespace ControlSystem.MainApp.Controllers
                         WorkspaceId = ticket.Status.Workspace.Id
                     }).ToList();
 
+                    ticketsToJson.Reverse();
+
                     return Json(ticketsToJson);
                 }
             }
@@ -70,13 +71,13 @@ namespace ControlSystem.MainApp.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> EditTicket(int id, TicketViewModel newTicketData)
+        public async Task<ActionResult> EditTicket(TicketDTO newTicketData)
         {
             var username = User.Identity!.Name!;
 
             if (ModelState.IsValid)
             {
-                var response = await _boardService.EditTicket(id, newTicketData);
+                var response = await _boardService.EditTicket(newTicketData.Id, newTicketData);
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
@@ -89,6 +90,8 @@ namespace ControlSystem.MainApp.Controllers
                         StatusId = ticket.Status.Id,
                         WorkspaceId = ticket.Status.Workspace.Id
                     }).ToList();
+
+                    ticketsToJson.Reverse();
 
                     return Json(ticketsToJson);
                 }
@@ -107,7 +110,40 @@ namespace ControlSystem.MainApp.Controllers
                 {
                     var ticket = response.Data;
 
-                    var model = new FullTicketViewModel(ticket!);
+                    var author = new UserDTO { Id = ticket.Author.Id, Name = ticket.Author.Username };
+
+                    var executor = ticket.Executor is not null ?
+                        new UserDTO { Id = ticket.Executor.Id, Name = ticket.Executor.Username } :
+                        null;
+
+                    var participants = ticket.Participants.Select(x => new UserDTO { Id = x.Id, Name = x.Username }).ToList();
+
+                    var files = ticket.Attachments.Select(x => new FileDTO { Id = x.Id, Name = x.FileName }).ToList();
+
+                    var comments = ticket.Comments.Select(x => new CommentDTO
+                    {
+                        Id = x.Id,
+                        AuthorName = x.Author.Username,
+                        Content = x.Content
+                    }).ToList();
+
+                    var model = new TicketDTO
+                    {
+                        Id = ticket.Id,
+                        Author = author,
+                        Executor = executor,
+                        Participants = participants,
+                        Description = ticket.Description,
+                        Title = ticket.Title!,
+                        UpdatedDate = ticket.UpdatedDate,
+                        CreationDate = ticket.CreationDate,
+                        Files = files,
+                        Links = ticket.Links.ToList(),
+                        Comments = comments,
+                        Priority = ticket.Priority,
+                        StatusId = ticket.Status.Id,
+                        Tags = ticket.Tags.ToList(),
+                    };
 
                     return PartialView("_TicketDetails", model);
                 }

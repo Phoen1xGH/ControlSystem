@@ -5,6 +5,7 @@ using ControlSystem.Domain.Enums;
 using ControlSystem.Domain.Extensions;
 using ControlSystem.Domain.Response;
 using ControlSystem.Domain.ViewModels;
+using ControlSystem.Services.DTO;
 using ControlSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -21,15 +22,23 @@ namespace ControlSystem.Services.Implementations
 
         private readonly IRepository<Ticket> _ticketRepository;
 
+        private readonly IRepository<Comment> _commentRepository;
+
+        private readonly IRepository<FileAttachment> _fileRepository;
+
         public BoardService(ILogger<BoardService> logger,
             IRepository<UserAccount> userRepository,
             IRepository<Board> boardRepository,
-            IRepository<Ticket> ticketRepository)
+            IRepository<Ticket> ticketRepository,
+            IRepository<Comment> commentRepository,
+            IRepository<FileAttachment> fileRepostory)
         {
             _logger = logger;
             _userRepository = userRepository;
             _boardRepository = boardRepository;
             _ticketRepository = ticketRepository;
+            _commentRepository = commentRepository;
+            _fileRepository = fileRepostory;
         }
 
         public async Task<BaseResponse<int>> CreateTicket(string username, TicketViewModel ticketVM)
@@ -111,6 +120,16 @@ namespace ControlSystem.Services.Implementations
 
                 var author = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Username == username);
 
+                if (author is null)
+                {
+                    return new BaseResponse<int>
+                    {
+                        StatusCode = StatusCode.UserNotFound,
+                        Description = StatusCode.UserNotFound.GetDescriptionValue(),
+                        Data = -1
+                    };
+                }
+
                 var ticket = new Ticket { Title = title, Author = author };
 
                 await (_boardRepository as BoardRepository)!.AddTicket(board, ticket);
@@ -176,7 +195,11 @@ namespace ControlSystem.Services.Implementations
         {
             try
             {
-                var tickets = _boardRepository.GetAll().FirstOrDefault(x => x.Id == boardId)!.Tickets.ToList();
+                var tickets = _boardRepository.GetAll()
+                    .FirstOrDefault(x => x.Id == boardId)!
+                    .Tickets
+                    .OrderBy(x => x.CreationDate)
+                    .ToList();
 
                 return new BaseResponse<List<Ticket>>()
                 {
@@ -197,7 +220,7 @@ namespace ControlSystem.Services.Implementations
             }
         }
 
-        public async Task<BaseResponse<bool>> EditTicket(int ticketId, TicketViewModel newTicketData)
+        public async Task<BaseResponse<bool>> EditTicket(int ticketId, TicketDTO newTicketData)
         {
             try
             {
@@ -214,21 +237,50 @@ namespace ControlSystem.Services.Implementations
                 }
 
                 var status = await _boardRepository.GetAll().FirstOrDefaultAsync(x => x.Id == newTicketData.StatusId);
-                var author = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Username == newTicketData.AuthorName);
-                var executor = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Username == newTicketData.ExecutorName);
+                var author = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Username == newTicketData.Author.Name);
+
+                var executor = newTicketData.Executor is not null ?
+                    await _userRepository.GetAll()
+                        .FirstOrDefaultAsync(x => x.Username == newTicketData.Executor.Name) :
+                    null;
+
+                var users = _userRepository.GetAll();
+                var commentsAll = _commentRepository.GetAll();
+                var filesAll = _fileRepository.GetAll();
+
+                var participants = newTicketData.Participants is not null ? users
+                    .Where(user => newTicketData.Participants
+                        .Any(part => part.Name == user.Username))
+                    .ToList() :
+                    null;
+
+                var files = newTicketData.Files is not null ?
+                    filesAll
+                        .Where(file => newTicketData.Files
+                            .Any(fileDTO => fileDTO.Id == file.Id))
+                        .ToList() :
+                    new();
+
+                var comments = newTicketData.Comments is not null ?
+                    commentsAll
+                        .Where(comment => newTicketData.Comments
+                            .Any(commentDTO => commentDTO.Id == comment.Id))
+                        .ToList() :
+                    new();
 
                 ticket.Status = status!;
                 ticket.Author = author!;
                 ticket.Description = newTicketData.Description;
                 ticket.Priority = newTicketData.Priority;
-                ticket.Attachments = newTicketData.Attachments;
-                ticket.Participants = newTicketData.Participants;
-                ticket.Comments = newTicketData.Comments;
+                ticket.Attachments = files;
+                ticket.Participants = participants;
+                ticket.Comments = comments;
                 ticket.Tags = newTicketData.Tags;
                 ticket.Links = newTicketData.Links;
                 ticket.DeadlineDate = newTicketData.DeadlineDate;
                 ticket.Executor = executor;
                 ticket.Title = newTicketData.Title;
+                ticket.UpdatedDate = DateTime.Now;
 
                 await (_ticketRepository as TicketRepository)!.Update(ticket);
 

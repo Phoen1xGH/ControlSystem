@@ -1,16 +1,18 @@
-﻿@using ControlSystem.MainApp.ViewModels;
+﻿@using ControlSystem.Services.DTO;
 
-@model FullTicketViewModel
+@model TicketDTO
 @if (Model != null)
 {
     <form id="formTicket">
         <div class="ticket-container">
             <div class="left-ticket-modal">
-                <input type="hidden" name="StatusId" value="" />
+                <input type="hidden" name="Id" value="@Model.Id"/>
+                <input type="hidden" name="StatusId" value="@Model.StatusId" />
                 <textarea type="text" class="ticket-title" name="Title" placeholder="Название">@Model.Title</textarea>
 
                 <div class="info-card">
-                    <input type="hidden" name="AuthorName" value="@Model.Author.Name" />
+                    <input type="hidden" name="Author.Name" value="@Model.Author.Name" />
+                    <input type="hidden" name="Author.Id" value="@Model.Author.Id"/>
                     <label class="info-card-author">Заказчик: <a href="#" style="color: #d8d8d8">@Model.Author.Name</a></label>
                     @if(Model.Executor != null)
                     {
@@ -20,19 +22,22 @@
                     {
                         <div style="margin-left: auto">
                             <label class="info-card-date" style="font-style: italic; margin-right: 4px">Обновлено:</label>
-
+                            <input type="hidden" name="UpdatedDate" value="@Model.UpdatedDate" />
+                            <input type="hidden" name="CreationDate" value="@Model.CreationDate" />
                             <label class="info-card-date"> @Model.UpdatedDate.ToString("dd.MM.yyyy  HH:mm")</label>
                         </div>
                     }
                     else
                     {
+                        <input type="hidden" name="UpdatedDate" value="@Model.UpdatedDate" />
+                        <input type="hidden" name="CreationDate" value="@Model.CreationDate" />
                         <label class="info-card-date">Создано: @Model.CreationDate.ToString("dd.MM.yyyy  HH:mm")</label>
                     }
                 </div>
                 <div class="deadline-div">
                     @if (Model.DeadlineDate != null)
                     {
-
+                        <input type="hidden" name="DeadlineDate" value="@Model.DeadlineDate.Value" />
                         <label class="info-card-date">
                             <label style="font-style: italic; margin-right: 4px">
                                 Срок сдачи:
@@ -49,13 +54,20 @@
                         </svg>
                         <label style="color: #d8d8d8; padding-left: 7px; padding-right: 7px">Теги:</label>
 
-                        foreach (var tag in Model.Tags)
+                        for(int i = 0; i < Model.Tags.Count; i++)
                         {
+                            var tag = Model.Tags[i];
+
                             <div class="tag" style="background-color: @tag.ColorHex; border-radius: 20px 20px 20px 20px; padding-right: 15px; padding-left:15px; margin-left: 7px;">
+                                
+                                <input type="hidden" name="Tags[@i].ColorHex" value="@tag.ColorHex">
+                                <input type="hidden" name="Tags[@i].Name" value="@tag.Name">
+                                <input type="hidden" name="Tags[@i].Id" value="@tag.Id">
 
                                 <label style="font-weight: bold">@tag.Name</label>
                             </div>
                         }
+
                         <button id="add-button" style="margin-left: 7px">
                             <svg id="add-button-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
                                 <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
@@ -68,6 +80,7 @@
                 <div class="priority-container">
                     @if (Model.Priority != null)
                     {
+                        <input type="hidden" name="Priority" value="@Model.Priority" />
                         <svg class="prio-image" width="20px" height="20px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
                             <path fill="#d8d8d8" d="M288 128h608L736 384l160 256H288v320h-96V64h96v64z" />
                         </svg>
@@ -204,5 +217,4 @@
         </div>
     </form>
 }
-
 

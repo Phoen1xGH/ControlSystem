@@ -45,7 +45,8 @@ namespace ControlSystem.DAL.Repositories
                 .Include(x => x.Tags)
                 .Include(x => x.Links)
                 .Include(x => x.Attachments)
-                .Include(x => x.Comments);
+                .Include(x => x.Comments)
+                .Include(x => x.Status);
         }
 
         public async Task Update(Ticket entity)

@@ -16,6 +16,8 @@ namespace ControlSystem.MainApp.Helpers
             services.AddScoped<IRepository<Ticket>, TicketRepository>();
             services.AddScoped<IRepository<Tag>, TagsRepository>();
             services.AddScoped<IRepository<Priority>, PriorityRepository>();
+            services.AddScoped<IRepository<Comment>, CommentRepository>();
+            services.AddScoped<IRepository<FileAttachment>, FileRepository>();
         }
 
         public static void InitializeServices(this IServiceCollection services)

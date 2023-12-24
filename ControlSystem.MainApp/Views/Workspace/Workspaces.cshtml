@@ -299,6 +299,7 @@
             margin-top: auto;
         }
 
+        #ticket-del-button:hover,
         #send-comment-button:hover,
         #add-button:hover,
         #open-modal:hover,
@@ -317,6 +318,15 @@
             border: 1px solid #87909e;
             text-align: center;
             color: #d8d8d8;
+            display: flex;
+            flex-direction: row;
+        }
+        
+        .ticket:hover {
+            cursor: pointer !important;
+        }
+        .ticket label {
+            cursor: pointer !important;
         }
 
         .myModal-ticket {
@@ -632,8 +642,30 @@
         }
 
         
+        #ticket-del-button {
+            margin-bottom: auto;
+            margin-top: 5px;
+            margin-left: auto !important;
+            margin-right: 7px !important;
+            background-color: transparent;
+            border: none;
+            transition: background-color 0.3s;
+            border-radius: 10px;
+            display: flex; 
+            align-items: center;
+        }
 
-
+        .ticket button {
+            opacity: 0;
+            transition: opacity 0.5s !important;
+        }
+        .ticket:hover button{
+            opacity: 1;
+        }
+        #ticket-preview-label {
+            width: 100%;
+            color: #d8d8d8;
+        }
 
     </style>
     <title>Вертикальные блоки</title>
@@ -719,7 +751,12 @@
                                     foreach (var ticket in tickets)
                                     {
                                         <div class="ticket" id="ticket-@ticket.Id" onclick="openTicket(@board.Workspace.Id, @ticket.Id)">
-                                            <label style="color: #d8d8d8">@ticket.Title</label>
+                                            <label id="ticket-preview-label">@ticket.Title</label>
+                                            <button id="ticket-del-button" onclick="deleteTicket(@board.Id, @ticket.Id)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red">
+                                                    <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+                                                </svg>
+                                            </button>
                                         </div>
                                     }
                                 }
@@ -865,6 +902,12 @@
 
         // Заменяем текущее состояние истории новым состоянием с обновленным URL
         history.replaceState(null, null, trimmedUrl);
+
+        var modal = document.getElementById('myModalTicket');
+        var form = modal.querySelector('form');
+        var id = form.querySelector('input[name="StatusId"]').value;
+
+        editTicket(id);
     }
 
   
@@ -928,9 +971,9 @@
         });
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        setupDescriptionInput();
-    });
+    //document.addEventListener('DOMContentLoaded', function () {
+    //    setupDescriptionInput();
+    //});
 
 
     // Ajax-------------------------------------------------------------------------------
@@ -971,18 +1014,6 @@
 
     //-------------------------------------------------------------------------------
 
-    //function addNewTicket(id) {
-    //    var newTicketHtml = '<div class="ticket" contenteditable="true" onkeydown="handleKeyDown(event)"></div>';
-    //    $("#board-" + id).prepend(newTicketHtml);
-    //    //requestAnimationFrame(function () {
-    //    //    $("#board" + id +" div:first-child").focus();
-    //    //});
-    //    $("#board-" + id).on("DOMSubtreeModified", function () {
-    //        //$(".ticket").off("DOMSubtreeModified"); // Отключаем обработчик, чтобы избежать повторных вызовов
-    //        $(".ticket:first").focus();
-    //    });
-
-    //}
     function addNewTicket(id) {
         var newTicketHtml = '<div class="ticket" contenteditable="true" onkeydown="handleKeyDown(event, ' + id + ')"></div>';
         var $board = $("#board-" + id);
@@ -1022,13 +1053,22 @@
                 result.forEach(function (ticket) {
                     
                 //ticketsDiv.append('<div class="ticket"><label style="color: #d8d8d8">' + ticket.title + '</label></div>');
-                    var ticketElement = $('<div class="ticket"><label style="color: #d8d8d8">' + ticket.title + '</label></div>');
+                    var ticketElement = $('<div class="ticket"><label id="ticket-preview-label">' + ticket.title + '</label></div>');
                     ticketElement.attr('id', 'ticket-' + ticket.Id);
 
                     // Добавляем обработчик события click
                     ticketElement.click(function () {
                         openTicket(ticket.workspaceId, ticket.id);
                     });
+
+                    var button = $('<button id="ticket-del-button"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg></button>');
+
+                    // Добавляем обработчик события click
+                    button.click(function() {
+                        deleteTicket(ticket.statusId, ticket.Id);
+                    });
+
+                    ticketElement.append(button);
 
                     // Добавляем элемент в ticketsDiv
                     ticketsDiv.append(ticketElement);
@@ -1067,7 +1107,7 @@
             success: function (data) {
                 openModal(data);
             },
-            error: function () {
+            error: function (xhr, status, error) {
                 toastr.error(JSON.parse(xhr.responseText).trim() || 'Произошла ошибка!');
             }
         });
@@ -1084,7 +1124,7 @@
         modal.style.display = 'block';
         overlay.style.display = 'block';
 
-
+        setupDescriptionInput();
         initializeTabs();
     }
 
@@ -1096,5 +1136,95 @@
             loadTicketData(@ViewBag.Id, @ViewBag.TicketId);
         }
     });
+
+    function editTicket(boardId){
+        var formData = $("#formTicket").serialize();
+
+        $.ajax({
+            url: "/Ticket/EditTicket",  
+            method: 'POST',
+            data: formData,
+            success: function (result) {
+                var ticketsDiv = $('#board-' + result[0].statusId);
+                ticketsDiv.empty();
+                result.forEach(function (ticket) {
+                    
+                //ticketsDiv.append('<div class="ticket"><label style="color: #d8d8d8">' + ticket.title + '</label></div>');
+                    var ticketElement = $('<div class="ticket"><label id="ticket-preview-label">' + ticket.title + '</label></div>');
+                    ticketElement.attr('id', 'ticket-' + ticket.Id);
+
+                    // Добавляем обработчик события click
+                    ticketElement.click(function () {
+                        openTicket(ticket.workspaceId, ticket.id);
+                    });
+
+                    var button = $('<button id="ticket-del-button"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg></button>');
+
+                    // Добавляем обработчик события click
+                    button.click(function() {
+                        deleteTicket(ticket.statusId, ticket.id);
+                    });
+
+                    ticketElement.append(button);
+
+                    // Добавляем элемент в ticketsDiv
+                    ticketsDiv.append(ticketElement);
+                });
+
+                toastr.success('Изменения сохранены!');
+            },
+            error: function (xhr, status, error) {
+                toastr.error(xhr.responseText || 'Произошла ошибка!');
+            }
+        });
+    }
+
+    function deleteTicket(boardId, ticketId){
+
+        if (window.event) {
+            window.event.stopPropagation(); // Для IE
+        } 
+        else if (event) {
+            event.stopPropagation(); // Современные браузеры
+        }
+
+        $.ajax({
+            url: "/Ticket/DeleteTicket",
+            method: "POST",
+            data: { boardId: boardId, ticketId: ticketId },
+            success: function(result) {
+                 var ticketsDiv = $('#board-' + result[0].statusId);
+                ticketsDiv.empty();
+                result.forEach(function (ticket) {
+                    
+                //ticketsDiv.append('<div class="ticket"><label style="color: #d8d8d8">' + ticket.title + '</label></div>');
+                    var ticketElement = $('<div class="ticket"><label id="ticket-preview-label">' + ticket.title + '</label></div>');
+                    ticketElement.attr('id', 'ticket-' + ticket.id);
+
+                    // Добавляем обработчик события click
+                    ticketElement.click(function () {
+                        openTicket(ticket.workspaceId, ticket.id);
+                    });
+
+                    var button = $('<button id="ticket-del-button" onclick="deleteTicket(' + boardId + ',' + ticketId + ')"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg></button>');
+
+                    // Добавляем обработчик события click
+                    button.click(function() {
+                        deleteTicket(boardId, ticketId);
+                    });
+
+                    ticketElement.append(button);
+
+                    // Добавляем элемент в ticketsDiv
+                    ticketsDiv.append(ticketElement);
+                });
+
+                toastr.success('Задача успешно удалена!');
+            },
+            error: function (xhr, status, error) {
+                toastr.error(xhr.responseText || 'Произошла ошибка!');
+            }
+        });
+    }
 
 </script>

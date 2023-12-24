@@ -1,6 +1,7 @@
 ﻿using ControlSystem.Domain.Entities;
 using ControlSystem.Domain.Response;
 using ControlSystem.Domain.ViewModels;
+using ControlSystem.Services.DTO;
 
 namespace ControlSystem.Services.Interfaces
 {
@@ -10,7 +11,7 @@ namespace ControlSystem.Services.Interfaces
 
         Task<BaseResponse<int>> CreateTicket(string username, string title, int boardId);
 
-        Task<BaseResponse<bool>> EditTicket(int ticketId, TicketViewModel newTicketData);
+        Task<BaseResponse<bool>> EditTicket(int ticketId, TicketDTO newTicketData);
 
         Task<BaseResponse<bool>> DeleteTicket(int ticketId);
 
