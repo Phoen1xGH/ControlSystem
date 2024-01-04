@@ -77,7 +77,8 @@ namespace ControlSystem.MainApp.Controllers
 
             if (ModelState.IsValid)
             {
-                var response = await _boardService.EditTicket(newTicketData.Id, newTicketData);
+                var ticketData = new TicketChangesDTO { Id = newTicketData.Id, Title = newTicketData.Title, Description = newTicketData.Description };
+                var response = await _boardService.EditTicket(newTicketData.Id, ticketData);
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {

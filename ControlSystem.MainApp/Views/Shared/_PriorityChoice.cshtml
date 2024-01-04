@@ -1,0 +1,140 @@
+﻿@using ControlSystem.Domain.Entities;
+
+@model Tuple<int, List<Priority>>
+
+<style>
+    #add-priority-btn {
+        border-radius: 20px;
+        color: #15c118;
+        background-color: transparent;
+        border: 1px solid #15c118;
+        padding: 10px;
+    }
+
+    #prio-container {
+        margin-top: 7px;
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+        max-height: 250px;
+    }
+
+    #prio-data-div {
+        display: flex;
+        flex-direction: row;
+        position: relative;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    .input {
+        padding: 10px;
+        width: 250px;
+        box-sizing: border-box;
+        outline: none;
+        border: 1px solid #d8d8d8;
+        background-color: #30353c;
+        border-radius: 20px;
+        color: #d8d8d8;
+    }
+    .input:empty + .placeholder {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        padding: 0 5px;
+        background-color: transparent;
+        transition: 0.3s;
+        pointer-events: none;
+        color: #d8d8d8;
+    }
+
+    .input:focus + .placeholder {
+        top: -8px;
+        color: #15c118;
+        background-color: #30353c;
+        opacity: 1;
+        font-size: 12px;
+    }
+
+    .input:focus{
+        border: 1px solid #15c118;
+    }
+
+    .color-input {
+        margin-left: 7px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        width: 50px;
+        height: 50px;
+        cursor: pointer;
+        background-color: transparent;
+        border: none;
+    }
+
+    .color-input::-webkit-color-swatch {
+        border-radius: 20px;
+        border: 2px solid #d8d8d8;
+    }
+
+    #cancel-new-prio,
+    #accept-new-prio {
+        display: flex;
+        min-height: 30px !important;
+        min-width: 30px !important;
+        height: 30px !important;
+        width: 30px !important;
+        margin-left: 7px;
+        background-color: transparent;
+        border: none;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+    }
+
+    #prio-flex-wrapper {
+        display: flex;
+        flex-direction: row;
+    }
+
+    #del-prio-btn {
+        background-color: transparent;
+        border: none;
+        margin-top: 7px;
+        margin-left: 10px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 20px;
+        min-width: 20px;
+    }
+
+    #del-prio-btn:hover {
+        background-color: #4f5762;
+    }
+
+</style>
+
+
+<button id="add-priority-btn" onclick="addNewPrio(@Model.Item1)">
+    Добавить приоритет
+</button><br/>
+<label style="color: #d8d8d8; margin-top: 5px;">Выберите приоритет:</label>
+<div id="prio-container">
+    
+    @foreach(Priority priority in Model.Item2)
+    {
+        <div id="prio-flex-wrapper">
+            <div style="margin-top: 7px; padding-left: 7px; padding-right: 7px; background-color: @priority.ColorHex; border-radius: 20px; width: fit-content;"
+            onclick="choosePrio(@Model.Item1, @priority.Id)">
+                <label style="font-weight: bold">@priority.Name</label>
+            </div>
+            <button id="del-prio-btn" onclick="delPrio(@Model.Item1, @priority.Id)">
+                <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red">
+                      <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+                 </svg>
+            </button>
+        </div>
+    }
+</div>

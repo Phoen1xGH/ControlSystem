@@ -220,7 +220,7 @@ namespace ControlSystem.Services.Implementations
             }
         }
 
-        public async Task<BaseResponse<bool>> EditTicket(int ticketId, TicketDTO newTicketData)
+        public async Task<BaseResponse<bool>> EditTicket(int ticketId, TicketChangesDTO newTicketData)
         {
             try
             {
@@ -236,51 +236,54 @@ namespace ControlSystem.Services.Implementations
                     };
                 }
 
-                var status = await _boardRepository.GetAll().FirstOrDefaultAsync(x => x.Id == newTicketData.StatusId);
-                var author = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Username == newTicketData.Author.Name);
+                //var status = await _boardRepository.GetAll().FirstOrDefaultAsync(x => x.Id == newTicketData.StatusId);
+                //var author = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Username == newTicketData.Author.Name);
 
-                var executor = newTicketData.Executor is not null ?
-                    await _userRepository.GetAll()
-                        .FirstOrDefaultAsync(x => x.Username == newTicketData.Executor.Name) :
-                    null;
+                //var executor = newTicketData.Executor is not null ?
+                //    await _userRepository.GetAll()
+                //        .FirstOrDefaultAsync(x => x.Username == newTicketData.Executor.Name) :
+                //    null;
 
-                var users = _userRepository.GetAll();
-                var commentsAll = _commentRepository.GetAll();
-                var filesAll = _fileRepository.GetAll();
+                //var users = _userRepository.GetAll();
+                //var commentsAll = _commentRepository.GetAll();
+                //var filesAll = _fileRepository.GetAll();
 
-                var participants = newTicketData.Participants is not null ? users
-                    .Where(user => newTicketData.Participants
-                        .Any(part => part.Name == user.Username))
-                    .ToList() :
-                    null;
+                //var participants = newTicketData.Participants is not null ? users
+                //    .Where(user => newTicketData.Participants
+                //        .Any(part => part.Name == user.Username))
+                //    .ToList() :
+                //    null;
 
-                var files = newTicketData.Files is not null ?
-                    filesAll
-                        .Where(file => newTicketData.Files
-                            .Any(fileDTO => fileDTO.Id == file.Id))
-                        .ToList() :
-                    new();
+                //var files = newTicketData.Files is not null ?
+                //    filesAll
+                //        .Where(file => newTicketData.Files
+                //            .Any(fileDTO => fileDTO.Id == file.Id))
+                //        .ToList() :
+                //    new();
 
-                var comments = newTicketData.Comments is not null ?
-                    commentsAll
-                        .Where(comment => newTicketData.Comments
-                            .Any(commentDTO => commentDTO.Id == comment.Id))
-                        .ToList() :
-                    new();
+                //var comments = newTicketData.Comments is not null ?
+                //    commentsAll
+                //        .Where(comment => newTicketData.Comments
+                //            .Any(commentDTO => commentDTO.Id == comment.Id))
+                //        .ToList() :
+                //    new();
 
-                ticket.Status = status!;
-                ticket.Author = author!;
+                //ticket.Status = status!;
+                //ticket.Author = author!;
+                //ticket.Description = newTicketData.Description;
+                //ticket.Priority = newTicketData.Priority;
+                //ticket.Attachments = files;
+                //ticket.Participants = participants;
+                //ticket.Comments = comments;
+                //ticket.Tags = newTicketData.Tags;
+                //ticket.Links = newTicketData.Links;
+                //ticket.DeadlineDate = newTicketData.DeadlineDate;
+                //ticket.Executor = executor;
+                //ticket.Title = newTicketData.Title;
+                //ticket.UpdatedDate = DateTime.Now;
+
                 ticket.Description = newTicketData.Description;
-                ticket.Priority = newTicketData.Priority;
-                ticket.Attachments = files;
-                ticket.Participants = participants;
-                ticket.Comments = comments;
-                ticket.Tags = newTicketData.Tags;
-                ticket.Links = newTicketData.Links;
-                ticket.DeadlineDate = newTicketData.DeadlineDate;
-                ticket.Executor = executor;
                 ticket.Title = newTicketData.Title;
-                ticket.UpdatedDate = DateTime.Now;
 
                 await (_ticketRepository as TicketRepository)!.Update(ticket);
 
@@ -296,6 +299,180 @@ namespace ControlSystem.Services.Implementations
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"[EditTicket]: {ex.Message}");
+
+                return new BaseResponse<bool>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = false
+                };
+            }
+        }
+
+        public async Task<BaseResponse<bool>> AddTicketPriority(int ticketId, Priority priority)
+        {
+            try
+            {
+                var ticket = await _ticketRepository.GetAll().FirstOrDefaultAsync(x => x.Id == ticketId);
+
+                if (ticket is null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.TicketNotFound,
+                        Description = StatusCode.TicketNotFound.GetDescriptionValue(),
+                        Data = false
+                    };
+                }
+
+                ticket.Priority = priority;
+
+                await _ticketRepository.Update(ticket);
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[AddTicketPriority]: {ex.Message}");
+
+                return new BaseResponse<bool>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = false
+                };
+            }
+        }
+
+        public async Task<BaseResponse<bool>> AddTicketTags(int ticketId, List<Tag> tags)
+        {
+            try
+            {
+                var ticket = await _ticketRepository.GetAll().FirstOrDefaultAsync(x => x.Id == ticketId);
+
+                if (ticket is null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.TicketNotFound,
+                        Description = StatusCode.TicketNotFound.GetDescriptionValue(),
+                        Data = false
+                    };
+                }
+
+                ticket.Tags = tags;
+
+                await _ticketRepository.Update(ticket);
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[AddTicketTags]: {ex.Message}");
+
+                return new BaseResponse<bool>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = false
+                };
+            }
+        }
+
+
+        public async Task<BaseResponse<bool>> AddTicketLink(int ticketId, Link link)
+        {
+            try
+            {
+                var ticket = await _ticketRepository.GetAll().FirstOrDefaultAsync(x => x.Id == ticketId);
+
+                if (ticket is null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.TicketNotFound,
+                        Description = StatusCode.TicketNotFound.GetDescriptionValue(),
+                        Data = false
+                    };
+                }
+
+                ticket.Links.Add(link);
+
+                await _ticketRepository.Update(ticket);
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[AddTicketLink]: {ex.Message}");
+
+                return new BaseResponse<bool>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = false
+                };
+            }
+        }
+
+        public async Task<BaseResponse<bool>> AddTicketComment(int ticketId, CommentDTO comment)
+        {
+            try
+            {
+                var ticket = await _ticketRepository.GetAll().FirstOrDefaultAsync(x => x.Id == ticketId);
+
+                if (ticket is null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.TicketNotFound,
+                        Description = StatusCode.TicketNotFound.GetDescriptionValue(),
+                        Data = false
+                    };
+                }
+
+                var author = await _userRepository.GetAll()
+                    .FirstOrDefaultAsync(x => x.Username == comment.AuthorName);
+
+                if (author is null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.UserNotFound,
+                        Description = StatusCode.UserNotFound.GetDescriptionValue(),
+                        Data = false
+                    };
+                }
+
+                ticket.Comments.Add(new Comment { Content = comment.Content, Author = author });
+
+                await _ticketRepository.Update(ticket);
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[AddTicketComment]: {ex.Message}");
 
                 return new BaseResponse<bool>()
                 {

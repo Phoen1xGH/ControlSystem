@@ -94,7 +94,7 @@ namespace ControlSystem.Services.Implementations
         {
             try
             {
-                var priorities = _priorityRepository.GetAll().ToList();
+                var priorities = _priorityRepository.GetAll().OrderBy(x => x.Id).ToList();
 
                 return new BaseResponse<List<Priority>>
                 {
@@ -207,7 +207,7 @@ namespace ControlSystem.Services.Implementations
 
                 var priority = await _priorityRepository.GetAll().FirstOrDefaultAsync(x => x.Id == priorityId);
 
-                if (ticket is null)
+                if (priority is null)
                 {
                     return new BaseResponse<Priority>
                     {
@@ -217,6 +217,8 @@ namespace ControlSystem.Services.Implementations
                 }
 
                 ticket.Priority = priority;
+
+                await _priorityRepository.Update(priority);
 
                 return new BaseResponse<Priority>
                 {

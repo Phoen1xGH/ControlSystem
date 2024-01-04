@@ -11,7 +11,7 @@ namespace ControlSystem.Services.Interfaces
 
         Task<BaseResponse<int>> CreateTicket(string username, string title, int boardId);
 
-        Task<BaseResponse<bool>> EditTicket(int ticketId, TicketDTO newTicketData);
+        Task<BaseResponse<bool>> EditTicket(int ticketId, TicketChangesDTO newTicketData);
 
         Task<BaseResponse<bool>> DeleteTicket(int ticketId);
 

@@ -47,11 +47,11 @@ namespace ControlSystem.MainApp.Controllers
             return BadRequest("Ошибка при редактировании приоритетности");
         }
 
-        public async Task<ActionResult> DeletePriority(int id)
+        public async Task<ActionResult> DeletePriority(int priorityId)
         {
             if (ModelState.IsValid)
             {
-                var response = await _priorityService.DeletePriority(id);
+                var response = await _priorityService.DeletePriority(priorityId);
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
@@ -72,12 +72,25 @@ namespace ControlSystem.MainApp.Controllers
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
-                    var priotity = _priorityService.GetPriorityByTicket(ticketId);
+                    var priotity = response.Data;/*_priorityService.GetPriorityByTicket(ticketId);*/
 
                     return Json(priotity);
                 }
             }
             return BadRequest("Ошибка при добавлении приоритета для задачи");
+        }
+
+        public ActionResult GetPriorities(int ticketId)
+        {
+            var response = _priorityService.GetPriorities();
+
+            if (response.StatusCode == Domain.Enums.StatusCode.OK)
+            {
+                var priorities = new Tuple<int, List<Priority>>(ticketId, response.Data!);
+
+                return PartialView("_PriorityChoice", priorities);
+            }
+            return BadRequest("Ошибка при открытии окна приоритетов");
         }
     }
 }

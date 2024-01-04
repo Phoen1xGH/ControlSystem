@@ -26,7 +26,7 @@ namespace ControlSystem.DAL.Repositories
         public IQueryable<Board> GetAll()
         {
             return _context.Boards
-                .Include(x => x.Tickets).ThenInclude(x => x.Author)
+                .Include(x => x.Tickets).ThenInclude(x => x.Author).Include(x => x.Tickets).ThenInclude(x => x.Priority)
                 .Include(x => x.Workspace);
         }
 
