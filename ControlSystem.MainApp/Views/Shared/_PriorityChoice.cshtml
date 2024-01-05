@@ -48,7 +48,8 @@
         color: #d8d8d8;
     }
 
-    .input:focus + .placeholder {
+    .input:focus + .placeholder,
+    .input:not(:placeholder-shown) + .placeholder {
         top: -8px;
         color: #15c118;
         background-color: #30353c;
@@ -58,6 +59,10 @@
 
     .input:focus{
         border: 1px solid #15c118;
+    }
+
+    .input:not(:focus) + .placeholder  {
+         color: #d8d8d8;
     }
 
     .color-input {
