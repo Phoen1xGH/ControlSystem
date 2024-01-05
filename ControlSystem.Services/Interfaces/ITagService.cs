@@ -16,5 +16,9 @@ namespace ControlSystem.Services.Interfaces
         BaseResponse<List<Tag>> GetTagsByTicket(int ticketId);
 
         Task<BaseResponse<List<Tag>>> AddTagsToTicket(int ticketId, List<int> tagIds);
+
+        Task<BaseResponse<Tag>> AddTagToTicket(int ticketId, int tagId);
+
+        Task<BaseResponse<Tag>> RemoveTagFromTicket(int ticketId, int tagId);
     }
 }

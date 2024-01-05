@@ -22,10 +22,14 @@
         border: none;
 
         cursor: pointer;
+        background-color: #2a2e34;
+        border: none;
+        border-bottom: 1px solid #d8d8d8;
+        color: #d8d8d8;
     }
 
     .dropdown-content button:hover {
-        background-color: #ddd;
+        background-color: #87909e;
     }
 </style>
 
@@ -41,11 +45,6 @@
                 <div class="ticket-title-div">
                     <textarea type="text" class="ticket-title" name="Title" placeholder="Название">@Model.Title</textarea>
 
-                    @*<button type="button" class="ticket-options-button">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                            <path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z" />
-                        </svg>
-                    </button>*@
                     <div class="dropdown">
                         <button type="button" class="ticket-options-button" onclick="toggleDropdown()">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
@@ -53,8 +52,8 @@
                             </svg>
                         </button>
                         <div class="dropdown-content">
-                            <button type="button"  >Добавить теги</button>
-                            <button type="button" onclick="getPriorityData(@Model.Id)">Добавить приоритетность</button>
+                            <button type="button"  onclick="getTagsData(@Model.Id)">Ред. теги</button>
+                            <button type="button" onclick="getPriorityData(@Model.Id)">Ред. приоритет</button>
                         </div>
                     </div>
 
@@ -238,7 +237,7 @@
                 <div style="margin-left: 7px;">
                     <h4 class="comment-header">Комментарии</h4>
                     <div class="comments-container">
-                        @if (Model.Comments != null)
+                        @if (Model.Comments != null && Model.Comments.Count > 0)
                         {
                             @foreach (var commentary in Model.Comments)
                             {
@@ -250,7 +249,7 @@
                         }
                         else
                         {
-                            <h4>Комментариев пока нет</h4>
+                            <h4 style="display: flex; color: #d8d8d8; justify-content: center">Комментариев пока нет</h4>
                         }
 
                         <div class="send-comment-container">

@@ -241,5 +241,105 @@ namespace ControlSystem.Services.Implementations
                 };
             }
         }
+
+        public async Task<BaseResponse<Tag>> AddTagToTicket(int ticketId, int tagId)
+        {
+            try
+            {
+                var ticket = await _ticketRepository.GetAll().FirstOrDefaultAsync(x => x.Id == ticketId);
+
+                if (ticket is null)
+                {
+                    return new BaseResponse<Tag>
+                    {
+                        StatusCode = StatusCode.TicketNotFound,
+                        Description = StatusCode.TicketNotFound.GetDescriptionValue(),
+                    };
+                }
+
+                var tag = await _tagRepository.GetAll().FirstOrDefaultAsync(x => x.Id == tagId);
+
+                if (tag is null)
+                {
+                    return new BaseResponse<Tag>
+                    {
+                        StatusCode = StatusCode.TagNotFound,
+                        Description = StatusCode.TagNotFound.GetDescriptionValue(),
+                    };
+                }
+
+                ticket.Tags.Add(tag);
+
+                await _ticketRepository.Update(ticket);
+
+                return new BaseResponse<Tag>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = tag
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[AddTagToTicket]: {ex.Message}");
+
+                return new BaseResponse<Tag>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<Tag>> RemoveTagFromTicket(int ticketId, int tagId)
+        {
+            try
+            {
+                var ticket = await _ticketRepository.GetAll().FirstOrDefaultAsync(x => x.Id == ticketId);
+
+                if (ticket is null)
+                {
+                    return new BaseResponse<Tag>
+                    {
+                        StatusCode = StatusCode.TicketNotFound,
+                        Description = StatusCode.TicketNotFound.GetDescriptionValue(),
+                    };
+                }
+
+                var tag = await _tagRepository.GetAll().FirstOrDefaultAsync(x => x.Id == tagId);
+
+                if (tag is null)
+                {
+                    return new BaseResponse<Tag>
+                    {
+                        StatusCode = StatusCode.TagNotFound,
+                        Description = StatusCode.TagNotFound.GetDescriptionValue(),
+                    };
+                }
+
+                ticket.Tags.Remove(tag);
+
+                await _ticketRepository.Update(ticket);
+
+                return new BaseResponse<Tag>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = tag
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[RemoveTagFromTicket]: {ex.Message}");
+
+                return new BaseResponse<Tag>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = null
+                };
+            }
+        }
     }
 }

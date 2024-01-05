@@ -95,6 +95,7 @@
             z-index: 3;
         }
 
+        .overlay-tags,
         .overlay-prio {
             display: none;
             position: fixed;
@@ -310,6 +311,9 @@
             margin-top: auto;
         }
 
+        #del-tag-btn:hover,
+        #cancel-new-tag:hover,
+        #accept-new-tag:hover,
         #cancel-new-prio:hover,
         #accept-new-prio:hover,
         .ticket-options-button:hover,
@@ -706,6 +710,7 @@
             min-width: 25px !important;
         }
 
+        #modal-tags,
         #modal-priority {
             min-width: 700px;
             min-height: 400px;
@@ -867,6 +872,11 @@
   
     </div>
     <div id="overlayPriority" class="overlay-prio" onclick="closeModalPriority()"></div>
+
+    <div id="modal-tags">
+        
+    </div>
+    <div id="overlayTags" class="overlay-tags" onclick="closeModalTags()"></div>
 
 <!----------------------------------------------------------------------------------------------->
 
@@ -1288,14 +1298,6 @@
         });
     }
 
-    //function toggleDropdown() {
-    //    var dropdownContent = document.querySelector(".dropdown-content");
-    //    dropdownContent.classList.toggle("show");
-    //}
-
-    function addTicketPriority(ticketId){
-
-    }
 
     function openModalPriority(partialViewHtml) {
         var modal = document.getElementById('modal-priority');
@@ -1456,6 +1458,388 @@
                     $("#prio-container").append(priorityDiv);
                 });
                 
+            },
+            error: function (xhr, status, error) {
+                toastr.error(xhr.responseText || 'Произошла ошибка!');
+            }
+        });
+    }
+
+
+    function openModalTags(partialViewHtml) {
+        var modal = document.getElementById('modal-tags');
+        var overlay = document.getElementById('overlayTags');
+
+        // Заполняем содержимым Partial View
+        modal.innerHTML = partialViewHtml;
+
+        modal.style.display = 'block';
+        overlay.style.display = 'block';
+    }
+
+    function closeModalTags(){
+        var modal = document.getElementById('modal-tags');
+        var overlay = document.getElementById('overlayTags');
+
+        modal.style.display = 'none';
+        overlay.style.display = 'none';
+    }
+
+    function getTagsData(ticketId) {
+
+        $.ajax({
+            url: "/Tags/GetTags",
+            method: "GET",
+            data: { ticketId: ticketId },
+            success: function (result) {
+                
+                openModalTags(result);
+            },
+            error: function (xhr, status, error) {
+                toastr.error(xhr.responseText || 'Произошла ошибка!');
+            }
+        });
+    }
+
+    function addNewTag(ticketId){
+        var newTagHtml =  `
+            <div id="tag-data-div">
+                <input id="tag-name" type="text" class="input" name="Name"/>
+                <label class="placeholder">Название</label>
+                <label style="margin-left: 20px; color: #d8d8d8">Цвет</label>
+                <input type="color" name="ColorHex" class="color-input"/>
+                <button id="accept-new-tag" onclick="acceptNewTag(${ticketId})">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="30" width="30" viewBox="0 0 448 512" fill="#15c118">
+                        <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
+                    </svg>
+                </button>
+
+                <button id="cancel-new-tag" onclick="cancelNewTag()">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="30" width="30" viewBox="0 0 384 512" fill="#f01313">
+                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                    </svg>
+                </button>
+            </div>`;
+
+        $("#add-tag-wrapper").append(newTagHtml).promise().done(function () {
+            $("#add-tag-wrapper").find("#tag-name").focus();
+        });
+    }
+
+    function cancelNewTag(){
+        $("#tag-data-div").remove();
+    }
+
+    function acceptNewTag(ticketId){
+
+        var tagData = {
+            ColorHex:  $(".color-input").val(),
+            Name: $("#tag-name").val()
+        };
+
+        $.ajax({
+            url: "/Tags/CreateTag",
+            method: "POST",
+            data: {ticketId: ticketId, tagData: tagData},
+            success: function(result) {
+                $("#tag-data-div").remove();
+
+                $("#all-tags-container").empty();
+               
+                result.unusedTags.forEach(function(tag) {
+                    var tagDiv = `
+                    <div id="tag-flex-wrapper">
+                        <div style="margin-top: 7px; padding-left: 7px; padding-right: 7px; background-color: ${tag.colorHex}; border-radius: 20px; width: fit-content;"
+                             onclick="chooseTag(${ticketId}, ${tag.id})">
+                            <label style="font-weight: bold">${tag.name}</label>
+                        </div>
+                            <button id="del-tag-btn" onclick="delTag(${ticketId}, ${tag.id})">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red">
+                                <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" />
+                            </svg>
+                        </button>
+                    </div>`;
+
+                    $("#all-tags-container").append(tagDiv);
+                });
+
+                $("#used-tags-container").empty();
+
+                result.usedTags.forEach(function(tag) {
+                    var tagDiv = `
+                    <div id="tag-flex-wrapper">
+                        <div style="margin-top: 7px; padding-left: 7px; padding-right: 7px; background-color: ${tag.colorHex}; border-radius: 20px; width: fit-content;"
+                             onclick="removeTag(${ticketId}, ${tag.id})">
+                            <label style="font-weight: bold">${tag.name}</label>
+                        </div>
+                        <button id="del-tag-btn" onclick="delTag(${ticketId}, ${tag.id})">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red">
+                                <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" />
+                            </svg>
+                        </button>
+                    </div>`;
+
+                    $("#used-tags-container").append(tagDiv);
+                });
+
+            },
+            error: function (xhr, status, error) {
+                toastr.error(xhr.responseText || 'Произошла ошибка!');
+            }
+        });
+    }
+
+    function chooseTag(ticketId, tagId){
+
+        $.ajax({
+            url: "/Tags/AddTagToTicket",
+            method: "POST",
+            data: {ticketId: ticketId, tagId: tagId},
+            success: function(result) {
+
+                $(".tags").empty();
+                $("#used-tags-container").empty();
+                $("#all-tags-container").empty();
+
+                $(".tags").append(`
+                    <svg class="tags-image" fill="#d8d8d8" width="20px" height="20px" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M246.65625,132.43713l-45.625,68.43848.001-.001a15.96649,15.96649,0,0,1-13.31348,7.125H40a16.01833,16.01833,0,0,1-16-16v-128a16.01833,16.01833,0,0,1,16-16H187.71875a15.9687,15.9687,0,0,1,13.31348,7.126l45.624,68.43652A7.99771,7.99771,0,0,1,246.65625,132.43713Z" />
+                    </svg>
+                    <label style="color: #d8d8d8; padding-left: 7px; padding-right: 7px">Теги:</label>`);
+                
+                var index = 0;
+
+                result.usedTags.forEach(function(tag) {
+
+                    var tagDiv = `
+                    <div class="tag" style="background-color: ${tag.colorHex}; border-radius: 20px 20px 20px 20px; padding-right: 15px; padding-left:15px; margin-left: 7px;">
+
+                        <input type="hidden" name="Tags[${index}].ColorHex" value="${tag.colorHex}">
+                        <input type="hidden" name="Tags[${index}].Name" value="${tag.name}">
+                        <input type="hidden" name="Tags[${index}].Id" value="${tag.id}">
+
+                        <label style="font-weight: bold">${tag.name}</label>
+                    </div>`;
+                
+                    $(".tags").append(tagDiv);
+
+
+                    var tagDiv = `
+                    <div id="tag-flex-wrapper">
+                        <div style="margin-top: 7px; padding-left: 7px; padding-right: 7px; background-color: ${tag.colorHex}; border-radius: 20px; width: fit-content;"
+                             onclick="removeTag(${ticketId}, ${tag.id})">
+                            <label style="font-weight: bold">${tag.name}</label>
+                        </div>
+                        <button id="del-tag-btn" onclick="delTag(${ticketId}, ${tag.id})">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red">
+                                <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" />
+                            </svg>
+                        </button>
+                    </div>`;
+
+                    $("#used-tags-container").append(tagDiv);
+
+                    ++index;
+                });
+                
+                $(".tags").append(`
+                     <button id="add-button" style="margin-left: 7px">
+                        <svg id="add-button-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                            <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
+                        </svg>
+                    </button>`);
+
+               
+                $("#all-tags-container").empty();
+               
+                result.unusedTags.forEach(function(tag) {
+                    var tagDiv = `
+                    <div id="tag-flex-wrapper">
+                        <div style="margin-top: 7px; padding-left: 7px; padding-right: 7px; background-color: ${tag.colorHex}; border-radius: 20px; width: fit-content;"
+                             onclick="chooseTag(${ticketId}, ${tag.id})">
+                            <label style="font-weight: bold">${tag.name}</label>
+                        </div>
+                            <button id="del-tag-btn" onclick="delTag(${ticketId}, ${tag.id})">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red">
+                                <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" />
+                            </svg>
+                        </button>
+                    </div>`;
+
+                    $("#all-tags-container").append(tagDiv);
+                });
+               
+            },
+             error: function (xhr, status, error) {
+                toastr.error(xhr.responseText || 'Произошла ошибка!');
+            }
+        });
+    }
+
+    function removeTag(ticketId, tagId){
+        $.ajax({
+            url: "/Tags/RemoveTagFromTicket",
+            method: "POST",
+            data: { ticketId: ticketId, tagId: tagId },
+            success: function (result) {
+
+                $(".tags").empty();
+                $("#used-tags-container").empty();
+                $("#all-tags-container").empty();
+
+                $(".tags").append(`
+                        <svg class="tags-image" fill="#d8d8d8" width="20px" height="20px" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M246.65625,132.43713l-45.625,68.43848.001-.001a15.96649,15.96649,0,0,1-13.31348,7.125H40a16.01833,16.01833,0,0,1-16-16v-128a16.01833,16.01833,0,0,1,16-16H187.71875a15.9687,15.9687,0,0,1,13.31348,7.126l45.624,68.43652A7.99771,7.99771,0,0,1,246.65625,132.43713Z" />
+                        </svg>
+                        <label style="color: #d8d8d8; padding-left: 7px; padding-right: 7px">Теги:</label>`);
+
+                var index = 0;
+
+                result.usedTags.forEach(function (tag) {
+
+                    var tagDiv = `
+                        <div class="tag" style="background-color: ${tag.colorHex}; border-radius: 20px 20px 20px 20px; padding-right: 15px; padding-left:15px; margin-left: 7px;">
+
+                            <input type="hidden" name="Tags[${index}].ColorHex" value="${tag.colorHex}">
+                            <input type="hidden" name="Tags[${index}].Name" value="${tag.name}">
+                            <input type="hidden" name="Tags[${index}].Id" value="${tag.id}">
+
+                            <label style="font-weight: bold">${tag.name}</label>
+                        </div>`;
+
+                    $(".tags").append(tagDiv);
+
+                    var tagDiv = `
+                    <div id="tag-flex-wrapper">
+                        <div style="margin-top: 7px; padding-left: 7px; padding-right: 7px; background-color: ${tag.colorHex}; border-radius: 20px; width: fit-content;"
+                         onclick="removeTag(${ticketId}, ${tag.id})">
+                            <label style="font-weight: bold">${tag.name}</label>
+                        </div>
+                        <button id="del-tag-btn" onclick="delTag(${ticketId}, ${tag.id})">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red">
+                                <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" />
+                            </svg>
+                        </button>
+                    </div>`;
+
+                    $("#used-tags-container").append(tagDiv);
+
+                    ++index;
+                });
+
+                $(".tags").append(`
+                         <button id="add-button" style="margin-left: 7px">
+                            <svg id="add-button-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
+                            </svg>
+                        </button>`);
+
+                
+                result.unusedTags.forEach(function(tag) {
+                    var tagDiv = `
+                    <div id="tag-flex-wrapper">
+                        <div style="margin-top: 7px; padding-left: 7px; padding-right: 7px; background-color: ${tag.colorHex}; border-radius: 20px; width: fit-content;"
+                         onclick="chooseTag(${ticketId}, ${tag.id})">
+                            <label style="font-weight: bold">${tag.name}</label>
+                        </div>
+                            <button id="del-tag-btn" onclick="delTag(${ticketId}, ${tag.id})">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red">
+                                <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" />
+                            </svg>
+                        </button>
+                    </div>`;
+
+                    $("#all-tags-container").append(tagDiv);
+                });
+
+            },
+            error: function (xhr, status, error) {
+                toastr.error(xhr.responseText || 'Произошла ошибка!');
+            }
+        });
+    }
+
+    function delTag(ticketId, tagId) {
+
+        $.ajax({
+            url: "/Tags/DeleteTag",
+            method: "POST",
+            data: { ticketId: ticketId, tagId: tagId },
+            success: function(result) {
+                $("#tag-data-div").remove();
+
+                $("#all-tags-container").empty();
+                $("#used-tags-container").empty();
+
+                result.unusedTags.forEach(function (tag) {
+                    var tagDiv = `
+                        <div id="tag-flex-wrapper">
+                            <div style="margin-top: 7px; padding-left: 7px; padding-right: 7px; background-color: ${tag.colorHex}; border-radius: 20px; width: fit-content;"
+                             onclick="chooseTag(${ticketId}, ${tag.id})">
+                                <label style="font-weight: bold">${tag.name}</label>
+                            </div>
+                            <button id="del-tag-btn" onclick="delTag(${ticketId}, ${tag.id})">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red">
+                                    <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" />
+                                </svg>
+                            </button>
+                        </div>`;
+
+                    $("#all-tags-container").append(tagDiv);
+                });
+
+                
+
+                result.usedTags.forEach(function (tag) {
+                    var tagDiv = `
+                        <div id="tag-flex-wrapper">
+                            <div style="margin-top: 7px; padding-left: 7px; padding-right: 7px; background-color: ${tag.colorHex}; border-radius: 20px; width: fit-content;"
+                             onclick="removeTag(${ticketId}, ${tag.id})">
+                                <label style="font-weight: bold">${tag.name}</label>
+                            </div>
+                                <button id="del-tag-btn" onclick="delTag(${ticketId}, ${tag.id})">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red">
+                                    <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" />
+                                </svg>
+                            </button>
+                        </div>`;
+
+                    $("#used-tags-container").append(tagDiv);
+                });
+
+                $(".tags").empty();
+
+                $(".tags").append(`
+                            <svg class="tags-image" fill="#d8d8d8" width="20px" height="20px" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M246.65625,132.43713l-45.625,68.43848.001-.001a15.96649,15.96649,0,0,1-13.31348,7.125H40a16.01833,16.01833,0,0,1-16-16v-128a16.01833,16.01833,0,0,1,16-16H187.71875a15.9687,15.9687,0,0,1,13.31348,7.126l45.624,68.43652A7.99771,7.99771,0,0,1,246.65625,132.43713Z" />
+                            </svg>
+                            <label style="color: #d8d8d8; padding-left: 7px; padding-right: 7px">Теги:</label>`);
+
+                var index = 0;
+
+                result.usedTags.forEach(function (tag) {
+
+                    var tagDiv = `
+                            <div class="tag" style="background-color: ${tag.colorHex}; border-radius: 20px 20px 20px 20px; padding-right: 15px; padding-left:15px; margin-left: 7px;">
+
+                                <input type="hidden" name="Tags[${index}].ColorHex" value="${tag.colorHex}">
+                                <input type="hidden" name="Tags[${index}].Name" value="${tag.name}">
+                                <input type="hidden" name="Tags[${index}].Id" value="${tag.id}">
+
+                                <label style="font-weight: bold">${tag.name}</label>
+                            </div>`;
+
+                    $(".tags").append(tagDiv);
+
+                    ++index;
+                });
+
+                $(".tags").append(`
+                             <button id="add-button" style="margin-left: 7px">
+                                <svg id="add-button-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                    <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
+                                </svg>
+                            </button>`);
             },
             error: function (xhr, status, error) {
                 toastr.error(xhr.responseText || 'Произошла ошибка!');
