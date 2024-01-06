@@ -194,7 +194,8 @@
             display: flex;
             align-items: center;
         }
-
+        
+        #del-link:hover,
         #delete-board:hover {
                 background-color: #4f5762; /* Цвет подсветки при наведении */
         }
@@ -218,6 +219,7 @@
             align-items: center;
         }
 
+        #edit-link:hover,
         #edit-board:hover {
             background-color: #4f5762; /* Цвет подсветки при наведении */
         }
@@ -311,6 +313,8 @@
             margin-top: auto;
         }
 
+        #cancel-new-link:hover,
+        #accept-new-link:hover,
         #del-tag-btn:hover,
         #cancel-new-tag:hover,
         #accept-new-tag:hover,
@@ -590,8 +594,7 @@
         .add-button-tab-container {
             margin-left: auto;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            margin-bottom: auto;
         }
         
         .prio-image,
@@ -727,6 +730,101 @@
             background-color: #30353c;
         }
 
+        #link-data-div {
+            display: flex;
+            flex-direction: row;
+            position: relative;
+            align-items: center;
+            margin-top: 10px;
+            margin-bottom: 7px;
+        }
+
+        .input {
+            padding: 10px;
+            width: 250px;
+            box-sizing: border-box;
+            outline: none;
+            border: 1px solid #d8d8d8;
+            background-color: #30353c;
+            border-radius: 20px;
+            color: #d8d8d8;
+        }
+
+        .input:empty + .placeholder {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 0 5px;
+            background-color: transparent;
+            transition: 0.3s;
+            pointer-events: none;
+            color: #d8d8d8;
+        }
+
+        .input:focus + .placeholder,
+        .input:not(:placeholder-shown) + .placeholder {
+            top: -8px;
+            color: #15c118;
+            background-color: #30353c;
+            opacity: 1;
+            font-size: 12px;
+        }
+
+        .input:focus {
+            border: 1px solid #15c118;
+        }
+
+        .input:not(:focus) + .placeholder {
+            color: #d8d8d8;
+        }
+
+        #cancel-new-link,
+        #accept-new-link {
+            display: flex;
+            min-height: 30px !important;
+            min-width: 30px !important;
+            height: 30px !important;
+            width: 30px !important;
+            margin-left: 7px;
+            background-color: transparent;
+            border: none;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+        }
+
+        .link-label {
+            color: #d8d8d8;
+        }
+
+        .ticket-link {
+            display: flex;
+            flex-direction: row;
+        }
+
+        #del-link {
+            margin-left: 10px;
+            margin-right: 1px !important;
+            background-color: transparent;
+            border: none;
+            min-height: 25px !important;
+            min-width: 25px !important;
+            transition: background-color 0.3s;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        #edit-link {
+            min-height: 25px !important;
+            min-width: 25px !important;
+            background-color: transparent;
+            border: none;
+            transition: background-color 0.3s;
+            border-radius: 10px;
+            display: flex; 
+            align-items: center;
+        }
     </style>
     <title>Вертикальные блоки</title>
 </head>
@@ -1840,6 +1938,182 @@
                                     <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
                                 </svg>
                             </button>`);
+            },
+            error: function (xhr, status, error) {
+                toastr.error(xhr.responseText || 'Произошла ошибка!');
+            }
+        });
+    }
+
+    function addLink(ticketId){
+
+        var linkDataDiv = `
+            <div id="link-data-div">
+                <div style="position: relative">
+                    <input id="link-name" type="text" class="input" name="Name" placeholder=""/>
+                    <label class="placeholder">Название</label>
+                </div>
+                <div style="position: relative; margin-left: 10px;">
+                    <input id="link-source" type="text" class="input" name="Source" placeholder=""/>
+                    <label class="placeholder">Ссылка</label>
+                </div>
+                <button id="accept-new-link" type="button" onclick="acceptNewLink(${ticketId})">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="30" width="30" viewBox="0 0 448 512" fill="#15c118">
+                            <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
+                        </svg>
+                    </button>
+
+                    <button id="cancel-new-link" type="button" onclick="cancelNewLink()">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="30" width="30" viewBox="0 0 384 512" fill="#f01313">
+                            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                        </svg>
+                    </button>
+            </div>`;
+
+        $("#links").find(".inner-tab-content").prepend(linkDataDiv);
+
+        $("#links-empty").remove();
+    }
+
+    function cancelNewLink() {
+        $("#link-data-div").remove();
+
+        var linksDiv = $("#links").find(".inner-tab-content");
+
+        if(linksDiv.hasClass("ticket-link") != -1){
+             linksDiv.prepend(`<h4 id="links-empty"style="color: #d8d8d8">Нет ссылок в карточке</h4>`);
+        }
+    }
+
+    function acceptNewLink(ticketId){
+
+        var link = {
+            Name: $("#link-name").val(),
+            Source: $("#link-source").val()
+        };
+        
+        $.ajax({
+            url: "/Link/CreateLink",
+            method: "POST",
+            data: { ticketId, link },
+            success: function(result){
+                $("#links").find(".inner-tab-content").empty();
+
+                result.forEach(function(link){
+                    var linkDiv = `
+                        <div id="link-${link.id}" class="ticket-link">
+                            <a class="link-label" href="${link.source}">${link.name}</a>
+                        </div>`;
+
+                    $("#links").find(".inner-tab-content").append(linkDiv);
+                });
+            },
+            error: function (xhr, status, error) {
+                toastr.error(xhr.responseText || 'Произошла ошибка!');
+            }
+        });
+    }
+
+    function delLink(linkId){
+        $.ajax({
+            url: "/Link/DeleteLink",
+            method: "POST",
+            data: { linkId },
+            success: function (result) {
+                $("#links").find(".inner-tab-content").find("#link-" + linkId).remove();
+            },
+            error: function (xhr, status, error) {
+                toastr.error(xhr.responseText || 'Произошла ошибка!');
+            }
+        });
+    }
+
+    var linkName;
+    var linkSource;
+
+    function editLink(ticketId, linkId) {
+
+        linkName = $("#link-" + linkId).find(".link-label").text();
+        linkSource = $("#link-" + linkId).find(".link-label").attr("href");
+
+        var linkDataDiv = `
+            <div id="link-data-div">
+                <div style="position: relative">
+                    <input id="link-name" type="text" class="input" name="Name" placeholder="" value="${linkName}"/>
+                    <label class="placeholder">Название</label>
+                </div>
+                <div style="position: relative; margin-left: 10px;">
+                    <input id="link-source" type="text" class="input" name="Source" placeholder="" value="${linkSource}"/>
+                    <label class="placeholder">Ссылка</label>
+                </div>
+                <button id="accept-new-link" type="button" onclick="acceptEditLink(${ticketId}, ${linkId})">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="30" width="30" viewBox="0 0 448 512" fill="#15c118">
+                            <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
+                        </svg>
+                    </button>
+
+                    <button id="cancel-new-link" type="button" onclick="cancelEditLink(${ticketId}, ${linkId})">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="30" width="30" viewBox="0 0 384 512" fill="#f01313">
+                            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                        </svg>
+                    </button>
+            </div>`;
+
+        $("#link-" + linkId).html(linkDataDiv);
+    }
+
+    function cancelEditLink(ticketId, linkId) {
+
+        $("#link-data-div").remove();
+
+        var linkDiv = `
+            <a class="link-label" href="${linkSource}">${linkName}</a>
+            <button id="del-link" type="button" onclick="delLink(${linkId})">
+                <svg class="delete-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                    <path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z" />
+                </svg>
+            </button>
+            <button id="edit-link" type="button" onclick="editLink(${ticketId}, ${linkId})">
+                <svg id="edit-board-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                    <path d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z" />
+                </svg>
+            </button>`;
+
+        $("#link-" + linkId).html(linkDiv);
+
+    }
+
+    function acceptEditLink(ticketId, linkId) {
+
+        //linkName = $("#link-" + linkId).find(".link-label").text();
+        //linkSource = $("#link-" + linkId).find(".link-label").attr("href");
+        linkName = $("#link-name").val();
+        linkSource = $("#link-source").val();
+        $("#link-data-div").remove();
+
+         var link = {
+            Id: linkId,
+            Name: linkName,
+            Source: linkSource
+        };
+
+        $.ajax({
+            url: "/Link/EditLink",
+            method: "POST",
+            data: { newLinkData: link },
+            success: function(result) {
+                $("#link-" + result.id).html(`
+                    <a class="link-label" href="${result.source}">${result.name}</a>
+                    <button id="del-link" type="button" onclick="delLink(${linkId})">
+                        <svg class="delete-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                            <path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z" />
+                        </svg>
+                    </button>
+                    <button id="edit-link" type="button" onclick="editLink(${ticketId}, ${result.id})">
+                        <svg id="edit-board-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                            <path d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z" />
+                        </svg>
+                    </button>`);
             },
             error: function (xhr, status, error) {
                 toastr.error(xhr.responseText || 'Произошла ошибка!');

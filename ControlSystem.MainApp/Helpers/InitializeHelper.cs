@@ -18,6 +18,7 @@ namespace ControlSystem.MainApp.Helpers
             services.AddScoped<IRepository<Priority>, PriorityRepository>();
             services.AddScoped<IRepository<Comment>, CommentRepository>();
             services.AddScoped<IRepository<FileAttachment>, FileRepository>();
+            services.AddScoped<IRepository<Link>, LinkRepository>();
         }
 
         public static void InitializeServices(this IServiceCollection services)
@@ -28,6 +29,7 @@ namespace ControlSystem.MainApp.Helpers
             services.AddScoped<IBoardService, BoardService>();
             services.AddScoped<ITagService, TagService>();
             services.AddScoped<IPriorityService, PriorityService>();
+            services.AddScoped<ILinkService, LinkService>();
         }
     }
 }

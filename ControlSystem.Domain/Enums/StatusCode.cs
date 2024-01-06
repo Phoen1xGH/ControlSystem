@@ -27,6 +27,9 @@ namespace ControlSystem.Domain.Enums
         [Description("Приотритет не найден")]
         PriorityNotFound = 6,
 
+        [Description("Ссылка не найдена")]
+        LinkNotFound = 7,
+
         #endregion
 
         #region Http statuses
