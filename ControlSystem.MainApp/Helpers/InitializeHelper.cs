@@ -30,6 +30,7 @@ namespace ControlSystem.MainApp.Helpers
             services.AddScoped<ITagService, TagService>();
             services.AddScoped<IPriorityService, PriorityService>();
             services.AddScoped<ILinkService, LinkService>();
+            services.AddScoped<IFileService, FileService>();
         }
     }
 }

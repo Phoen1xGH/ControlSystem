@@ -1,5 +1,6 @@
 ﻿using ControlSystem.DAL.Interfaces;
 using ControlSystem.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace ControlSystem.DAL.Repositories
 {
@@ -27,6 +28,10 @@ namespace ControlSystem.DAL.Repositories
         public IQueryable<FileAttachment> GetAll()
         {
             return _context.Attachments;
+        }
+        public IQueryable<FileAttachment> GetAllWithContent()
+        {
+            return _context.Attachments.Include(x => x.FileContent);
         }
 
         public async Task Update(FileAttachment entity)

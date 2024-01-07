@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 
-
    @* <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>*@
     <style>
         body, html {
@@ -195,6 +194,7 @@
             align-items: center;
         }
         
+        #del-file:hover,
         #del-link:hover,
         #delete-board:hover {
                 background-color: #4f5762; /* Цвет подсветки при наведении */
@@ -284,6 +284,7 @@
             border-radius: 10px;
         }
 
+        #add-file-button,
         #add-button,
         #open-modal-ticket{
             margin-right: 2px;
@@ -793,15 +794,26 @@
             border-radius: 20px;
         }
 
+        .file-label,
         .link-label {
             color: #d8d8d8;
         }
 
+        .file-label:hover {
+            text-decoration: underline;
+            color: white;
+            cursor: pointer;
+        }
+
+        .ticket-file,
         .ticket-link {
             display: flex;
             flex-direction: row;
+            border-bottom: 1px solid #d8d8d8;
+            padding: 7px;
         }
 
+        #del-file,
         #del-link {
             margin-left: 10px;
             margin-right: 1px !important;
@@ -825,6 +837,12 @@
             display: flex; 
             align-items: center;
         }
+
+        #del-link,
+        #del-file {
+            margin-left: auto;
+        }
+
     </style>
     <title>Вертикальные блоки</title>
 </head>
@@ -2120,5 +2138,125 @@
             }
         });
     }
+
+    function uploadFile(ticketId) {
+        var fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.style.display = 'none';
+        fileInput.multiple = true;
+
+        document.body.appendChild(fileInput);
+
+        fileInput.addEventListener('change', function () {
+            // Получаем выбранные файлы
+            var files = fileInput.files;
+
+            // Создаем объект FormData и добавляем все файлы
+            var formData = new FormData();
+
+            formData.append('ticketId', ticketId);
+            for (var i = 0; i < files.length; i++) {
+                formData.append('files', files[i]);
+            }
+
+            // Создаем объект XMLHttpRequest
+            var xhr = new XMLHttpRequest();
+
+            // Настраиваем запрос
+            xhr.open('POST', '/File/AddFiles', true);
+
+            // Обработка завершения запроса
+            xhr.onload = function () {
+            if (xhr.status === 200) {
+                
+                $("#files-empty").remove();
+                var files = JSON.parse(xhr.responseText);
+
+                $("#files").find(".inner-tab-content").empty();
+
+                files.forEach(function(file) {
+
+                    var fileDiv = `
+                        <div id="file-${file.id}" class="ticket-file">
+                            <label class="file-label" onclick="downloadFile(${file.id}, '${file.name}')">${file.name}</label>
+                            <button id="del-link" type="button" onclick="delFile(${file.id})">
+                                <svg class="delete-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                    <path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z" />
+                                </svg>
+                            </button>
+                        </div>`;
+
+                    $("#files").find(".inner-tab-content").append(fileDiv);
+                });
+
+            } else {
+                toastr.error(xhr.responseText || 'Произошла ошибка!');
+            }
+
+                // Удаляем временный input
+                document.body.removeChild(fileInput);
+            };
+
+            // Отправляем запрос на сервер с данными FormData
+            xhr.send(formData);
+        });
+
+        // Запускаем окно выбора файлов
+        fileInput.click();
+    }
+
+
+    function delFile(fileId) {
+
+        $.ajax({
+            url: "/File/DeleteFile",
+            method: "POST",
+            data: { fileId },
+            success: function(result) {
+                $("#files").find(".inner-tab-content").find("#file-" + fileId).remove();
+            },
+            error: function (xhr, status, error) {
+                toastr.error(xhr.responseText || 'Произошла ошибка!');
+            }
+        });
+    }
+
+    function downloadFile(fileId, fileName) {
+        // Создаем объект XMLHttpRequest
+        var xhr = new XMLHttpRequest();
+
+        // Настраиваем запрос
+        xhr.open('GET', '/File/DownloadFile?fileId=' + fileId + '&fileName=' + encodeURIComponent(fileName), true);
+
+        // Ответ будет в виде массива байтов
+        xhr.responseType = 'arraybuffer';
+
+        // Обработка завершения запроса
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                // Создаем ссылку для скачивания
+                var blob = new Blob([xhr.response], { type: 'application/octet-stream' });
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+
+                // Используем название файла для сохранения
+                link.download = fileName;
+
+                // Добавляем ссылку на страницу и эмулируем клик
+                document.body.appendChild(link);
+                link.click();
+
+                // Удаляем ссылку
+                document.body.removeChild(link);
+            } else {
+                console.error('Произошла ошибка:', xhr.status, xhr.statusText);
+                toastr.error('Произошла ошибка при скачивании файла.');
+            }
+        };
+
+        // Отправляем запрос
+        xhr.send();
+    }
+
 
 </script>

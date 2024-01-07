@@ -30,6 +30,9 @@ namespace ControlSystem.Domain.Enums
         [Description("Ссылка не найдена")]
         LinkNotFound = 7,
 
+        [Description("Файл не найден")]
+        FileNotFound = 8,
+
         #endregion
 
         #region Http statuses

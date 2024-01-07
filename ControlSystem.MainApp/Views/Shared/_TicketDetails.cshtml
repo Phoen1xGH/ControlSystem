@@ -168,16 +168,23 @@
                                 {
                                     @foreach (var file in Model.Files)
                                     {
-                                        <p>@file.Name</p>
+                                        <div id="file-@file.Id" class="ticket-file">
+                                            <label class="file-label" onclick="downloadFile(@file.Id, '@file.Name')">@file.Name</label>
+                                            <button id="del-file" type="button" onclick="delFile(@file.Id)">
+                                                <svg class="delete-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                    <path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z" />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     }
                                 }
                                 else
                                 {
-                                    <h4 style="color: #d8d8d8">Нет файлов в карточке</h4>
+                                    <h4 id="files-empty" style="color: #d8d8d8">Нет файлов в карточке</h4>
                                 }
                             </div>
                             <div class="add-button-tab-container">
-                                <button id="add-button" style="margin-left: 7px">
+                                <button id="add-button" style="margin-left: 7px" type="button" onclick="uploadFile(@Model.Id)">
                                     <svg id="add-button-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
                                         <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
                                     </svg>
