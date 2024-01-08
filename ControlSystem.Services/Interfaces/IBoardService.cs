@@ -17,5 +17,7 @@ namespace ControlSystem.Services.Interfaces
 
         BaseResponse<List<Ticket>> GetTickets(int boardId);
         Task<BaseResponse<Ticket>> GetTicketById(int ticketId);
+
+        Task<BaseResponse<bool>> RemoveParticipant(int ticketId, int participantId);
     }
 }

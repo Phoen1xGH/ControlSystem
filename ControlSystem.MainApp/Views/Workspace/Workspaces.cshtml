@@ -194,6 +194,7 @@
             align-items: center;
         }
         
+        #del-part:hover,
         #del-file:hover,
         #del-link:hover,
         #delete-board:hover {
@@ -794,6 +795,7 @@
             border-radius: 20px;
         }
 
+        .part-label,
         .file-label,
         .link-label {
             color: #d8d8d8;
@@ -805,6 +807,7 @@
             cursor: pointer;
         }
 
+        .ticket-part,
         .ticket-file,
         .ticket-link {
             display: flex;
@@ -813,6 +816,7 @@
             padding: 7px;
         }
 
+        #del-part,
         #del-file,
         #del-link {
             margin-left: 10px;
@@ -838,6 +842,7 @@
             align-items: center;
         }
 
+        #del-part,
         #del-link,
         #del-file {
             margin-left: auto;
@@ -2258,5 +2263,23 @@
         xhr.send();
     }
 
+    function removePart(ticketId, partId) {
+        $.ajax({
+            url: "/Ticket/RemoveParticipant",
+            method: "POST",
+            data: { ticketId: ticketId, participantId: partId },
+            success: function() {
+
+                $("#part-" + partId).remove();
+
+                if ($("#participants").find(".inner-tab-content").hasClass("ticket-part") != -1) {
+                    $("#participants").find(".inner-tab-content").append(`<h4 style="color: #d8d8d8">Нет участников в карточке</h4>`);
+                }
+            },
+            error: function (xhr, status, error) {
+                toastr.error(xhr.responseText || 'Произошла ошибка!');
+            }
+        });
+    }
 
 </script>

@@ -130,7 +130,9 @@ namespace ControlSystem.Services.Implementations
                     };
                 }
 
-                var ticket = new Ticket { Title = title, Author = author };
+                var participants = board.Workspace.Participants;
+
+                var ticket = new Ticket { Title = title, Author = author, Participants = participants };
 
                 await (_boardRepository as BoardRepository)!.AddTicket(board, ticket);
 
@@ -518,6 +520,70 @@ namespace ControlSystem.Services.Implementations
                     Data = null
                 };
             }
+        }
+
+        public async Task<BaseResponse<bool>> RemoveParticipant(int ticketId, int participantId)
+        {
+            try
+            {
+                var ticket = await _ticketRepository.GetAll().FirstOrDefaultAsync(x => x.Id == ticketId);
+
+                if (ticket is null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.TicketNotFound,
+                        Description = StatusCode.TicketNotFound.GetDescriptionValue(),
+                        Data = false
+                    };
+                }
+
+                var user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Id == participantId);
+
+                if (user is null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.UserNotFound,
+                        Description = StatusCode.UserNotFound.GetDescriptionValue(),
+                        Data = false
+                    };
+                }
+
+                ticket.Participants.Remove(user);
+
+                await _ticketRepository.Update(ticket);
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[RemoveParticipant]: {ex.Message}");
+
+                return new BaseResponse<bool>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = false
+                };
+            }
+        }
+
+        public void AddParts()
+        {
+            var tickets = _ticketRepository.GetAll().ToList();
+
+            foreach (var item in tickets)
+            {
+                item.Participants = item.Status.Workspace.Participants;
+                _ticketRepository.Update(item);
+            }
+
         }
     }
 }

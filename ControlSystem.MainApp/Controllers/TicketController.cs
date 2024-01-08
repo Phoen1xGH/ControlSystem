@@ -1,5 +1,6 @@
 ﻿using ControlSystem.MainApp.DTO;
 using ControlSystem.Services.DTO;
+using ControlSystem.Services.Implementations;
 using ControlSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -150,6 +151,27 @@ namespace ControlSystem.MainApp.Controllers
                 }
             }
             return BadRequest("Произошла ошибка при открытии задачи");
+        }
+
+
+        public async Task<ActionResult> RemoveParticipant(int ticketId, int participantId)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _boardService.RemoveParticipant(ticketId, participantId);
+
+                if (response.StatusCode == Domain.Enums.StatusCode.OK)
+                {
+                    return Ok();
+                }
+                ModelState.AddModelError("", response.Description);
+            }
+            return BadRequest("Ошибка при удалении участника");
+        }
+
+        public void AddPartsToAllTicket()
+        {
+            (_boardService as BoardService)!.AddParts();
         }
     }
 }

@@ -35,7 +35,7 @@ namespace ControlSystem.DAL.Repositories
                 .Include(x => x.Attachments)
                     .ThenInclude(x => x.FileContent)
                 .Include(x => x.Comments)
-                .Include(x => x.Status)
+                .Include(x => x.Status).ThenInclude(x => x.Workspace).ThenInclude(x => x.Participants)
                 .Include(x => x.Priority);
 
         }

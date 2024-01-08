@@ -22,5 +22,14 @@ namespace ControlSystem.DAL
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<UserAccount> UserAccounts { get; set; }
         public DbSet<Workspace> Workspaces { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Ticket>()
+                .HasMany(t => t.Participants)
+                .WithMany();
+        }
     }
 }
