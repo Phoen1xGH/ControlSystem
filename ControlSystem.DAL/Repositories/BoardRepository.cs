@@ -28,6 +28,7 @@ namespace ControlSystem.DAL.Repositories
             return _context.Boards
                 .Include(x => x.Tickets).ThenInclude(x => x.Author)
                 .Include(x => x.Tickets).ThenInclude(x => x.Priority)
+                .Include(x => x.Tickets).ThenInclude(x => x.Tags)
                 .Include(x => x.Workspace).ThenInclude(x => x.Participants);
         }
 

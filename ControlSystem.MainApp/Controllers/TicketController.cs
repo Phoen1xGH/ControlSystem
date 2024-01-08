@@ -33,7 +33,8 @@ namespace ControlSystem.MainApp.Controllers
                         Id = ticket.Id,
                         Title = ticket.Title,
                         StatusId = ticket.Status.Id,
-                        WorkspaceId = ticket.Status.Workspace.Id
+                        WorkspaceId = ticket.Status.Workspace.Id,
+                        Priority = ticket.Priority
                     }).ToList();
 
                     return Json(ticketsToJson);
@@ -60,7 +61,8 @@ namespace ControlSystem.MainApp.Controllers
                         Id = ticket.Id,
                         Title = ticket.Title,
                         StatusId = ticket.Status.Id,
-                        WorkspaceId = ticket.Status.Workspace.Id
+                        WorkspaceId = ticket.Status.Workspace.Id,
+                        Priority = ticket.Priority
                     }).ToList();
 
                     ticketsToJson.Reverse();
@@ -90,7 +92,8 @@ namespace ControlSystem.MainApp.Controllers
                         Id = ticket.Id,
                         Title = ticket.Title,
                         StatusId = ticket.Status.Id,
-                        WorkspaceId = ticket.Status.Workspace.Id
+                        WorkspaceId = ticket.Status.Workspace.Id,
+                        Priority = ticket.Priority
                     }).ToList();
 
                     ticketsToJson.Reverse();

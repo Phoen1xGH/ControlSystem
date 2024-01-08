@@ -171,8 +171,8 @@
             border-right: 1px solid #3c414a;
             border-left: 1px solid #3c414a;
             align-items: center !important;
-            display: flex;
-            flex-direction: column;
+            /*display: flex;
+            flex-direction: column;*/
             overflow: auto;
             padding-bottom: 18px;
         }
@@ -291,7 +291,7 @@
             margin-right: 2px;
             min-height: 25px !important;
             min-width: 25px !important;
-            max-height: 25px !important;
+           /* max-height: 25px !important;*/
             max-width: 25px !important;
             background-color: transparent;
             border: none;
@@ -336,14 +336,17 @@
         .ticket{
             width: 210px;
             border-radius: 20px;
-            min-height: 50px;
+            min-height: 60px;
+            margin-left: auto;
+            margin-right: auto;
             margin-top: 18px;
             background-color:  #3c414a;
             border: 1px solid #87909e;
             text-align: center;
             color: #d8d8d8;
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
+            box-sizing: border-box;
         }
         
         .ticket:hover {
@@ -848,6 +851,23 @@
             margin-left: auto;
         }
 
+        .ticket-preview-priority,
+        .ticket-title-preview {
+             display: flex; 
+             flex-direction: row;
+              
+        }
+
+        .ticket-preview-priority {
+            margin-top: 5px;
+            margin-bottom: 5px; 
+            margin-left: 10px;
+
+        }
+
+        /*.ticket-title-preview {
+            min-height: 50px;
+        }*/
     </style>
     <title>Вертикальные блоки</title>
 </head>
@@ -932,12 +952,25 @@
                                     foreach (var ticket in tickets)
                                     {
                                         <div class="ticket" id="ticket-@ticket.Id" onclick="openTicket(@board.Workspace.Id, @ticket.Id)">
-                                            <label id="ticket-preview-label">@ticket.Title</label>
-                                            <button id="ticket-del-button" onclick="deleteTicket(@board.Id, @ticket.Id)">
-                                                <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red">
-                                                    <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/>
-                                                </svg>
-                                            </button>
+                                            <div class="ticket-title-preview">
+                                                <label id="ticket-preview-label">@ticket.Title</label>
+                                                <button id="ticket-del-button" onclick="deleteTicket(@board.Id, @ticket.Id)">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red">
+                                                        <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            @if (ticket.Priority != null)
+                                            {
+                                                <div class="ticket-preview-priority">
+                                                    <svg class="prio-image" width="20px" height="20px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                                                        <path fill="#d8d8d8" d="M288 128h608L736 384l160 256H288v320h-96V64h96v64z" />
+                                                    </svg>
+                                                    <div style="margin-left: 7px; padding-left: 7px; padding-right: 7px; background-color: @ticket.Priority.ColorHex; border-radius: 20px;">
+                                                        <label style="font-weight: bold; color: black">@ticket.Priority.Name</label>
+                                                    </div>
+                                                </div>
+                                            }
                                         </div>
                                     }
                                 }
@@ -1242,28 +1275,35 @@
 
                 var ticketsDiv = $('#board-' + result[0].statusId);
                 ticketsDiv.empty();
+
                 result.forEach(function (ticket) {
-                    
-                //ticketsDiv.append('<div class="ticket"><label style="color: #d8d8d8">' + ticket.title + '</label></div>');
-                    var ticketElement = $('<div class="ticket"><label id="ticket-preview-label">' + ticket.title + '</label></div>');
-                    ticketElement.attr('id', 'ticket-' + ticket.Id);
+                    var ticketElement = `
+                                <div class="ticket" id="ticket-${ticket.id}" onclick="openTicket(${ticket.workspaceId}, ${ticket.id})">
+                                    <div class="ticket-title-preview">
+                                        <label id="ticket-preview-label">${ticket.title}</label>
+                                        <button id="ticket-del-button" onclick="deleteTicket(${ticket.statusId}, ${ticket.id})">
+                                            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red">
+                                                <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                `;
+                        if(ticket.priority != null) {
+                            console.log(ticket.priority);
+                            ticketElement += `
+                                <div class="ticket-preview-priority">
+                                    <svg class="prio-image" width="20px" height="20px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill="#d8d8d8" d="M288 128h608L736 384l160 256H288v320h-96V64h96v64z" />
+                                    </svg>
+                                    <div style="margin-left: 7px; padding-left: 7px; padding-right: 7px; background-color: ${ticket.priority.colorHex}; border-radius: 20px;">
+                                        <label style="font-weight: bold; color: black">${ticket.priority.name}</label>
+                                    </div>
+                                </div>`;
+                        }
 
-                    // Добавляем обработчик события click
-                    ticketElement.click(function () {
-                        openTicket(ticket.workspaceId, ticket.id);
-                    });
-
-                    var button = $('<button id="ticket-del-button"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg></button>');
-
-                    // Добавляем обработчик события click
-                    button.click(function() {
-                        deleteTicket(ticket.statusId, ticket.Id);
-                    });
-
-                    ticketElement.append(button);
-
-                    // Добавляем элемент в ticketsDiv
-                    ticketsDiv.append(ticketElement);
+                        ticketElement += `</div>`;
+                        // Добавляем элемент в ticketsDiv
+                        ticketsDiv.append(ticketElement);
                 });
 
                 toastr.success('Тикет успешно создан!');
@@ -1340,27 +1380,33 @@
                 var ticketsDiv = $('#board-' + result[0].statusId);
                 ticketsDiv.empty();
                 result.forEach(function (ticket) {
-                    
-                //ticketsDiv.append('<div class="ticket"><label style="color: #d8d8d8">' + ticket.title + '</label></div>');
-                    var ticketElement = $('<div class="ticket"><label id="ticket-preview-label">' + ticket.title + '</label></div>');
-                    ticketElement.attr('id', 'ticket-' + ticket.Id);
+                 var ticketElement = `
+                                <div class="ticket" id="ticket-${ticket.id}" onclick="openTicket(${ticket.workspaceId}, ${ticket.id})">
+                                    <div class="ticket-title-preview">
+                                        <label id="ticket-preview-label">${ticket.title}</label>
+                                        <button id="ticket-del-button" onclick="deleteTicket(${ticket.statusId}, ${ticket.id})">
+                                            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red">
+                                                <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                `;
+                        if(ticket.priority != null) {
+                            console.log(ticket.priority);
+                            ticketElement += `
+                                <div class="ticket-preview-priority">
+                                    <svg class="prio-image" width="20px" height="20px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill="#d8d8d8" d="M288 128h608L736 384l160 256H288v320h-96V64h96v64z" />
+                                    </svg>
+                                    <div style="margin-left: 7px; padding-left: 7px; padding-right: 7px; background-color: ${ticket.priority.colorHex}; border-radius: 20px;">
+                                        <label style="font-weight: bold; color: black">${ticket.priority.name}</label>
+                                    </div>
+                                </div>`;
+                        }
 
-                    // Добавляем обработчик события click
-                    ticketElement.click(function () {
-                        openTicket(ticket.workspaceId, ticket.id);
-                    });
-
-                    var button = $('<button id="ticket-del-button"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg></button>');
-
-                    // Добавляем обработчик события click
-                    button.click(function() {
-                        deleteTicket(ticket.statusId, ticket.id);
-                    });
-
-                    ticketElement.append(button);
-
-                    // Добавляем элемент в ticketsDiv
-                    ticketsDiv.append(ticketElement);
+                        ticketElement += `</div>`;
+                        // Добавляем элемент в ticketsDiv
+                        ticketsDiv.append(ticketElement);
                 });
 
                 toastr.success('Изменения сохранены!');
@@ -1385,30 +1431,37 @@
             method: "POST",
             data: { boardId: boardId, ticketId: ticketId },
             success: function(result) {
-                 var ticketsDiv = $('#board-' + result[0].statusId);
+                var ticketsDiv = $('#board-' + result[0].statusId);
                 ticketsDiv.empty();
                 result.forEach(function (ticket) {
                     
-                //ticketsDiv.append('<div class="ticket"><label style="color: #d8d8d8">' + ticket.title + '</label></div>');
-                    var ticketElement = $('<div class="ticket"><label id="ticket-preview-label">' + ticket.title + '</label></div>');
-                    ticketElement.attr('id', 'ticket-' + ticket.id);
+                    var ticketElement = `
+                                <div class="ticket" id="ticket-${ticket.id}" onclick="openTicket(${ticket.workspaceId}, ${ticket.id})">
+                                    <div class="ticket-title-preview">
+                                        <label id="ticket-preview-label">${ticket.title}</label>
+                                        <button id="ticket-del-button" onclick="deleteTicket(${ticket.statusId}, ${ticket.id})">
+                                            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red">
+                                                <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                `;
+                        if(ticket.priority != null) {
+                            console.log(ticket.priority);
+                            ticketElement += `
+                                <div class="ticket-preview-priority">
+                                    <svg class="prio-image" width="20px" height="20px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill="#d8d8d8" d="M288 128h608L736 384l160 256H288v320h-96V64h96v64z" />
+                                    </svg>
+                                    <div style="margin-left: 7px; padding-left: 7px; padding-right: 7px; background-color: ${ticket.priority.colorHex}; border-radius: 20px;">
+                                        <label style="font-weight: bold; color: black">${ticket.priority.name}</label>
+                                    </div>
+                                </div>`;
+                        }
 
-                    // Добавляем обработчик события click
-                    ticketElement.click(function () {
-                        openTicket(ticket.workspaceId, ticket.id);
-                    });
-
-                    var button = $('<button id="ticket-del-button" onclick="deleteTicket(' + boardId + ',' + ticketId + ')"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512" fill="red"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg></button>');
-
-                    // Добавляем обработчик события click
-                    button.click(function() {
-                        deleteTicket(boardId, ticketId);
-                    });
-
-                    ticketElement.append(button);
-
-                    // Добавляем элемент в ticketsDiv
-                    ticketsDiv.append(ticketElement);
+                        ticketElement += `</div>`;
+                        // Добавляем элемент в ticketsDiv
+                        ticketsDiv.append(ticketElement);
                 });
 
                 toastr.success('Задача успешно удалена!');
