@@ -129,8 +129,11 @@ namespace ControlSystem.MainApp.Controllers
                     {
                         Id = x.Id,
                         AuthorName = x.Author.Username,
-                        Content = x.Content
+                        Content = x.Content,
+                        CreationDate = x.CreationDate.ToString("dd.MM.yyyy  HH:mm")
                     }).ToList();
+
+                    comments.Reverse();
 
                     var model = new TicketDTO
                     {
@@ -156,6 +159,20 @@ namespace ControlSystem.MainApp.Controllers
             return BadRequest("Произошла ошибка при открытии задачи");
         }
 
+        public async Task<ActionResult> AddExecutor(int ticketId, int userId)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _boardService.AddExecutorToTicket(ticketId, userId);
+
+                if (response.StatusCode == Domain.Enums.StatusCode.OK)
+                {
+                    return Json(response.Data);
+                }
+                ModelState.AddModelError("", response.Description);
+            }
+            return BadRequest("Ошибка при добавлении ответственного");
+        }
 
         public async Task<ActionResult> RemoveParticipant(int ticketId, int participantId)
         {

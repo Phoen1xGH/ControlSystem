@@ -238,52 +238,6 @@ namespace ControlSystem.Services.Implementations
                     };
                 }
 
-                //var status = await _boardRepository.GetAll().FirstOrDefaultAsync(x => x.Id == newTicketData.StatusId);
-                //var author = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Username == newTicketData.Author.Name);
-
-                //var executor = newTicketData.Executor is not null ?
-                //    await _userRepository.GetAll()
-                //        .FirstOrDefaultAsync(x => x.Username == newTicketData.Executor.Name) :
-                //    null;
-
-                //var users = _userRepository.GetAll();
-                //var commentsAll = _commentRepository.GetAll();
-                //var filesAll = _fileRepository.GetAll();
-
-                //var participants = newTicketData.Participants is not null ? users
-                //    .Where(user => newTicketData.Participants
-                //        .Any(part => part.Name == user.Username))
-                //    .ToList() :
-                //    null;
-
-                //var files = newTicketData.Files is not null ?
-                //    filesAll
-                //        .Where(file => newTicketData.Files
-                //            .Any(fileDTO => fileDTO.Id == file.Id))
-                //        .ToList() :
-                //    new();
-
-                //var comments = newTicketData.Comments is not null ?
-                //    commentsAll
-                //        .Where(comment => newTicketData.Comments
-                //            .Any(commentDTO => commentDTO.Id == comment.Id))
-                //        .ToList() :
-                //    new();
-
-                //ticket.Status = status!;
-                //ticket.Author = author!;
-                //ticket.Description = newTicketData.Description;
-                //ticket.Priority = newTicketData.Priority;
-                //ticket.Attachments = files;
-                //ticket.Participants = participants;
-                //ticket.Comments = comments;
-                //ticket.Tags = newTicketData.Tags;
-                //ticket.Links = newTicketData.Links;
-                //ticket.DeadlineDate = newTicketData.DeadlineDate;
-                //ticket.Executor = executor;
-                //ticket.Title = newTicketData.Title;
-                //ticket.UpdatedDate = DateTime.Now;
-
                 ticket.Description = newTicketData.Description;
                 ticket.Title = newTicketData.Title;
 
@@ -570,6 +524,61 @@ namespace ControlSystem.Services.Implementations
                     StatusCode = StatusCode.InternalServerError,
                     Description = ex.Message,
                     Data = false
+                };
+            }
+        }
+
+
+
+        public async Task<BaseResponse<UserAccount>> AddExecutorToTicket(int ticketId, int userId)
+        {
+            try
+            {
+                var ticket = await _ticketRepository.GetAll().FirstOrDefaultAsync(x => x.Id == ticketId);
+
+                if (ticket is null)
+                {
+                    return new BaseResponse<UserAccount>
+                    {
+                        StatusCode = StatusCode.TicketNotFound,
+                        Description = StatusCode.TicketNotFound.GetDescriptionValue(),
+                        Data = null
+                    };
+                }
+
+                var user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Id == userId);
+
+                if (user is null)
+                {
+                    return new BaseResponse<UserAccount>
+                    {
+                        StatusCode = StatusCode.UserNotFound,
+                        Description = StatusCode.UserNotFound.GetDescriptionValue(),
+                        Data = null
+                    };
+                }
+
+                ticket.Executor = user;
+
+                await _ticketRepository.Update(ticket);
+
+                return new BaseResponse<UserAccount>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = user
+                };
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex, $"[AddExecutorToTicket]: {ex.Message}");
+
+                return new BaseResponse<UserAccount>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = null
                 };
             }
         }

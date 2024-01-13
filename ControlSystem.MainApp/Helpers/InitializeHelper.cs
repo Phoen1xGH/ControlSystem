@@ -31,6 +31,7 @@ namespace ControlSystem.MainApp.Helpers
             services.AddScoped<IPriorityService, PriorityService>();
             services.AddScoped<ILinkService, LinkService>();
             services.AddScoped<IFileService, FileService>();
+            services.AddScoped<ICommentService, CommentService>();
         }
     }
 }

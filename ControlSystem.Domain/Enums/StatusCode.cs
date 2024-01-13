@@ -33,6 +33,9 @@ namespace ControlSystem.Domain.Enums
         [Description("Файл не найден")]
         FileNotFound = 8,
 
+        [Description("Комментарий не найден")]
+        CommentNotFound = 9,
+
         #endregion
 
         #region Http statuses

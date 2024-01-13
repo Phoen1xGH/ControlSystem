@@ -19,5 +19,6 @@ namespace ControlSystem.Services.Interfaces
         Task<BaseResponse<Ticket>> GetTicketById(int ticketId);
 
         Task<BaseResponse<bool>> RemoveParticipant(int ticketId, int participantId);
+        Task<BaseResponse<UserAccount>> AddExecutorToTicket(int ticketId, int userId);
     }
 }

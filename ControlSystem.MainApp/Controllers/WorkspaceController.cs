@@ -189,5 +189,39 @@ namespace ControlSystem.MainApp.Controllers
             }
             return RedirectToAction("Workspaces");
         }
+
+
+        [HttpGet("InviteUser/Workspace/{workspaceId}")]
+        public async Task<ActionResult> InviteUserToWorkspace(int workspaceId)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _workspaceService.GetWorkspaceById(workspaceId);
+                var userResponse = _userService.GetUser(User.Identity!.Name!);
+                if (response.StatusCode == Domain.Enums.StatusCode.OK)
+                {
+                    ViewBag.UserId = userResponse.Id;
+                    return View(response.Data);
+                }
+                ModelState.AddModelError("", response.Description);
+            }
+            return BadRequest("Ошибка при прохождении по ссылке");
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> InviteUserToWorkspace(int workspaceId, int userId)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _workspaceService.AddWorkspaceToUser(workspaceId, userId);
+
+                if (response.StatusCode == Domain.Enums.StatusCode.OK)
+                {
+                    return RedirectToAction("Workspaces");
+                }
+                ModelState.AddModelError("", response.Description);
+            }
+            return RedirectToAction("Workspaces");
+        }
     }
 }

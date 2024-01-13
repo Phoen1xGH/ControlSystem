@@ -318,5 +318,92 @@ namespace ControlSystem.Services.Implementations
                 };
             }
         }
+
+        public async Task<BaseResponse<bool>> AddWorkspaceToUser(int workspaceId, int userId)
+        {
+            try
+            {
+                var workspace = await _workspaceRepository.GetAll().FirstOrDefaultAsync(x => x.Id == workspaceId);
+
+                if (workspace is null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.WorkspaceNotFound,
+                        Description = StatusCode.WorkspaceNotFound.GetDescriptionValue(),
+                        Data = false
+                    };
+                }
+
+                var user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Id == userId);
+
+                if (user is null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.UserNotFound,
+                        Description = StatusCode.UserNotFound.GetDescriptionValue(),
+                        Data = false
+                    };
+                }
+
+                await (_userRepository as UserAccountRepository)!.AddWorkspaceToUser(user, workspace);
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = true
+                };
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[AddWorkspaceToUser]: {ex.Message}");
+
+                return new BaseResponse<bool>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = false
+                };
+            }
+        }
+
+        public async Task<BaseResponse<Workspace>> GetWorkspaceById(int workspaceId)
+        {
+            try
+            {
+                var workspace = await _workspaceRepository.GetAll().FirstOrDefaultAsync(x => x.Id == workspaceId);
+
+                if (workspace is null)
+                {
+                    return new BaseResponse<Workspace>()
+                    {
+                        StatusCode = StatusCode.WorkspaceNotFound,
+                        Description = StatusCode.WorkspaceNotFound.GetDescriptionValue(),
+                        Data = null
+                    };
+                }
+
+                return new BaseResponse<Workspace>()
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = workspace
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[GetWorkspaceById]: {ex.Message}");
+
+                return new BaseResponse<Workspace>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = null
+                };
+            }
+        }
     }
 }

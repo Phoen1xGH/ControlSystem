@@ -313,6 +313,7 @@
             border-radius: 50px;
             padding: 0 !important;
             margin-top: auto;
+            border: 3px solid #15c118;
         }
 
         #cancel-new-link:hover,
@@ -528,7 +529,8 @@
             
         }
 
-        .comment-content label{
+        .comment-content label,
+        .comment-info label {
             color: white; 
             margin-left: 20px;
             margin-bottom: 5px;
@@ -865,9 +867,20 @@
 
         }
 
-        /*.ticket-title-preview {
-            min-height: 50px;
-        }*/
+        .comment-info {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .comment-creation-date {
+            margin-left: auto !important;
+            margin-right: 20px;
+
+        }
+        
+        .comments-div {
+            overflow: auto;
+        }
     </style>
     <title>Вертикальные блоки</title>
 </head>
@@ -2335,4 +2348,47 @@
         });
     }
 
+    function addExecutor(ticketId, userId) {
+        $.ajax({
+            url: "/Ticket/AddExecutor",
+            method: "POST",
+            data: { ticketId: ticketId, userId: userId },
+            success: function() {
+                $("#ticket-executor")
+                    .html(`<label class="info-card-author" style="margin-left: auto;">Отвественнный: <a href="#" style="color: #d8d8d8">${result.username}</a></label>`);
+            },
+            error: function (xhr, status, error) {
+                toastr.error(xhr.responseText || 'Произошла ошибка!');
+            }
+        });
+    }
+
+    function sendComment(ticketId) {
+        var content = $(".comment-enter").val();
+
+        $.ajax({
+            url: "/Comment/AddComment",
+            method: "POST",
+            data: { ticketId: ticketId, content: content },
+            success: function(result) {
+                console.log(result);
+                var commentDiv = `
+                        <div class="comment-content">
+                            <div class="comment-info">
+                                <label>${result.authorName}</label>
+                                    <label class="comment-creation-date">${result.creationDate}</label>
+                             </div>
+                            <div class="comment-text">${result.content}</div>
+                        </div>`;
+
+                $("#comments-empty").remove();
+
+                $(".comments-div").prepend(commentDiv);
+                $(".comment-enter").val("");
+            },
+            error: function (xhr, status, error) {
+                toastr.error(xhr.responseText || 'Произошла ошибка!');
+            }
+        });
+    }
 </script>

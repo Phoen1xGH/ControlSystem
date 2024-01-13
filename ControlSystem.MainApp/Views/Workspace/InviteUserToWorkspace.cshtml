@@ -1,0 +1,129 @@
+﻿@using ControlSystem.Domain.Entities;
+
+@{
+    Layout = null;
+}
+
+@model Workspace
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<style>
+    .invite-wrapper {
+        width: 500px;
+        position: absolute;
+        top: 50%;
+        height: 200px;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 20px;
+        background-color: #30353c;
+    }
+
+    .invite-div {
+        width: 500px;
+        height: 200px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #invite-workspace,
+    #invite-text {
+        color: #d8d8d8;
+    }
+
+    #invite-text {
+        margin-left: 20px;
+        margin-top: 20px;
+    }
+
+    #invite-workspace {
+        font-size: 20px;
+        font-weight: bold;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 20px;
+    }
+
+    .invite-buttons {
+        display: flex;
+        flex-direction: row;
+
+    }
+
+    body, html {
+        background-color: #2a2e34;
+    }
+
+    #accept-invite {
+        background-color: transparent;
+        color: #15c118;
+        border-radius: 20px;
+        border: 1px solid #15c118;
+        margin-left: auto;
+        margin-right: 20px;
+        padding: 13px;
+        font-weight: bold;
+    }
+
+    #cancel-invite {
+        background-color: transparent;
+        color: red;
+        border-radius: 20px;
+        border: 1px solid red;
+        margin-left: 20px;
+        margin-right: auto;
+        padding: 13px;
+        font-weight: bold;
+    }
+
+    #accept-invite:hover {
+        background-color: #15c118;
+        color: #30353c;
+        cursor: pointer;
+    }
+
+    #cancel-invite:hover {
+        background-color: red;
+        color: #30353c;
+        cursor: pointer;
+    }
+
+    .buttons-wrapper {
+        display: flex;
+        flex-direction: column;
+        margin-top: auto;
+        margin-bottom: 20px;
+    }
+
+</style>
+
+<div class="invite-wrapper">
+    <div class="invite-div">
+        <label id="invite-text">Вас пригласили в рабочее пространство:</label>
+        <label id="invite-workspace">@Model.Name</label>
+        <div class="buttons-wrapper">
+            <div class="invite-buttons">
+                <button id="cancel-invite">Отмена</button>
+                <button id="accept-invite" onclick="acceptInvite()">Присоединиться</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function acceptInvite() {
+        var workspaceId = @Model.Id;
+        var userId = @ViewBag.UserId;
+
+        $.ajax({
+            url: "/Workspace/InviteUserToWorkspace",
+            method: "POST",
+            data: {workspaceId, userId },
+            success: function(){
+
+            },
+            error: function (xhr, status, error) {
+                toastr.error(xhr.responseText || 'Произошла ошибка!');
+            }
+        });
+    }
+</script>
