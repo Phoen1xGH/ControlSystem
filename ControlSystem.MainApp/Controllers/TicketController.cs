@@ -9,10 +9,13 @@ namespace ControlSystem.MainApp.Controllers
     public class TicketController : Controller
     {
         private readonly IBoardService _boardService;
+        private readonly IWorkspaceService _workspaceService;
 
-        public TicketController(IBoardService boardService)
+        public TicketController(IBoardService boardService,
+            IWorkspaceService workspaceService)
         {
             _boardService = boardService;
+            _workspaceService = workspaceService;
         }
 
         [HttpPost]
@@ -135,6 +138,13 @@ namespace ControlSystem.MainApp.Controllers
 
                     comments.Reverse();
 
+                    var statuses = _workspaceService.GetBoards(workspaceId).Data!
+                        .Select(x => new BoardDTO
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }).ToList();
+
                     var model = new TicketDTO
                     {
                         Id = ticket.Id,
@@ -151,6 +161,7 @@ namespace ControlSystem.MainApp.Controllers
                         Priority = ticket.Priority,
                         StatusId = ticket.Status.Id,
                         Tags = ticket.Tags.ToList(),
+                        Statuses = statuses
                     };
 
                     return PartialView("_TicketDetails", model);
@@ -187,6 +198,40 @@ namespace ControlSystem.MainApp.Controllers
                 ModelState.AddModelError("", response.Description);
             }
             return BadRequest("Ошибка при удалении участника");
+        }
+
+        public async Task<ActionResult> ChangeStatus(int ticketId, int boardId)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _boardService.ChangeStatus(ticketId, boardId);
+
+                if (response.StatusCode == Domain.Enums.StatusCode.OK)
+                {
+                    var ticketsResponse = _boardService.GetTickets(response.Data);
+
+                    var tickets = ticketsResponse.Data.Select(ticket => new TicketPreviewViewModel
+                    {
+                        Id = ticket.Id,
+                        Title = ticket.Title,
+                        StatusId = ticket.Status.Id,
+                        WorkspaceId = ticket.Status.Workspace.Id,
+                        Priority = ticket.Priority
+                    });
+
+                    var statuses = _workspaceService.GetBoards(ticketsResponse.Data[0].Status.Workspace.Id);
+
+                    var newStatuses = statuses.Data!.Where(status => status.Id != boardId).Select(status => new BoardDTO
+                    {
+                        Id = status.Id,
+                        Name = status.Name
+                    }).OrderBy(status => status.Id);
+
+                    return Json(new { Tickets = tickets.Reverse(), Statuses = newStatuses });
+                }
+                ModelState.AddModelError("", response.Description);
+            }
+            return BadRequest("Ошибка при смене статуса");
         }
 
         public void AddPartsToAllTicket()

@@ -28,5 +28,6 @@ namespace ControlSystem.Services.DTO
 
         public List<Tag>? Tags { get; set; }
 
+        public List<BoardDTO>? Statuses { get; set; }
     }
 }

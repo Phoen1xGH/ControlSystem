@@ -1,10 +1,15 @@
 ﻿@using ControlSystem.Services.DTO;
 
 <style>
-    .dropdown-content {
+    .dropdown-content,
+    .dropdown-status-content {
         display: none;
         right: 20px;
         white-space: nowrap;
+    }
+
+    .dropdown-status-content{
+        right: 0px;
     }
 
     .ticket-options-button:hover + .dropdown-content, 
@@ -31,6 +36,13 @@
     .dropdown-content button:hover {
         background-color: #87909e;
     }
+
+        #statuses-button:hover ~ .dropdown-status-content,
+        .dropdown-status-content:hover {
+            display: block;
+            z-index: 1;
+            position: absolute;
+        }
 </style>
 
 @model TicketDTO
@@ -54,7 +66,16 @@
                         <div class="dropdown-content">
                             <button type="button"  onclick="getTagsData(@Model.Id)">Ред. теги</button>
                             <button type="button" onclick="getPriorityData(@Model.Id)">Ред. приоритет</button>
+                            <button id="statuses-button" type="button">Ред. статус</button>
+                            <div class="dropdown-status-content">
+                                @foreach (var status in Model.Statuses.Where(x => x.Id != Model.StatusId))
+                                {
+                                    <button type="button" onclick="changeStatus(@Model.Id, @status.Id)">@status.Name</button>
+                                }
+                            </div>
                         </div>
+
+                        
                     </div>
 
                 </div>
@@ -301,4 +322,3 @@
         </div>
     </form>
 }
-

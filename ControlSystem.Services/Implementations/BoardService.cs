@@ -583,6 +583,57 @@ namespace ControlSystem.Services.Implementations
             }
         }
 
+        public async Task<BaseResponse<int>> ChangeStatus(int ticketId, int boardId)
+        {
+            try
+            {
+                var ticket = await _ticketRepository.GetAll().FirstOrDefaultAsync(x => x.Id == ticketId);
+
+                if (ticket is null)
+                {
+                    return new BaseResponse<int>
+                    {
+                        StatusCode = StatusCode.TicketNotFound,
+                        Description = StatusCode.TicketNotFound.GetDescriptionValue(),
+                    };
+                }
+
+                var oldboardId = ticket.Status.Id;
+
+                var board = await _boardRepository.GetAll().FirstOrDefaultAsync(x => x.Id == boardId);
+
+                if (board is null)
+                {
+                    return new BaseResponse<int>
+                    {
+                        StatusCode = StatusCode.BoardNotFound,
+                        Description = StatusCode.BoardNotFound.GetDescriptionValue(),
+                    };
+                }
+
+                ticket.Status = board;
+
+                await _ticketRepository.Update(ticket);
+
+                return new BaseResponse<int>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = oldboardId
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[ChangeStatus]: {ex.Message}");
+
+                return new BaseResponse<int>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                };
+            }
+        }
+
         public void AddParts()
         {
             var tickets = _ticketRepository.GetAll().ToList();
