@@ -66,7 +66,7 @@
                         <div class="dropdown-content">
                             <button type="button"  onclick="getTagsData(@Model.Id)">Ред. теги</button>
                             <button type="button" onclick="getPriorityData(@Model.Id)">Ред. приоритет</button>
-                            <button id="statuses-button" type="button">Ред. статус</button>
+                            <button id="statuses-button" type="button">Ред. статус &#9660;</button>
                             <div class="dropdown-status-content">
                                 @foreach (var status in Model.Statuses.Where(x => x.Id != Model.StatusId))
                                 {

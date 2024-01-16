@@ -881,6 +881,23 @@
         .comments-div {
             overflow: auto;
         }
+
+        .color-input {
+            margin-left: 7px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            background-color: transparent;
+            border: none;
+        }
+
+    .color-input::-webkit-color-swatch {
+        border-radius: 20px;
+        border: 2px solid #d8d8d8;
+    }
     </style>
     <title>Вертикальные блоки</title>
 </head>
@@ -1004,10 +1021,13 @@
 
     <div id="myModal" class="myModal">
         <form method="post" action="/Workspace/CreateWorkspace">
-            <span class="closeBtn" onclick="closeModal()">&times;</span>
             <input type="hidden" name="id" value="" />
-            <p>Введите название рабочего пространства</p>
-            <input type="text" class="modalInput" name="workspaceName" placeholder="Название">
+            <p style="color: #d8d8d8">Введите название рабочего пространства</p>
+            <div style="position: relative">
+                <input type="text" style="width: 100%" class="input" name="workspaceName" placeholder="">
+                <label class="placeholder">Название</label>
+            </div>
+            
             <input class="modalButton" type="submit" value="Сохранить" />
         </form>
     </div>
@@ -1016,13 +1036,15 @@
 
     <div id="myModalBoard" class="myModal">
         <form method="post" action="/Workspace/CreateBoard">
-            <span class="closeBtn" onclick="closeModalBoard()">&times;</span>
             <input type="hidden" name="workspaceId" value="" />
             <input type="hidden" name="boardId" value=""/>
-            <p>Введите название доски</p>
-            <input type="text" class="modalInput" name="Name" placeholder="Название">
-            <p>Выберете цвет</p>
-            <input type="color" name="ColorHex" value=""/>
+            <p style="color: #d8d8d8">Введите название доски</p>
+            <div style="position: relative">
+                <input type="text" style="width: 100%" class="input" name="Name" placeholder="">
+                <label class="placeholder">Название</label>
+            </div>
+            <p style="color: #d8d8d8; margin-top: 7px">Выберете цвет</p>
+            <input type="color" class="color-input" name="ColorHex" value="" style="margin-left: 0;"/>
             <input class="modalButton" type="submit" onclick="getWorkspaceId()" value="Сохранить" />
         </form>
     </div>
@@ -1113,7 +1135,7 @@
         var modal = document.getElementById('myModalBoard');
         var form = modal.querySelector('form');
         form.action = '/Workspace/EditBoard';
-        form.querySelector('input[name="StatusId"]').value = id;
+        form.querySelector('input[name="boardId"]').value = id;
         form.querySelector('input[name="ColorHex"]').value = color;
 
         openModalBoard();
@@ -1350,7 +1372,7 @@
             method: 'GET',
             data: { workspaceId: workspaceId, ticketId: ticketId },
             success: function (data) {
-                openModal(data);
+                openTicketModal(data);
             },
             error: function (xhr, status, error) {
                 toastr.error(JSON.parse(xhr.responseText).trim() || 'Произошла ошибка!');
@@ -1358,7 +1380,7 @@
         });
     }
 
-    function openModal(partialViewHtml) {
+    function openTicketModal(partialViewHtml) {
         // Ваш код для открытия модального окна
         var modal = document.getElementById('myModalTicket');
         var overlay = document.getElementById('overlayTicket');
