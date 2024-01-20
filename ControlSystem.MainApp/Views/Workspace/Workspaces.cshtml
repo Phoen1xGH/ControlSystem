@@ -7,6 +7,7 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
 
    @* <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>*@
     <style>
@@ -2473,4 +2474,72 @@
             }
         });
     }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        var ticketsData = [];
+        
+        // Получаем все элементы с классом ticket-preview-label
+        var ticketLabels = document.querySelectorAll("#ticket-preview-label");
+
+        // Проходимся по каждому элементу и добавляем данные в массив ticketsData
+        ticketLabels.forEach(function (label) {
+            var ticketId = label.closest(".ticket").id.replace("ticket-", ""); // Получаем ID тикета
+            var ticketTitle = label.textContent; // Получаем название тикета
+
+            // Добавляем данные в массив ticketsData
+            ticketsData.push({
+                Id: ticketId,
+                Title: ticketTitle
+                // Добавьте другие свойства тикета по необходимости
+            });
+        });
+
+        console.log(ticketsData);
+        // Инициализируем fuse.js с настройками (подробнее см. документацию fuse.js)
+        var fuseOptions = {
+            keys: ["Title"],
+            includeScore: true,
+            threshold: 0.5 // Подстройте этот параметр в зависимости от ваших требований
+        };
+        var fuse = new Fuse(ticketsData, fuseOptions);
+
+        // Получаем элементы DOM
+        var ticketContainers = document.querySelectorAll(".ticket");
+
+        // Функция для выполнения поиска и обновления отображения
+        function performSearch(query) {
+
+            if (query.trim() === "") {
+                ticketContainers.forEach(function (ticketContainer) {
+                    ticketContainer.style.display = "block";
+                });
+
+                return;
+            }
+
+            var result = fuse.search(query);
+
+            // Отображаем только те тикеты, которые соответствуют результатам поиска
+            ticketContainers.forEach(function (ticketContainer) {
+                var ticketId = ticketContainer.id.replace("ticket-", "");
+                var foundTicket = result.find(function (item) {
+                    return item.item.Id === ticketId;
+                });
+
+                // Отображаем или скрываем тикет в зависимости от результата поиска
+                if (foundTicket) {
+                    ticketContainer.style.display = "block";
+                } else {
+                    ticketContainer.style.display = "none";
+                }
+            });
+        }
+
+        // Вызываем функцию поиска при вводе в поле поиска
+        var searchInput = document.getElementById("search-input"); // Замените на ID вашего поля ввода поиска
+        searchInput.addEventListener("input", function () {
+            var searchQuery = searchInput.value;
+            performSearch(searchQuery);
+        });
+    });
 </script>
