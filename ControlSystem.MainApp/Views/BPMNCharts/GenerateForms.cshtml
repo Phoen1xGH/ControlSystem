@@ -3,11 +3,180 @@
 }
 @model ControlSystem.Domain.Models.BPMNComponents.BPMNElementsStorage
 
+<style>
+    body, html{
+        background-color: #30353c;
+    }
+
+    #add-field-button {
+        margin-right: 2px;
+        margin-left: 20px;
+        min-height: 35px !important;
+        min-width: 35px !important;
+        /* max-height: 25px !important;*/
+        max-width: 35px !important;
+        background-color: transparent;
+        border: none;
+        display: flex;
+        align-items: center;
+        border-radius: 10px;
+        margin-top: 12px;
+    }
+
+
+    #add-button-image {
+        fill: #15c118;
+        height: 30px !important;
+        width: 30px !important;
+    }
+
+
+    #add-field-button:hover {
+        background-color: #4f5762; /* Цвет подсветки при наведении */
+    }
+
+    #doc-title {
+        color: #d8d8d8;
+        margin: 20px;
+        top: 50%;
+        text-align: center;
+    }
+
+    .choice-div {
+        border-radius: 20px;
+        padding: 22px;
+        color: #d8d8d8;
+        background-color: #3c414a;
+        width: fit-content;
+        margin-left: 20px;
+        margin-top: 20px;
+        border: 1px solid #87909e;
+    }
+
+    #submitButton {
+        margin-left: 20px;
+        margin-top: 20px;
+    }
+    
+    .name-input {
+        padding: 10px;
+        width: 250px;
+        box-sizing: border-box;
+        outline: none;
+        border: 1px solid #d8d8d8;
+        background-color: #3c414a;
+        border-radius: 20px;
+        color: #d8d8d8;
+    }
+
+    .name-input:empty + .placeholder {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        padding: 0 5px;
+        background-color: transparent;
+        transition: 0.3s;
+        pointer-events: none;
+        color: #d8d8d8;
+    }
+
+    .name-input:focus + .placeholder,
+    .name-input:not(:placeholder-shown) + .placeholder {
+        top: -8px;
+        color: #15c118;
+        background-color: #3c414a;
+        opacity: 1;
+        font-size: 12px;
+    }
+
+    .name-input:focus {
+        border: 1px solid #15c118;
+    }
+
+    .name-input:not(:focus) + .placeholder  {
+         color: #d8d8d8;
+    }
+
+    .flexible {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .select-list {
+        background-color: #3c414a;
+        color: #d8d8d8;
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 20px 20px 0 0;
+        border: 1px solid #d8d8d8;
+    }
+
+    .remove-button {
+        margin-top: 7px;
+        display: flex;
+        margin-left: auto;
+        padding: 5px 10px 5px 10px;
+        border-radius: 20px;
+        border: 1px solid red;
+        background-color: transparent;
+        color: red;
+        font-weight: bold;
+    }
+
+    .remove-button:hover {
+        /*background-color: #a71c1c;*/
+        /*box-shadow: 2px 2px 2px red;*/
+         background-color: #4f5762;
+    }
+
+    #submitButton {
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+        border-radius: 20px;
+        border: 1px solid #15c118;
+        padding: 11px;
+        background-color: transparent;
+        color: #15c118;
+        overflow: hidden;
+    }
+
+    #submitButton:hover {
+            background-color: #4f5762;
+    }
+   /* #submitButton::before {
+        position: absolute;
+        content: '';
+        width: 50%;
+        height: 180%;
+        background: #15c118;
+        transform: rotate(45deg);
+    }
+
+    #submitButton:hover::before {
+        animation: animateSubmitButton 2s linear infinite;
+    }
+
+    #submitButton::after {
+        position: absolute;
+        content: '';
+        inset: 5px;
+        background: black;
+        border-radius: 8px;
+    }*/
+</style>
+
+<h2 id="doc-title">Укажите составляющие диаграммы</h2>
 <form method="post" action="/BPMNCharts/GenerateForms">
     <input type="hidden" name="allData" id="allData" />
     <div id="dynamic-fields-container">
     </div>
-    <button type="button" id="add-field-button">+</button>
+   
+    <button type="button" id="add-field-button">
+        <svg id="add-button-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+            <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
+        </svg>
+    </button>
     <p>
         <input id="submitButton" type="submit" value="Отправить" />
     </p>
@@ -29,9 +198,9 @@
 
             const newField = document.createElement("div");
             newField.innerHTML = `
-                        <select name="element-type-${fieldCount}">
+                        <select class="select-list" name="element-type-${fieldCount}">
                             <option value="">Выберите тип элемента</option>
-                            <option value="Participants">Отвечающий за этап</option>
+                            <option value="Participants">Отвечающий за процесс</option>
                             <option value="StartEvent">Начальное событие</option>
                             <option value="Task">Задача</option>
                             <option value="ExclusiveGateway">Условие</option>
@@ -39,7 +208,7 @@
                         </select>
                         <div class="element-fields" id="element-fields-${fieldCount}"></div>
                     `;
-
+            newField.className = "choice-div";
             dynamicFieldsContainer.appendChild(newField);
 
             const elementFieldsContainer = newField.querySelector(`#element-fields-${fieldCount}`);
@@ -52,38 +221,51 @@
                 if (selectedElementType === "Participants") {
                     elementFieldsContainer.innerHTML = `
                                 <p>
-                                    <label>Name</label>
-                                    <input type="text" name="ParticipantName" />
+                                    <div style="position: relative">
+                                        <input class="name-input" type="text" name="ParticipantName" placeholder=""/>
+                                        <label class="placeholder">Название</label>
+                                    </div>
                                 </p>
                             `;
                 }
                 else if (selectedElementType === "StartEvent") {
                     elementFieldsContainer.innerHTML = `
-                                <p>
-                                    <label>Name</label>
-                                    <input type="text" name="StartEvent.Name" />
-                                </p>
-                                <p>
-                                    <label>out</label>
-                                    <input type="text" name="StartEvent.Outgoing" />
-                                </p>
-                            `;
+                        <p>
+                            <div class="flexible">
+                                <div>
+                                    <div style="position: relative">
+                                        <input class="name-input" type="text" name="StartEvent.Name" placeholder=""/>
+                                        <label class="placeholder">Название</label>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="position: relative; margin-left: 10px">
+                                        <input class="name-input" type="text" name="StartEvent.Outgoing" placeholder=""/>
+                                        <label class="placeholder">Выход</label>
+                                    </div>
+                                </div>
+                           </div>
+                        </p>`;
                 }
                 else if (selectedElementType === "Task") {
                     const taskIndex = taskCount++;
 
                     elementFieldsContainer.innerHTML = `
                             <p>
-                                <label>in</label><br/>
-                                <input type="text" name="Task.Incoming"/>
-                            </p>
-                            <p>
-                                <label>Name</label><br/>
-                                <input type="text" name="Task.Name"/>
-                            </p>
-                            <p>
-                                <label>out</label><br/>
-                                <input type="text" name="Task.Outgoing"/>
+                                <div class="flexible">
+                                    <div style="position: relative;">
+                                        <input class="name-input" type="text" name="Task.Incoming" placeholder=""/>
+                                        <label class="placeholder">Вход</label>
+                                    </div>
+                                    <div style="position: relative; margin-left: 10px">
+                                        <input type="text" class="name-input" name="Task.Name" placeholder=""/>
+                                        <label class="placeholder">Название</label>
+                                    </div>
+                                    <div style="position: relative; margin-left: 10px">
+                                        <input class="name-input" type="text" name="Task.Outgoing" placeholder=""/>
+                                        <label class="placeholder">Выход</label>
+                                    </div>
+                                </div>
                             </p>`;
 
                 }
@@ -92,14 +274,26 @@
 
                     elementFieldsContainer.innerHTML = `
                             <p>
-                                <label>Name</label>
-                                    <input type="text" name="ExclusiveGateway.Name"/>
-                                <label>in</label>
-                                    <input type="text" name="ExclusiveGateway.Incomings"/>
-                                <label>Out1</label>
-                                    <input type="text" name="ExclusiveGateway.OutgoingsY"/>
-                                <label>Out2</label>
-                                    <input type="text" name="ExclusiveGateway.OutgoingsN" />
+                                <div class="flexible">
+                                    <div style="position: relative; margin: auto 0 auto 0">
+                                        <input class="name-input" type="text" name="ExclusiveGateway.Incomings" placeholder=""/>
+                                        <label class="placeholder">Вход</label>
+                                    </div>
+                                    <div style="position: relative; margin: auto 0 auto 10px">
+                                        <input type="text" class="name-input" name="ExclusiveGateway.Name" placeholder=""/>
+                                        <label class="placeholder">Название</label>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column">
+                                        <div style="position: relative; margin: 0 0 auto 10px;">
+                                            <input type="text" class="name-input" name="ExclusiveGateway.OutgoingsY" placeholder=""/>
+                                            <label class="placeholder">Условие: Да</label>
+                                        </div>
+                                        <div style="position: relative; margin: 40px 0 auto 10px;">
+                                            <input type="text" class="name-input" name="ExclusiveGateway.OutgoingsN" placeholder=""/>
+                                            <label class="placeholder">Условие: Нет</label>
+                                        </div>
+                                    </div>
+                                </div>
                             </p>`;
                 }
                 else if (selectedElementType === "EndEvent") {
@@ -107,10 +301,16 @@
 
                     elementFieldsContainer.innerHTML = `
                             <p>
-                                <label>in</label>
-                                <input type="text" name="EndEvent.Incoming">
-                                <label>Name</label>
-                                <input type="text" name="EndEvent.Name"/>
+                                <div class="flexible">
+                                    <div style="position: relative;">
+                                        <input class="name-input" type="text" name="EndEvent.Incoming" placeholder="">
+                                        <label class="placeholder"l>Вход</label>
+                                    </div>
+                                    <div style="position: relative; margin-left: 10px">
+                                        <input type="text" class="name-input" name="EndEvent.Name" placeholder=""/>
+                                        <label class="placeholder">Название</label>
+                                    </div>
+                                </div>
                             </p>`;
                 }
             });
@@ -119,7 +319,7 @@
             const removeFieldButton = document.createElement("button");
             removeFieldButton.type = "button";
             removeFieldButton.textContent = "Удалить";
-
+            removeFieldButton.className = "remove-button";
             removeFieldButton.addEventListener("click", function () {
                 dynamicFieldsContainer.removeChild(newField);
             });
