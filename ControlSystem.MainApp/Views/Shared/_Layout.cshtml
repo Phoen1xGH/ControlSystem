@@ -110,7 +110,7 @@
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="accountDropdown">
                                     <a class="dropdown-item" asp-area="" asp-controller="BPMNCharts" asp-action="GenerateForms">Генерация</a>
-                                    <a class="dropdown-item" asp-area="" asp-controller="" asp-action="">Создание</a>
+                                    <a class="dropdown-item" asp-area="" asp-controller="BPMNCharts" asp-action="Modeler">Создание</a>
                                     <a class="dropdown-item" asp-area="" asp-controller="" asp-action="">Мои диаграммы</a>
                                 </div>
                             </li>
@@ -167,7 +167,6 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var currentUrl = window.location.pathname;
-        console.log(currentUrl);
         var searchBox = document.querySelector(".search-box");
 
         if (currentUrl.includes("Workspaces")) {

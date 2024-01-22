@@ -1,8 +1,7 @@
 ﻿@using ControlSystem.Domain.Entities;
 
-@{
-	Layout = null;
-}
+
+
 
 <!DOCTYPE html>
 <html>
@@ -29,6 +28,11 @@
             margin: 0;
         }
 
+        #canvas {
+            height: 90vh;
+            overflow: hidden;
+        }
+
         .diagram-note {
             background-color: rgba(66, 180, 21, 0.7);
             color: White;
@@ -45,40 +49,31 @@
             stroke: rgba(66, 180, 21, 0.7) !important; /* color elements as red */
         }
 
-        #save-button {
+        #saves {
             position: fixed;
             bottom: 20px;
             left: 20px;
-            display: inline-block;
-            margin-right: 10px;
-            z-index: 1; /* Установите z-index на значение больше, чем у другой кнопки */
+            display: flex;
         }
 
-        #saveBpmn {
-            position: fixed;
-            bottom: 20px;
-            left: 150px; /* Измените left, чтобы разместить кнопку в другом месте */
+        button {
+            
+            border: 1px solid #3c414a;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
             display: inline-block;
-            margin-right: 10px;
-            z-index: 2; /* Установите z-index на значение больше, чем у первой кнопки */
+            font-size: 16px;
+            cursor: pointer;
         }
-        #export-svg-button{
-            position: fixed;
-            bottom: 20px;
-            left: 300px; /* Измените left, чтобы разместить кнопку в другом месте */
-            display: inline-block;
-            margin-right: 10px;
-            z-index: 3; /* Установите z-index на значение больше, чем у первой кнопки */
-        }
-        
-        #save-to-db{
-            position: fixed;
-            bottom: 20px;
-            left: 450px; /* Измените left, чтобы разместить кнопку в другом месте */
-            display: inline-block;
-            margin-right: 10px;
-            z-index: 3; /* Установите z-index на значение больше, чем у первой кнопки */
-        }
+
+            button:not(:last-child) {
+                border-right: none;
+            }
+
+            button:hover {
+                background-color: #d8d8d8;
+            }
 
         a.bjs-powered-by {
 	        display: none;
@@ -136,13 +131,25 @@
             border-radius: 5px;
         }
 
+        button {
+            background-color: transparent;
+            padding: 10px;
+        }
+
+        #saveBpmn {
+            border-radius: 20px 0 0 20px;
+        }
+
+        #save-to-db {
+            border-radius: 0 20px 20px 0;
+        }
+
     </style>
 </head>
 <body>
     <div id="canvas"></div>
 
     <div id="saves">
-        <button id="save-button">print to console</button>
         <button id="saveBpmn">Экспорт в файл</button>
         <button id="export-svg-button">Экспорт в SVG</button>
         <button id="save-to-db" onclick="openModal()">Сохранить в БД</button>
