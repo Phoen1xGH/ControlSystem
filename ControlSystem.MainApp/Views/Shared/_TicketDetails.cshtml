@@ -46,6 +46,10 @@
 </style>
 
 @model TicketDTO
+
+<input id="title-cache-value" type="hidden" value="@Model.Title" />
+<input id="description-cache-value" type="hidden" value="@Model.Description"/>
+
 @if (Model != null)
 {
     <form id="formTicket">

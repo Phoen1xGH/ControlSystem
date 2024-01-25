@@ -1055,7 +1055,7 @@
     <div id="myModalTicket" class="myModal-ticket">
         @*@Html.Partial("_TicketDetails");*@
     </div>
-    <div id="overlayTicket" class="overlay" onclick="closeModalTicket()"></div>
+    <div id="overlayTicket" class="overlay" onclick="checkTicketChanges()"></div>
     
 
     <div id="modal-priority">
@@ -1325,7 +1325,7 @@
                                     </div>
                                 `;
                         if(ticket.priority != null) {
-                            console.log(ticket.priority);
+
                             ticketElement += `
                                 <div class="ticket-preview-priority">
                                     <svg class="prio-image" width="20px" height="20px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
@@ -1357,11 +1357,20 @@
 
 
     function openTicket(workspaceId, ticketId) {
-        var ticketUrl = workspaceId + '/' + ticketId;
+        var currentPath = window.location.pathname;
+
+        // Проверяем, содержится ли workspaceId в текущем пути
+        if (currentPath.indexOf(workspaceId) === -1) {
+            // Если не содержится, добавляем workspaceId к текущему пути
+            currentPath += '/' + workspaceId;
+        }
+
+        var ticketUrl = currentPath + '/' + ticketId;
+
         history.pushState({}, '', ticketUrl);
+
         // Загружаем данные через AJAX
         loadTicketData(workspaceId, ticketId);
-
     }
  
 
@@ -1429,7 +1438,7 @@
                                     </div>
                                 `;
                         if(ticket.priority != null) {
-                            console.log(ticket.priority);
+
                             ticketElement += `
                                 <div class="ticket-preview-priority">
                                     <svg class="prio-image" width="20px" height="20px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
@@ -1484,7 +1493,7 @@
                                     </div>
                                 `;
                         if(ticket.priority != null) {
-                            console.log(ticket.priority);
+
                             ticketElement += `
                                 <div class="ticket-preview-priority">
                                     <svg class="prio-image" width="20px" height="20px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
@@ -2494,7 +2503,6 @@
             });
         });
 
-        console.log(ticketsData);
         // Инициализируем fuse.js с настройками (подробнее см. документацию fuse.js)
         var fuseOptions = {
             keys: ["Title"],
@@ -2542,4 +2550,40 @@
             performSearch(searchQuery);
         });
     });
+
+    function checkTicketChanges() {
+        var title = $("#title-cache-value").val();
+        var description = $("#description-cache-value").val();
+        var realDescription = document.querySelector('.description-text-container').innerHTML;
+
+        console.log("title: " + title);
+        console.log("descr: " + description);
+        console.log("realTitle: " + $(".ticket-title").val());
+        console.log("realDescr: " + realDescription);
+
+        if(realDescription == description &&
+            $(".ticket-title").val() == title) {
+
+            document.getElementById('myModalTicket').style.display = 'none';
+            document.getElementById('overlayTicket').style.display = 'none';
+            var currentUrl = window.location.href;
+
+            // Регулярное выражение для удаления последнего сегмента URL
+            var regex = /\/\d+$/;
+
+            // Обрезаем URL до необходимого уровня
+            var trimmedUrl = currentUrl.replace(regex, '');
+
+            // Заменяем текущее состояние истории новым состоянием с обновленным URL
+            history.replaceState(null, null, trimmedUrl);
+
+            var modal = document.getElementById('myModalTicket');
+            var form = modal.querySelector('form');
+            var id = form.querySelector('input[name="StatusId"]').value;
+
+        }
+        else {
+            closeModalTicket();
+        }
+    }
 </script>

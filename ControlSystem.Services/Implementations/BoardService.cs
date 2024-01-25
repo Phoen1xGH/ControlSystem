@@ -240,6 +240,7 @@ namespace ControlSystem.Services.Implementations
 
                 ticket.Description = newTicketData.Description;
                 ticket.Title = newTicketData.Title;
+                ticket.UpdatedDate = DateTime.Now;
 
                 await (_ticketRepository as TicketRepository)!.Update(ticket);
 
