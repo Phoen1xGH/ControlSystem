@@ -2564,6 +2564,8 @@
         if(realDescription == description &&
             $(".ticket-title").val() == title) {
 
+            updateTicket();
+
             document.getElementById('myModalTicket').style.display = 'none';
             document.getElementById('overlayTicket').style.display = 'none';
             var currentUrl = window.location.href;
@@ -2577,13 +2579,35 @@
             // Заменяем текущее состояние истории новым состоянием с обновленным URL
             history.replaceState(null, null, trimmedUrl);
 
-            var modal = document.getElementById('myModalTicket');
-            var form = modal.querySelector('form');
-            var id = form.querySelector('input[name="StatusId"]').value;
-
+          
         }
         else {
             closeModalTicket();
         }
+    }
+
+    function updateTicket() {
+        var modal = document.getElementById('myModalTicket');
+        var form = modal.querySelector('form');
+        var ticketId = form.querySelector('input[name="Id"]').value;
+
+        var priority = {
+            Id: form.querySelector('input[name="Priority.Id"]').value,
+            Name: form.querySelector('input[name="Priority.Name"]').value,
+            Color: form.querySelector('input[name="Priority.ColorHex"]').value
+        };
+
+        $("#ticket-" + ticketId).find(".ticket-preview-priority").remove();
+
+        $("#ticket-" + ticketId).append(`
+                                <div class="ticket-preview-priority">
+                                    <svg class="prio-image" width="20px" height="20px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill="#d8d8d8" d="M288 128h608L736 384l160 256H288v320h-96V64h96v64z" />
+                                    </svg>
+                                    <div style="margin-left: 7px; padding-left: 7px; padding-right: 7px; background-color: ${priority.Color}; border-radius: 20px;">
+                                        <label style="font-weight: bold; color: black">${priority.Name}</label>
+                                    </div>
+                                </div>`);
+
     }
 </script>
