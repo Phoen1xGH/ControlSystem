@@ -19,6 +19,7 @@ namespace ControlSystem.MainApp.Helpers
             services.AddScoped<IRepository<Comment>, CommentRepository>();
             services.AddScoped<IRepository<FileAttachment>, FileRepository>();
             services.AddScoped<IRepository<Link>, LinkRepository>();
+            services.AddScoped<IRepository<Chart>, ChartRepository>();
         }
 
         public static void InitializeServices(this IServiceCollection services)

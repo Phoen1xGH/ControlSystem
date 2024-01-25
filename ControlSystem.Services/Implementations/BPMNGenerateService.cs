@@ -17,12 +17,17 @@ namespace ControlSystem.Services.Implementations
     {
         private readonly ILogger<UserAccountService> _logger;
 
-        private readonly IRepository<UserAccount> _repository;
+        private readonly IRepository<UserAccount> _userRepository;
 
-        public BPMNGenerateService(ILogger<UserAccountService> logger, IRepository<UserAccount> repository)
+        private readonly IRepository<Chart> _chartRepository;
+
+        public BPMNGenerateService(ILogger<UserAccountService> logger,
+            IRepository<UserAccount> userRepo,
+            IRepository<Chart> chartRepo)
         {
             _logger = logger;
-            _repository = repository;
+            _userRepository = userRepo;
+            _chartRepository = chartRepo;
         }
         public BaseResponse<XDocument> GenerateProcess(string jsonBpmn)
         {
@@ -57,7 +62,7 @@ namespace ControlSystem.Services.Implementations
         {
             try
             {
-                var user = await _repository.GetAll().FirstOrDefaultAsync(x => x.Username == username);
+                var user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Username == username);
 
                 if (user is null)
                 {
@@ -69,7 +74,7 @@ namespace ControlSystem.Services.Implementations
                     };
                 }
 
-                await (_repository as UserAccountRepository)!.AddChartToUser(user, chart);
+                await (_userRepository as UserAccountRepository)!.AddChartToUser(user, chart);
 
                 return new BaseResponse<bool>
                 {
@@ -80,6 +85,158 @@ namespace ControlSystem.Services.Implementations
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"[SaveBPMNToDB]: {ex.Message}");
+
+                return new BaseResponse<bool>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = false
+                };
+            }
+        }
+
+        public async Task<BaseResponse<List<Chart>>> GetAllChartsByUser(string username)
+        {
+            try
+            {
+                var user = await _userRepository.GetAll().FirstOrDefaultAsync(x => x.Username == username);
+
+                if (user is null)
+                {
+                    return new BaseResponse<List<Chart>>
+                    {
+                        StatusCode = StatusCode.UserNotFound,
+                        Description = StatusCode.UserNotFound.GetDescriptionValue(),
+                        Data = null
+                    };
+                }
+
+                List<Chart> charts = user.Charts.ToList();
+
+                return new BaseResponse<List<Chart>>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = charts
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[GetAllChartsByUser]: {ex.Message}");
+
+                return new BaseResponse<List<Chart>>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<Chart>> GetChartById(int chartId)
+        {
+            try
+            {
+                var chart = await _chartRepository.GetAll().FirstOrDefaultAsync(x => x.Id == chartId);
+
+                if (chart == null)
+                {
+                    return new BaseResponse<Chart>
+                    {
+                        StatusCode = StatusCode.ChartNotFound,
+                        Description = StatusCode.ChartNotFound.GetDescriptionValue(),
+                        Data = null
+                    };
+                }
+
+                return new BaseResponse<Chart>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = chart
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[GetChartById]: {ex.Message}");
+
+                return new BaseResponse<Chart>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<BaseResponse<bool>> EditChart(int chartId, string newXmlData)
+        {
+            try
+            {
+                var chart = await _chartRepository.GetAll().FirstOrDefaultAsync(x => x.Id == chartId);
+
+                if (chart == null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.ChartNotFound,
+                        Description = StatusCode.ChartNotFound.GetDescriptionValue(),
+                        Data = false
+                    };
+                }
+
+                chart.XmlData = newXmlData;
+
+                await _chartRepository.Update(chart);
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[EditChart]: {ex.Message}");
+
+                return new BaseResponse<bool>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = false
+                };
+            }
+        }
+
+        public async Task<BaseResponse<bool>> DeleteChart(int chartId)
+        {
+            try
+            {
+                var chart = await _chartRepository.GetAll().FirstOrDefaultAsync(x => x.Id == chartId);
+
+                if (chart == null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        StatusCode = StatusCode.ChartNotFound,
+                        Description = StatusCode.ChartNotFound.GetDescriptionValue(),
+                        Data = false
+                    };
+                }
+
+                await _chartRepository.Delete(chart);
+
+                return new BaseResponse<bool>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[EditChart]: {ex.Message}");
 
                 return new BaseResponse<bool>()
                 {

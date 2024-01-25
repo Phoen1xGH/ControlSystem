@@ -20,6 +20,8 @@
     <!-- needed for this example only -->
     <script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <!-- example styles -->
     <style>
         html, body, #canvas {
@@ -152,7 +154,7 @@
     <div id="saves">
         <button id="saveBpmn">Экспорт в файл</button>
         <button id="export-svg-button">Экспорт в SVG</button>
-        <button id="save-to-db" onclick="openModal()">Сохранить в БД</button>
+        <button id="save-to-db" onclick="doChartOperation()">Сохранить в БД</button>
     </div>
 
     <div id="myModal">
@@ -177,6 +179,9 @@
             }
         });
 
+        toastr.options = {
+            "positionClass": "toast-bottom-right", // Устанавливаем позицию в нижний правый угол
+        };
         /**  
          * Save diagram contents and print them to the console.
          */
@@ -286,6 +291,34 @@
         $('#saveBpmn').click(saveDiagramBpmn);
         $('#export-svg-button').click(exportSvg);
 
+
+        function doChartOperation() {
+            console.log(@ViewBag.Id);
+            var isEdit = @(ViewBag.Id != null ? 1 : 0);
+            if(!isEdit) {
+                openModal();
+            }
+            else {
+                editChart(@ViewBag.Id);
+            }
+        }
+
+        async function editChart(chartId) {
+
+            var xml = await bpmnModeler.saveXML({ format: true });
+
+            $.ajax({
+                url: '/BPMNCharts/EditChart',
+                method: 'POST',
+                data: { chartId: chartId, newXmlData: xml.xml },
+                success: function() {
+                    toastr.success('Изменения сохранены!');
+                },
+                error: function (xhr, status, error) {
+                    toastr.error(xhr.responseText || 'Произошла ошибка!');
+                }
+            });
+        }
 
         function openModal() {
             document.getElementById('myModal').style.display = 'block';

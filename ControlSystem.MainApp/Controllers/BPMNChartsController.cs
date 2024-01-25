@@ -50,6 +50,10 @@ namespace ControlSystem.MainApp.Controllers
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
                     ViewBag.Chart = chart.XmlData;
+
+                    var charts = await _accountService.GetAllChartsByUser(currentUserName);
+                    ViewBag.Id = charts.Data!.OrderBy(ch => ch.Id).Last().Id;
+
                     return View("Modeler");
                 }
                 ModelState.AddModelError("", response.Description);
@@ -77,6 +81,73 @@ namespace ControlSystem.MainApp.Controllers
                 
                 """;
             return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ModelerByChart(int chartId)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _accountService.GetChartById(chartId);
+
+                if (response.StatusCode == Domain.Enums.StatusCode.OK)
+                {
+                    ViewBag.Chart = response.Data!.XmlData;
+                    ViewBag.Id = response.Data!.Id;
+                    return View("Modeler");
+                }
+            }
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AllCharts()
+        {
+            var username = User.Identity!.Name!;
+
+            var response = await _accountService.GetAllChartsByUser(username);
+
+            if (response.StatusCode == Domain.Enums.StatusCode.OK)
+            {
+                return View(response.Data!);
+            }
+            ModelState.AddModelError("", response.Description);
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditChart(int chartId, string newXmlData)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _accountService.EditChart(chartId, newXmlData);
+
+                if (response.StatusCode == Domain.Enums.StatusCode.OK)
+                {
+                    ViewBag.Id = chartId;
+                    return Ok();
+                }
+            }
+            return BadRequest("Произошла ошибка при редактировании диаграммы");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteChart(int chartId)
+        {
+            if (ModelState.IsValid)
+            {
+                var delResponse = await _accountService.DeleteChart(chartId);
+
+                var getResponse = await _accountService.GetAllChartsByUser(User.Identity!.Name!);
+
+                if (delResponse.StatusCode == Domain.Enums.StatusCode.OK &&
+                    getResponse.StatusCode == Domain.Enums.StatusCode.OK)
+                {
+                    return Json(getResponse.Data);
+                }
+            }
+            return BadRequest("Ошибка при удалении диаграммы");
         }
     }
 }

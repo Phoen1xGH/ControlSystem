@@ -8,5 +8,13 @@ namespace ControlSystem.Services.Interfaces
     {
         BaseResponse<XDocument> GenerateProcess(string jsonBpmn);
         Task<BaseResponse<bool>> SaveBPMNToDB(string username, Chart chart);
+
+        Task<BaseResponse<List<Chart>>> GetAllChartsByUser(string username);
+
+        Task<BaseResponse<Chart>> GetChartById(int chartId);
+
+        Task<BaseResponse<bool>> EditChart(int chartI, string newXmlData);
+
+        Task<BaseResponse<bool>> DeleteChart(int chartId);
     }
 }

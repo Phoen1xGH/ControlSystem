@@ -36,6 +36,9 @@ namespace ControlSystem.Domain.Enums
         [Description("Комментарий не найден")]
         CommentNotFound = 9,
 
+        [Description("Диаграмма не найдена")]
+        ChartNotFound = 10,
+
         #endregion
 
         #region Http statuses
