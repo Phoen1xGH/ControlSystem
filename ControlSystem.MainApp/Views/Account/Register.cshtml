@@ -1,9 +1,5 @@
 ﻿@model ControlSystem.Domain.ViewModels.RegisterViewModel
 
-@{
-    ViewData["Title"] = "Регистрация";
-}
-
 <style>
     body, html {
         height: 92.4vh;
@@ -133,7 +129,7 @@
 
 <div class="outer-div">
     <div class="container">
-        <h2>@ViewData["Title"]</h2>
+        <h2>Регистрация</h2>
 
         <form asp-controller="Account" asp-action="Register" method="post" class="form-signin" style="max-width: 400px;">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>

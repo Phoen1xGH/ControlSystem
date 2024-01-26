@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ControlSystem.MainApp.Controllers
 {
     [Authorize]
-    public class WorkspaceController : Controller
+    public class WorkspaceController : BaseController
     {
         private readonly IWorkspaceService _workspaceService;
         private readonly IBoardService _boardService;
@@ -16,7 +16,7 @@ namespace ControlSystem.MainApp.Controllers
         public WorkspaceController(
             IWorkspaceService workspaceService,
             IBoardService boardService,
-            IUserAccountService userService)
+            IUserAccountService userService) : base()
         {
             _workspaceService = workspaceService;
             _boardService = boardService;

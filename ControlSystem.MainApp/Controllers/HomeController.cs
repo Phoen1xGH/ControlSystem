@@ -8,11 +8,11 @@ using System.Xml.Linq;
 
 namespace ControlSystem.MainApp.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger) : base()
         {
             _logger = logger;
         }

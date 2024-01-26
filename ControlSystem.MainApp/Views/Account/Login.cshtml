@@ -1,9 +1,5 @@
 ﻿@model ControlSystem.Domain.ViewModels.LoginViewModel
 
-@{
-    ViewData["Title"] = "Вход";
-}
-
 <style>
     body, html {
         height: 92.4vh;
@@ -140,10 +136,9 @@
     }
 
 </style>
-<title>@ViewData["Title"]</title>
 <div class="outer-div">
     <div class="container ">
-        <h2 style="color: #d8d8d8">@ViewData["Title"]</h2>
+        <h2 style="color: #d8d8d8">Вход</h2>
 
         <form asp-controller="Account" asp-action="Login" method="post" class="form-signin">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>

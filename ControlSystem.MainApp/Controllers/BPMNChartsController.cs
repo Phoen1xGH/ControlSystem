@@ -7,11 +7,11 @@ using Newtonsoft.Json;
 namespace ControlSystem.MainApp.Controllers
 {
     [Authorize]
-    public class BPMNChartsController : Controller
+    public class BPMNChartsController : BaseController
     {
         private readonly IBPMNGenerateService _accountService;
 
-        public BPMNChartsController(IBPMNGenerateService service)
+        public BPMNChartsController(IBPMNGenerateService service) : base()
         {
             _accountService = service;
         }

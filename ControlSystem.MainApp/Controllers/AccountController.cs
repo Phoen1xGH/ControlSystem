@@ -7,11 +7,11 @@ using System.Security.Claims;
 
 namespace ControlSystem.MainApp.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
         private readonly IUserAccountService _accountService;
 
-        public AccountController(IUserAccountService accountService)
+        public AccountController(IUserAccountService accountService) : base()
         {
             _accountService = accountService;
         }
