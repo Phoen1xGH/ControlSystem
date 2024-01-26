@@ -10,12 +10,12 @@ namespace ControlSystem.MainApp.Extensions.Attributes
         {
             var controller = context.Controller as Controller;
 
-            controller!.ViewBag.Title = GetController(controller);
+            controller!.ViewBag.Title = GetPageTitle(controller);
         }
 
         public void OnActionExecuting(ActionExecutingContext _) { }
 
-        private static string GetController(Controller controller) => controller switch
+        private static string GetPageTitle(Controller controller) => controller switch
         {
             AccountController => "Аккаунт",
             BPMNChartsController => "Бизнес-процессы",
