@@ -1,6 +1,8 @@
-﻿using ControlSystem.Domain.Extensions;
+﻿using ControlSystem.Domain.Entities;
+using ControlSystem.Domain.Extensions;
 using ControlSystem.Domain.Models.BPMNComponents;
 using ControlSystem.MainApp.Models;
+using ControlSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Diagnostics;
@@ -12,9 +14,13 @@ namespace ControlSystem.MainApp.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger) : base()
+        private readonly IUpdatesService _updatesService;
+
+        public HomeController(ILogger<HomeController> logger,
+            IUpdatesService updatesService) : base()
         {
             _logger = logger;
+            _updatesService = updatesService;
         }
 
         [HttpGet]
@@ -37,9 +43,25 @@ namespace ControlSystem.MainApp.Controllers
             return View("Modeler");
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
-            return View();
+            var response = _updatesService.GetUpdatesInfo();
+
+            ViewBag.AboutSite = "Иинформационная система управления задачами и бизнес-процессами";
+
+            List<UpdateInfo> list = new();
+
+            list.Add(new UpdateInfo
+            {
+                Topic = "Ну чо-то поменял ",
+                Date = DateTime.Now,
+                Version = "1.0-alpha",
+                Description = string.Join(", ", Enumerable.Repeat("Иинформационная система управления задачами и бизнес-процессами ", 12))
+            });
+            list.AddRange(Enumerable.Repeat(list[0], 10));
+            return View(list);
+            return View(response.Data);
         }
 
         public IActionResult Privacy()

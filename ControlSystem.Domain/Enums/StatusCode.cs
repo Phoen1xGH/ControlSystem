@@ -39,6 +39,9 @@ namespace ControlSystem.Domain.Enums
         [Description("Диаграмма не найдена")]
         ChartNotFound = 10,
 
+        [Description("Информация об обновлении не найдена")]
+        UpdateNotFound = 11,
+
         #endregion
 
         #region Http statuses

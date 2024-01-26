@@ -20,6 +20,7 @@ namespace ControlSystem.MainApp.Helpers
             services.AddScoped<IRepository<FileAttachment>, FileRepository>();
             services.AddScoped<IRepository<Link>, LinkRepository>();
             services.AddScoped<IRepository<Chart>, ChartRepository>();
+            services.AddScoped<IRepository<UpdateInfo>, UpdatesRepository>();
         }
 
         public static void InitializeServices(this IServiceCollection services)
@@ -33,6 +34,7 @@ namespace ControlSystem.MainApp.Helpers
             services.AddScoped<ILinkService, LinkService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<ICommentService, CommentService>();
+            services.AddScoped<IUpdatesService, UpdatesService>();
         }
     }
 }
