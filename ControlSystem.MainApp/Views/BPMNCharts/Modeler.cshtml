@@ -145,12 +145,19 @@
             border-radius: 0 20px 20px 0;
         }
 
+        #import-file-button {
+            border-radius: 20px;
+            border: 1px solid black;
+            margin-right: 25px;
+        }
+
     </style>
 </head>
 <body>
     <div id="canvas"></div>
 
     <div id="saves">
+        <button id="import-file-button">Импорт файла</button>
         <button id="saveBpmn">Экспорт в файл</button>
         <button id="export-svg-button">Экспорт в SVG</button>
         <button id="save-to-db" onclick="doChartOperation()">Сохранить в БД</button>
@@ -282,13 +289,13 @@
        // $.get(diagramUrl, openDiagram, 'text');
        document.addEventListener('DOMContentLoaded',
 	       function() {
-		       console.log(xmlChart);
                openDiagram(xmlChart);
 	       });
         // wire save button
         $('#save-button').click(exportDiagram);
         $('#saveBpmn').click(saveDiagramBpmn);
         $('#export-svg-button').click(exportSvg);
+        $('#import-file-button').click(uploadFile);
 
 
         function doChartOperation() {
@@ -319,6 +326,16 @@
             });
         }
 
+
+        document.addEventListener('DOMContentLoaded',
+	       function() {
+              var isEdit = @(ViewBag.Id != null ? 1 : 0);
+
+              if(isEdit) {
+                    $('#import-file-button').remove();
+              }
+	    });
+
         function openModal() {
             document.getElementById('myModal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
@@ -344,6 +361,56 @@
 
            document.getElementById("jsonChart").value = jsonData; 
         });
+
+
+        function uploadFile() {
+            var fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.bpmn, .xml'
+            fileInput.style.display = 'none';
+            fileInput.multiple = false;
+
+            document.body.appendChild(fileInput);
+
+            fileInput.addEventListener('change', function () {
+                // Получаем выбранные файлы
+                var file = fileInput.files[0];
+
+                // Создаем объект FormData и добавляем все файлы
+                var formData = new FormData();
+
+                formData.append('file', file);
+
+                // Создаем объект XMLHttpRequest
+                var xhr = new XMLHttpRequest();
+
+                // Настраиваем запрос
+                xhr.open('POST', '/BPMNCharts/ImportBPMNFile', true);
+
+                // Обработка завершения запроса
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        var xmlFile = JSON.parse(xhr.responseText);
+
+                        openDiagram(xmlFile);
+
+                        toastr.success('Файл импортирован!');
+                    } else {
+                        toastr.error(xhr.responseText || 'Произошла ошибка!');
+                    }
+
+                    // Удаляем временный input
+                    document.body.removeChild(fileInput);
+                };
+
+                // Отправляем запрос на сервер с данными FormData
+                xhr.send(formData);
+            });
+
+            // Запускаем окно выбора файлов
+            fileInput.click();
+        }
+
 
     </script>
     <!--

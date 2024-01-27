@@ -149,5 +149,20 @@ namespace ControlSystem.MainApp.Controllers
             }
             return BadRequest("Ошибка при удалении диаграммы");
         }
+
+
+        [HttpPost]
+        public IActionResult ImportBPMNFile([FromForm] IFormFile file)
+        {
+            if (ModelState.IsValid)
+            {
+                using var reader = new StreamReader(file.OpenReadStream());
+
+                string xmlChart = reader.ReadToEnd();
+
+                return Json(xmlChart);
+            }
+            return BadRequest("Ошибка при импорте файла");
+        }
     }
 }
