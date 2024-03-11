@@ -43,6 +43,11 @@
             z-index: 1;
             position: absolute;
         }
+
+    .info-status {
+        color: #d8d8d8;
+        margin-top: 10px;
+    }
 </style>
 
 @model TicketDTO
@@ -87,7 +92,12 @@
                 <div class="info-card">
                     <input type="hidden" name="Author.Name" value="@Model.Author.Name" />
                     <input type="hidden" name="Author.Id" value="@Model.Author.Id"/>
-                    <label class="info-card-author">Заказчик: <a href="#" style="color: #d8d8d8">@Model.Author.Name</a></label>
+                    <div style="display: flex; flex-direction: column">
+                        <label class="info-card-author">Заказчик: <a href="#" style="color: #d8d8d8">@Model.Author.Name</a></label>
+                        <label class="info-status">
+                            Статус: @Model.Statuses.FirstOrDefault(status => status.Id == Model.StatusId)!.Name
+                        </label>
+                    </div>
                     <div id="ticket-executor">
                         @if(Model.Executor != null)
                         {

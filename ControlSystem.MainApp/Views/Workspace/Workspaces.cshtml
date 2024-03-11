@@ -2507,7 +2507,8 @@
                     $(".dropdown-status-content")
                         .append(`<button type="button" onclick="changeStatus(${ticketId}, ${status.id})">${status.name}</button>`);
                 });
-                console.log(result.statuses);
+
+                $(".info-status").text("Статус: " + result.currentStatusName);
 
                 toastr.success('Статус успешно изменен!');
             },

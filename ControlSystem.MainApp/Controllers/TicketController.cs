@@ -231,7 +231,9 @@ namespace ControlSystem.MainApp.Controllers
                         Name = status.Name
                     }).OrderBy(status => status.Id);
 
-                    return Json(new { Tickets = tickets.Reverse(), Statuses = newStatuses });
+                    var currentStatus = statuses.Data!.FirstOrDefault(status => status.Id == boardId)!.Name;
+
+                    return Json(new { Tickets = tickets.Reverse(), Statuses = newStatuses, CurrentStatusName = currentStatus });
                 }
                 ModelState.AddModelError("", response.Description);
             }
