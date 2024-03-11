@@ -899,6 +899,35 @@
         border-radius: 20px;
         border: 2px solid #d8d8d8;
     }
+
+    #myModalticket::-webkit-scrollbar {
+            width: 7px; /* Ширина скролла */
+            background-color: transparent; /* Прозрачный фон */
+        }
+
+        #myModalticket::-webkit-scrollbar-thumb {
+            background-color: #87909e; /* Цвет скролла */
+            border-radius: 6px; /* Радиус скролла */
+        }
+
+       #myModalticket::-webkit-scrollbar-track {
+            background-color: transparent; /* Прозрачный трек */
+        }
+
+        #myModalticket::-o-scrollbar-thumb {
+            background-color: #87909e;
+            border-radius: 6px;
+        }
+
+        #myModalticket::-o-scrollbar {
+            width: 12px;
+            background-color: transparent;
+        }
+
+        #myModalticket::-o-scrollbar-track {
+            background-color: transparent;
+        }
+
     </style>
     <title>Вертикальные блоки</title>
 </head>
@@ -1228,7 +1257,7 @@
         var descriptionHidden = document.getElementById('hiddenDescription');
 
         descriptionDiv.addEventListener('input', function () {
-            descriptionHidden.value = descriptionDiv.innerHTML;
+            descriptionHidden.value = descriptionDiv.textContent;
         });
     }
 
@@ -1407,10 +1436,12 @@
 
 
     document.addEventListener("DOMContentLoaded", function () {
-        var ticketId = @ViewBag.TicketId;
+        var ticketId = @(ViewBag.TicketId != null ? ViewBag.TicketId : 0);
+        var workspaceId = @(ViewBag.Id != null ? ViewBag.Id : 0);
+
         if (ticketId != 0) 
         {
-            loadTicketData(@ViewBag.Id, @ViewBag.TicketId);
+            loadTicketData(workspaceId, ticketId);
         }
     });
 
@@ -1862,12 +1893,12 @@
                     ++index;
                 });
                 
-                $(".tags").append(`
-                     <button id="add-button" style="margin-left: 7px">
-                        <svg id="add-button-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                            <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
-                        </svg>
-                    </button>`);
+                //$(".tags").append(`
+                //     <button id="add-button" style="margin-left: 7px">
+                //        <svg id="add-button-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                //            <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
+                //        </svg>
+                //    </button>`);
 
                
                 $("#all-tags-container").empty();
@@ -2434,9 +2465,11 @@
 
                 var modal = document.getElementById('myModalTicket');
                 var form = modal.querySelector('form');
+                var oldId = form.querySelector('input[name="StatusId"]').value;
+
                 form.querySelector('input[name="StatusId"]').value = boardId;
 
-                var ticketsDiv = $('#board-' + result.tickets[0].statusId);
+                var ticketsDiv = $('#board-' + oldId);
                 ticketsDiv.empty();
 
                 result.tickets.forEach(function (ticket) {
@@ -2590,6 +2623,12 @@
         var modal = document.getElementById('myModalTicket');
         var form = modal.querySelector('form');
         var ticketId = form.querySelector('input[name="Id"]').value;
+
+        var prio = form.querySelector('input[name="Priority.Id"]');
+
+        if (prio == null) {
+            return;
+        }
 
         var priority = {
             Id: form.querySelector('input[name="Priority.Id"]').value,

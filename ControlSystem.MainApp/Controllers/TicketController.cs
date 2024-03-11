@@ -219,7 +219,11 @@ namespace ControlSystem.MainApp.Controllers
                         Priority = ticket.Priority
                     });
 
-                    var statuses = _workspaceService.GetBoards(ticketsResponse.Data[0].Status.Workspace.Id);
+                    var workspaceIdResponse = await _boardService.GetWorkspaceId(boardId);
+
+                    var workspaceId = workspaceIdResponse.Data;
+
+                    var statuses = _workspaceService.GetBoards(workspaceId);
 
                     var newStatuses = statuses.Data!.Where(status => status.Id != boardId).Select(status => new BoardDTO
                     {

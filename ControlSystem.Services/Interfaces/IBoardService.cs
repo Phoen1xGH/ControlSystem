@@ -23,5 +23,7 @@ namespace ControlSystem.Services.Interfaces
         Task<BaseResponse<UserAccount>> AddExecutorToTicket(int ticketId, int userId);
 
         Task<BaseResponse<int>> ChangeStatus(int ticketId, int boardId);
+
+        Task<BaseResponse<int>> GetWorkspaceId(int boardId);
     }
 }

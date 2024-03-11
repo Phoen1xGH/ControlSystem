@@ -28,6 +28,9 @@ namespace ControlSystem.MainApp.Controllers
         {
             ViewBag.Workspaces = _workspaceService.GetWorkspaces(User.Identity!.Name!).Data!;
 
+            if (ViewBag.Workspaces.Count == 0)
+                return View();
+
             if (id == 0)
                 id = ViewBag.Workspaces[0].Id;
 

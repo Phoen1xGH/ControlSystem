@@ -635,6 +635,43 @@ namespace ControlSystem.Services.Implementations
             }
         }
 
+
+        public async Task<BaseResponse<int>> GetWorkspaceId(int boardId)
+        {
+            try
+            {
+                var board = await _boardRepository.GetAll().FirstOrDefaultAsync(x => x.Id == boardId);
+
+                if (board is null)
+                {
+                    return new BaseResponse<int>
+                    {
+                        StatusCode = StatusCode.BoardNotFound,
+                        Description = StatusCode.BoardNotFound.GetDescriptionValue(),
+                    };
+                }
+
+                var workspaceId = board.Workspace.Id;
+
+                return new BaseResponse<int>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = workspaceId
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[GetWorkspaceId]: {ex.Message}");
+
+                return new BaseResponse<int>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                };
+            }
+        }
+
         public void AddParts()
         {
             var tickets = _ticketRepository.GetAll().ToList();
