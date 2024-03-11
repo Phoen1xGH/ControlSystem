@@ -2465,12 +2465,12 @@
 
                 var modal = document.getElementById('myModalTicket');
                 var form = modal.querySelector('form');
-                var oldId = form.querySelector('input[name="StatusId"]').value;
-
                 form.querySelector('input[name="StatusId"]').value = boardId;
 
-                var ticketsDiv = $('#board-' + oldId);
+                var ticketsDiv = $('#board-' + boardId);
                 ticketsDiv.empty();
+
+                $("#ticket-" + ticketId).remove();
 
                 result.tickets.forEach(function (ticket) {
                     var ticketElement = `

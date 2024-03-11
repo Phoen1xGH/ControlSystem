@@ -208,7 +208,7 @@ namespace ControlSystem.MainApp.Controllers
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
-                    var ticketsResponse = _boardService.GetTickets(response.Data);
+                    var ticketsResponse = _boardService.GetTickets(boardId);
 
                     var tickets = ticketsResponse.Data.Select(ticket => new TicketPreviewViewModel
                     {
