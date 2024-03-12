@@ -171,7 +171,7 @@ namespace ControlSystem.Services.Implementations
                     };
                 }
 
-                await (_ticketRepository as TicketRepository)!.Delete(ticket);
+                await _ticketRepository.Delete(ticket);
 
                 return new BaseResponse<bool>
                 {
