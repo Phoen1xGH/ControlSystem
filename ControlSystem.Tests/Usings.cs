@@ -1,0 +1,11 @@
+﻿global using ControlSystem.DAL;
+global using ControlSystem.DAL.Interfaces;
+global using ControlSystem.DAL.Repositories;
+global using ControlSystem.Domain.Entities;
+global using ControlSystem.Domain.Enums;
+global using ControlSystem.Services.Implementations;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Logging;
+global using MockQueryable.Moq;
+global using Moq;
+global using Xunit;

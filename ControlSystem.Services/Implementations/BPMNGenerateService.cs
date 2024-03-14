@@ -15,13 +15,13 @@ namespace ControlSystem.Services.Implementations
 {
     public class BPMNGenerateService : IBPMNGenerateService
     {
-        private readonly ILogger<UserAccountService> _logger;
+        private readonly ILogger<BPMNGenerateService> _logger;
 
         private readonly IRepository<UserAccount> _userRepository;
 
         private readonly IRepository<Chart> _chartRepository;
 
-        public BPMNGenerateService(ILogger<UserAccountService> logger,
+        public BPMNGenerateService(ILogger<BPMNGenerateService> logger,
             IRepository<UserAccount> userRepo,
             IRepository<Chart> chartRepo)
         {

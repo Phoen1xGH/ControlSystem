@@ -1,0 +1,25 @@
+{
+    "Collaboration": {
+        "Participants": [
+            {
+                
+            }
+        ]
+    },
+    "Processes": [
+        {
+            "TaskList": [],
+            "StartEvent": {
+                "Name": "Начал",
+                "Outgoing": "Закончил"
+            },
+            "EndEventList": [
+                {
+                    "Incoming": "Начал",
+                    "Name": "Закончил"
+                }
+            ],
+            "ExclusiveGatewayList": []
+        }
+    ]
+}

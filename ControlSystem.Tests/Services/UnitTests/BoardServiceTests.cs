@@ -1,14 +1,4 @@
-﻿using ControlSystem.DAL;
-using ControlSystem.DAL.Interfaces;
-using ControlSystem.DAL.Repositories;
-using ControlSystem.Domain.Entities;
-using ControlSystem.Domain.Enums;
-using ControlSystem.Services.Implementations;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using MockQueryable.Moq;
-using Moq;
-using Xunit;
+﻿using ControlSystem.Services.DTO;
 
 namespace ControlSystem.Tests.Services.UnitTests
 {
@@ -70,6 +60,91 @@ namespace ControlSystem.Tests.Services.UnitTests
             Assert.Equal(StatusCode.TicketNotFound, result.StatusCode);
         }
 
+        [Fact]
+        public async Task EditTicketSuccessful()
+        {
+            // Arrange
+
+            BoardService boardService = CreateService();
+            var ticketId = GetTickets().First().Id;
+            var ticketChanges = new TicketChangesDTO
+            {
+                Id = ticketId,
+                Description = "new",
+                Title = "new"
+            };
+
+            // Act
+
+            var result = await boardService.EditTicket(ticketId, ticketChanges);
+
+            // Assert
+
+            Assert.NotNull(result);
+            Assert.Equal(StatusCode.OK, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task EditTicketFailed()
+        {
+            // Arrange
+
+            BoardService boardService = CreateService();
+            var ticketId = 107;
+            var ticketChanges = new TicketChangesDTO
+            {
+                Id = ticketId,
+                Description = "new",
+                Title = "new"
+            };
+
+            // Act
+
+            var result = await boardService.EditTicket(ticketId, ticketChanges);
+
+            // Assert
+
+            Assert.NotNull(result);
+            Assert.Equal(StatusCode.TicketNotFound, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task ChangeStatusSuccessful()
+        {
+            // Arrange
+
+            BoardService boardService = CreateService();
+            int ticketId = 1;
+            int boardId = 1;
+
+            // Act
+
+            var result = await boardService.ChangeStatus(ticketId, boardId);
+
+            // Assert
+
+            Assert.NotNull(result);
+            Assert.Equal(StatusCode.OK, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task ChangeStatusFailed()
+        {
+            // Arrange
+
+            BoardService boardService = CreateService();
+            int ticketId = 187;
+            int boardId = 1;
+
+            // Act
+
+            var result = await boardService.ChangeStatus(ticketId, boardId);
+
+            // Assert
+
+            Assert.NotNull(result);
+            Assert.Equal(StatusCode.TicketNotFound, result.StatusCode);
+        }
 
         private BoardService CreateService()
         {
@@ -134,7 +209,7 @@ namespace ControlSystem.Tests.Services.UnitTests
         {
             return new List<Ticket>
             {
-                new Ticket{ Id = 1 }
+                new Ticket{ Id = 1, Status = GetBoards().First() }
             }.AsQueryable();
         }
     }
