@@ -188,7 +188,9 @@
                     </div>
                     <div class="description-body">
                         <input id="hiddenDescription" type="hidden" name="Description" value="" />
-                        <div class="description-text-container" name="Description" contenteditable="true">@Model.Description</div>
+                        <div class="description-text-container" name="Description" contenteditable="true">
+                            @Html.Raw(System.Web.HttpUtility.HtmlEncode(Model.Description))
+                        </div>
                     </div>
                 </div>
                 <div class="attachments-container">

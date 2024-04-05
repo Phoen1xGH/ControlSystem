@@ -13,8 +13,14 @@
     <link rel="stylesheet" href="https://unpkg.com/bpmn-js@13.2.2/dist/assets/diagram-js.css">
     <link rel="stylesheet" href="https://unpkg.com/bpmn-js@13.2.2/dist/assets/bpmn-font/css/bpmn.css">
 
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js/dist/assets/diagram-js.css" />
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css" />
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js-color-picker/colors/color-picker.css" />
+
     <!-- modeler distro -->
     <script src="https://unpkg.com/bpmn-js@13.2.2/dist/bpmn-modeler.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bpmn-js-color-picker@0.7.0/colors/ColorContextPadProvider.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bpmn-js-color-picker@0.7.0/colors/color-picker.min.css">
 
     <!-- needed for this example only -->
     <script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
@@ -174,7 +180,7 @@
     </div>
     <div id="overlay" onclick="closeModal()"></div>
 
-    <script>
+<script>
 
         var xmlChart = `@Html.Raw(ViewBag.Chart)`;
         // modeler instance

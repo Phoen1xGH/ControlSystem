@@ -20,12 +20,13 @@ namespace ControlSystem.Services.Implementations
             _updatesRepository = updatesRepository;
         }
 
-        public async Task<BaseResponse<bool>> AddUpdateInfo(string version, string description)
+        public async Task<BaseResponse<bool>> AddUpdateInfo(string version, string topic, string description)
         {
             try
             {
                 var newUpdate = new UpdateInfo
                 {
+                    Topic = topic,
                     Description = description,
                     Version = version,
                     Date = DateTime.Now

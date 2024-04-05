@@ -48,20 +48,35 @@ namespace ControlSystem.MainApp.Controllers
         {
             var response = _updatesService.GetUpdatesInfo();
 
-            ViewBag.AboutSite = "Иинформационная система управления задачами и бизнес-процессами";
+            ViewBag.InfoTitle = "Оптимизируйте процессы, подчинив себе время";
 
-            List<UpdateInfo> list = new();
+            ViewBag.AboutSite = "Time Sense Workflow - российская информационная система " +
+                "для управления задачами и бизнес-процессами с \"чувством времени\". Это верный инструмент, с которым " +
+                "Вы сможете оптимизировать задачи бизнеса и повседневной жизни. " +
+                "В ней есть работа с привычными карточками, а также диграммами бизнес-процессов с возможностью их генерации.";
 
-            list.Add(new UpdateInfo
+            var updates = response.Data ??= new List<UpdateInfo>();
+            return View(updates);
+        }
+
+        [HttpGet("/addPatchNote")]
+        public ActionResult AddPatchNote()
+        {
+            return View();
+        }
+
+        [HttpPost("/addPatchNote")]
+        public async Task<ActionResult> AddPatchNote(string version, string topic, string description)
+        {
+            if (ModelState.IsValid)
             {
-                Topic = "Ну чо-то поменял ",
-                Date = DateTime.Now,
-                Version = "1.0-alpha",
-                Description = string.Join(", ", Enumerable.Repeat("Иинформационная система управления задачами и бизнес-процессами ", 12))
-            });
-            list.AddRange(Enumerable.Repeat(list[0], 10));
-            return View(list);
-            return View(response.Data);
+                var response = await _updatesService
+                    .AddUpdateInfo(version, topic, description);
+
+                if (response.StatusCode == Domain.Enums.StatusCode.OK)
+                    return Ok();
+            }
+            return BadRequest();
         }
 
         public IActionResult Privacy()

@@ -156,11 +156,26 @@
         z-index: 1;
     }
     
+    .site-info {
+        text-align: center;
+    }
+
+    .title-bordered {
+        border-bottom: 1px solid #d8d8d8;
+        padding: 10px;
+    }
+
+    .slogan {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
 </style>
 
 <div class="outer-div">
     <div class="about-site">
-        <h3>О сайте</h3>
+        <h3 class="site-info title-bordered">Time Sense Workflow</h3>
+        <label class="site-info slogan">@ViewBag.InfoTitle</label>
         <label>@ViewBag.AboutSite</label>
     </div>
     <div class="updinfo-wrapper">
@@ -177,7 +192,7 @@
                         </label>
                         <label id="patch-date">[@patch.Date.ToString("dd.MM.yyyy")]</label>
                     </div>
-                    <label id="patch-topic">&#8211; @patch.Topic</label>
+                    <label id="patch-topic" class="topic">&#8211; @patch.Topic</label>
                 </div>
             }
         </div>
@@ -208,8 +223,15 @@
 
         $(".modalInfo").find("#patch-version").text('Обновление: ' + version);
         $(".modalInfo").find("#patch-date").text(dateString);
-        $(".modalInfo").find("#patch-topic").text(topic);
-        $(".modalInfo").find("#patch-description").text(description);
+
+        topic = topic.replace(/\n/g, "<br>");
+
+        $(".modalInfo").find("#patch-topic").html(topic);
+
+        description = description.replace(/\n/g, "<br>")
+                                 .replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
+
+        $(".modalInfo").find("#patch-description").html(description);
 
         document.getElementById('full-info').style.display = 'block';
         document.getElementById('overlay').style.display = 'block';
@@ -219,4 +241,13 @@
         document.getElementById('full-info').style.display = 'none';
         document.getElementById('overlay').style.display = 'none';
     }
+
+    $(".topic").each(function() {
+        
+        var labelText = $(this).text();
+        
+        labelText = labelText.replace(/\n/g, "<br>");
+        
+        $(this).html(labelText);
+    });
 </script>
