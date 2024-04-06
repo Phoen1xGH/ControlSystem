@@ -19,7 +19,7 @@
 
     <!-- modeler distro -->
     <script src="https://unpkg.com/bpmn-js@13.2.2/dist/bpmn-modeler.development.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bpmn-js-color-picker@0.7.0/colors/ColorContextPadProvider.min.js"></script>
+    @*<script src="https://cdn.jsdelivr.net/npm/bpmn-js-color-picker@0.7.0/colors/ColorContextPadProvider.min.js"></script>*@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bpmn-js-color-picker@0.7.0/colors/color-picker.min.css">
 
     <!-- needed for this example only -->
@@ -180,16 +180,29 @@
     </div>
     <div id="overlay" onclick="closeModal()"></div>
 
+<script type="module">
+        import BpmnColorPickerModule from 'https://cdn.jsdelivr.net/npm/bpmn-js-color-picker@0.7.0/+esm';
+        window.BpmnColorPickerModule = BpmnColorPickerModule;
+</script>
 <script>
+        
+        document.addEventListener("DOMContentLoaded", function () {
+        //var BpmnColorPickerModule =  window.BpmnColorPickerModule;
 
-        var xmlChart = `@Html.Raw(ViewBag.Chart)`;
-        // modeler instance
-        var bpmnModeler = new BpmnJS({
-            container: '#canvas',
-            keyboard: {
-                bindTo: window
-            }
-        });
+            var xmlChart = `@Html.Raw(ViewBag.Chart)`;
+            
+            // modeler instance
+            var bpmnModeler = new BpmnJS({
+                container: '#canvas',
+                keyboard: {
+                    bindTo: window
+                },
+                additionalModules: [
+                    window.BpmnColorPickerModule
+                ]
+            });
+
+            openDiagram(xmlChart);
 
         toastr.options = {
             "positionClass": "toast-bottom-right", // Устанавливаем позицию в нижний правый угол
@@ -293,10 +306,10 @@
 
         // load external diagram file via AJAX and open it
        // $.get(diagramUrl, openDiagram, 'text');
-       document.addEventListener('DOMContentLoaded',
-	       function() {
-               openDiagram(xmlChart);
-	       });
+       //document.addEventListener('DOMContentLoaded',
+	      // function() {
+       //        openDiagram(xmlChart);
+	      // });
         // wire save button
         $('#save-button').click(exportDiagram);
         $('#saveBpmn').click(saveDiagramBpmn);
@@ -417,7 +430,7 @@
             fileInput.click();
         }
 
-
+        });
     </script>
     <!--
       Thanks for trying out our BPMN toolkit!
