@@ -1527,7 +1527,7 @@
             method: "POST",
             data: { boardId: boardId, ticketId: ticketId },
             success: function(result) {
-                var ticketsDiv = $('#board-' + result[0].statusId);
+                var ticketsDiv = $('#board-' + boardId);
                 ticketsDiv.empty();
                 result.forEach(function (ticket) {
                     
