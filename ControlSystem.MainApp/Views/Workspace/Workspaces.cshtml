@@ -2614,7 +2614,7 @@
         console.log("realTitle: " + $(".ticket-title").val());
         console.log("realDescr: " + realDescription);
 
-        if(realDescription == description &&
+        if(realDescription.trim() == description.trim() &&
             $(".ticket-title").val() == title) {
 
             updateTicket();
