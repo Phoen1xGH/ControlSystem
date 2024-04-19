@@ -1,0 +1,126 @@
+﻿html, body, #canvas {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+#canvas {
+    height: 90vh;
+    overflow: hidden;
+}
+
+.diagram-note {
+    background-color: rgba(66, 180, 21, 0.7);
+    color: White;
+    border-radius: 5px;
+    font-family: Arial;
+    font-size: 12px;
+    padding: 5px;
+    min-height: 16px;
+    width: 50px;
+    text-align: center;
+}
+
+.needs-discussion:not(.djs-connection) .djs-visual > :nth-child(1) {
+    stroke: rgba(66, 180, 21, 0.7) !important; /* color elements as red */
+}
+
+#saves {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    display: flex;
+}
+
+button {
+    border: 1px solid #3c414a;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+    button:not(:last-child) {
+        border-right: none;
+    }
+
+    button:hover {
+        background-color: #d8d8d8;
+    }
+
+a.bjs-powered-by {
+    display: none;
+}
+
+#myModal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 30px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 4;
+    border-radius: 20px;
+}
+
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 3;
+}
+
+#closeBtn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+
+#modalButton {
+    display: block;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+#modalInput {
+    display: block;
+    margin-top: 10px;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    background-color: transparent;
+    padding: 10px;
+}
+
+#saveBpmn {
+    border-radius: 20px 0 0 20px;
+}
+
+#save-to-db {
+    border-radius: 0 20px 20px 0;
+}
+
+#import-file-button {
+    border-radius: 20px;
+    border: 1px solid black;
+    margin-right: 25px;
+}
