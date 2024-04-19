@@ -57,20 +57,7 @@ namespace ControlSystem.MainApp.Controllers
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
-                    var tickets = _boardService.GetTickets(boardId);
-
-                    var ticketsToJson = tickets.Data.Select(ticket => new TicketPreviewViewModel
-                    {
-                        Id = ticket.Id,
-                        Title = ticket.Title,
-                        StatusId = ticket.Status.Id,
-                        WorkspaceId = ticket.Status.Workspace.Id,
-                        Priority = ticket.Priority
-                    }).ToList();
-
-                    ticketsToJson.Reverse();
-
-                    return Json(ticketsToJson);
+                    return Ok();
                 }
             }
             return BadRequest("Ошибка при удалении тикета");
