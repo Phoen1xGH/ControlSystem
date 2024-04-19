@@ -2493,7 +2493,7 @@
 
                 result.tickets.forEach(function (ticket) {
                     var ticketElement = `
-                                <div class="ticket" id="ticket-${ticket.id}" onclick="openTicket(${ticket.workspaceId}, ${ticket.id})">
+                                    <div class="ticket" id="ticket-${ticket.id}" onclick="openTicket(${ticket.workspaceId}, ${ticket.id})" style="display: block;">
                                     <div class="ticket-title-preview">
                                         <label id="ticket-preview-label">${ticket.title}</label>
                                         <button id="ticket-del-button" onclick="deleteTicket(${ticket.statusId}, ${ticket.id})">
@@ -2538,34 +2538,39 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        var ticketsData = [];
+        var ticketContainers = [];
+        var fuse;
+
+        function updateListForSearch() {
+            var ticketsData = [];
+
+            // Получаем все элементы с классом ticket-preview-label
+            var ticketLabels = document.querySelectorAll("#ticket-preview-label");
         
-        // Получаем все элементы с классом ticket-preview-label
-        var ticketLabels = document.querySelectorAll("#ticket-preview-label");
+            // Проходимся по каждому элементу и добавляем данные в массив ticketsData
+            ticketLabels.forEach(function (label) {
+                var ticketId = label.closest(".ticket").id.replace("ticket-", ""); // Получаем ID тикета
+                var ticketTitle = label.textContent; // Получаем название тикета
 
-        // Проходимся по каждому элементу и добавляем данные в массив ticketsData
-        ticketLabels.forEach(function (label) {
-            var ticketId = label.closest(".ticket").id.replace("ticket-", ""); // Получаем ID тикета
-            var ticketTitle = label.textContent; // Получаем название тикета
-
-            // Добавляем данные в массив ticketsData
-            ticketsData.push({
-                Id: ticketId,
-                Title: ticketTitle
-                // Добавьте другие свойства тикета по необходимости
+                // Добавляем данные в массив ticketsData
+                ticketsData.push({
+                    Id: ticketId,
+                    Title: ticketTitle
+                    // Добавьте другие свойства тикета по необходимости
+                });
             });
-        });
 
-        // Инициализируем fuse.js с настройками (подробнее см. документацию fuse.js)
-        var fuseOptions = {
-            keys: ["Title"],
-            includeScore: true,
-            threshold: 0.5 // Подстройте этот параметр в зависимости от ваших требований
-        };
-        var fuse = new Fuse(ticketsData, fuseOptions);
+            // Инициализируем fuse.js с настройками (подробнее см. документацию fuse.js)
+            var fuseOptions = {
+                keys: ["Title"],
+                includeScore: true,
+                threshold: 0.5 // Подстройте этот параметр в зависимости от ваших требований
+            };
+            fuse = new Fuse(ticketsData, fuseOptions);
 
-        // Получаем элементы DOM
-        var ticketContainers = document.querySelectorAll(".ticket");
+            // Получаем элементы DOM
+            ticketContainers = document.querySelectorAll(".ticket");
+        }
 
         // Функция для выполнения поиска и обновления отображения
         function performSearch(query) {
@@ -2597,9 +2602,10 @@
         }
 
         // Вызываем функцию поиска при вводе в поле поиска
-        var searchInput = document.getElementById("search-input"); // Замените на ID вашего поля ввода поиска
+        var searchInput = document.getElementById("search-input"); 
         searchInput.addEventListener("input", function () {
             var searchQuery = searchInput.value;
+            updateListForSearch();
             performSearch(searchQuery);
         });
     });
