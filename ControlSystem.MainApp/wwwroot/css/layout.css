@@ -1,0 +1,65 @@
+﻿#navbar {
+    background-color: #3c414a;
+    border-color: #3c414a !important;
+}
+
+.dropdown-menu {
+    background-color: #3c414a !important;
+}
+
+.dropdown-item {
+    color: white !important;
+}
+
+    .dropdown-item:hover {
+        color: #50545c !important; /* Замените #yourHoverColor на ваш цвет для наведения */
+    }
+
+.search-box {
+    background: #2f3640;
+    height: 35px;
+    border-radius: 35px;
+    padding: 8px;
+    box-sizing: content-box;
+    visibility: hidden;
+    border: 1px solid transparent;
+}
+
+.search-btn {
+    color: #15c118;
+    float: right;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #2f3640;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.4s;
+}
+
+.search-txt {
+    border: none;
+    background: none;
+    outline: none;
+    float: left;
+    padding: 0;
+    color: #d8d8d8;
+    font-size: 16px;
+    transition: 0.4s;
+    line-height: 35px;
+    width: 0px;
+}
+
+.search-box:hover > .search-txt {
+    width: 240px;
+    padding: 0 6px;
+}
+
+.search-box:hover {
+    border: 1px solid #15c118;
+}
+
+    .search-box:hover > .search-btn {
+        background: white;
+    }

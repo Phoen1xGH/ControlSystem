@@ -1,54 +1,6 @@
 ﻿@using ControlSystem.Services.DTO;
 
-<style>
-    .dropdown-content,
-    .dropdown-status-content {
-        display: none;
-        right: 20px;
-        white-space: nowrap;
-    }
-
-    .dropdown-status-content{
-        right: 0px;
-    }
-
-    .ticket-options-button:hover + .dropdown-content, 
-    .dropdown-content:hover {
-        display: block;
-        z-index: 1;
-        position: absolute;
-    }
-
-    .dropdown-content button {
-        display: block;
-        width: 100%;
-        text-align: left;
-        padding: 10px;
-        border: none;
-
-        cursor: pointer;
-        background-color: #2a2e34;
-        border: none;
-        border-bottom: 1px solid #d8d8d8;
-        color: #d8d8d8;
-    }
-
-    .dropdown-content button:hover {
-        background-color: #87909e;
-    }
-
-        #statuses-button:hover ~ .dropdown-status-content,
-        .dropdown-status-content:hover {
-            display: block;
-            z-index: 1;
-            position: absolute;
-        }
-
-    .info-status {
-        color: #d8d8d8;
-        margin-top: 10px;
-    }
-</style>
+<link rel="stylesheet" href="~/css/ticketDetails.css"/>
 
 @model TicketDTO
 
