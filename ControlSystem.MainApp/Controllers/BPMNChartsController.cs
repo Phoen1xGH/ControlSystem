@@ -109,6 +109,7 @@ namespace ControlSystem.MainApp.Controllers
 
             if (response.StatusCode == Domain.Enums.StatusCode.OK)
             {
+                response.Data!.Reverse();
                 return View(response.Data!);
             }
             ModelState.AddModelError("", response.Description);
@@ -139,12 +140,9 @@ namespace ControlSystem.MainApp.Controllers
             {
                 var delResponse = await _accountService.DeleteChart(chartId);
 
-                var getResponse = await _accountService.GetAllChartsByUser(User.Identity!.Name!);
-
-                if (delResponse.StatusCode == Domain.Enums.StatusCode.OK &&
-                    getResponse.StatusCode == Domain.Enums.StatusCode.OK)
+                if (delResponse.StatusCode == Domain.Enums.StatusCode.OK)
                 {
-                    return Json(getResponse.Data);
+                    return Ok();
                 }
             }
             return BadRequest("Ошибка при удалении диаграммы");
