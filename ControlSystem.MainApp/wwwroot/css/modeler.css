@@ -54,6 +54,7 @@ a.bjs-powered-by {
     display: none;
 }
 
+#modalExportToTickets,
 #myModal {
     display: none;
     position: fixed;
@@ -67,6 +68,7 @@ a.bjs-powered-by {
     border-radius: 20px;
 }
 
+#overlayExport,
 #overlay {
     display: none;
     position: fixed;
@@ -85,6 +87,7 @@ a.bjs-powered-by {
     cursor: pointer;
 }
 
+#modalButtonExport,
 #modalButton {
     display: block;
     margin-top: 20px;
@@ -123,4 +126,16 @@ button {
     border-radius: 20px;
     border: 1px solid black;
     margin-right: 25px;
+}
+
+select {
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 10px 10px 0 0;
+    width: 100%;
+}
+
+#modalExportToTickets p {
+    margin-top: 7px;
+    margin-bottom: 7px;
 }

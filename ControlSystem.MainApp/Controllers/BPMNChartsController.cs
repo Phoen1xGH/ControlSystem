@@ -9,11 +9,17 @@ namespace ControlSystem.MainApp.Controllers
     [Authorize]
     public class BPMNChartsController : BaseController
     {
-        private readonly IBPMNGenerateService _accountService;
+        private readonly IBPMNGenerateService _chartService;
+        private readonly IBoardService _boardService;
+        private readonly IUserAccountService _userService;
 
-        public BPMNChartsController(IBPMNGenerateService service) : base()
+        public BPMNChartsController(IBPMNGenerateService service,
+            IBoardService boardService,
+            IUserAccountService userService) : base()
         {
-            _accountService = service;
+            _chartService = service;
+            _boardService = boardService;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -25,7 +31,7 @@ namespace ControlSystem.MainApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = _accountService.GenerateProcess(allData);
+                var response = _chartService.GenerateProcess(allData);
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
@@ -45,13 +51,13 @@ namespace ControlSystem.MainApp.Controllers
             if (ModelState.IsValid)
             {
                 var currentUserName = User.Identity!.Name!;
-                var response = await _accountService.SaveBPMNToDB(currentUserName, chart);
+                var response = await _chartService.SaveBPMNToDB(currentUserName, chart);
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
                     ViewBag.Chart = chart.XmlData;
 
-                    var charts = await _accountService.GetAllChartsByUser(currentUserName);
+                    var charts = await _chartService.GetAllChartsByUser(currentUserName);
                     ViewBag.Id = charts.Data!.OrderBy(ch => ch.Id).Last().Id;
 
                     return View("Modeler");
@@ -80,6 +86,9 @@ namespace ControlSystem.MainApp.Controllers
                 </bpmn:definitions>
                 
                 """;
+
+            SetupWorkspacesList();
+
             return View();
         }
 
@@ -88,12 +97,13 @@ namespace ControlSystem.MainApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _accountService.GetChartById(chartId);
+                var response = await _chartService.GetChartById(chartId);
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
                     ViewBag.Chart = response.Data!.XmlData;
                     ViewBag.Id = response.Data!.Id;
+                    SetupWorkspacesList();
                     return View("Modeler");
                 }
             }
@@ -105,7 +115,7 @@ namespace ControlSystem.MainApp.Controllers
         {
             var username = User.Identity!.Name!;
 
-            var response = await _accountService.GetAllChartsByUser(username);
+            var response = await _chartService.GetAllChartsByUser(username);
 
             if (response.StatusCode == Domain.Enums.StatusCode.OK)
             {
@@ -122,7 +132,7 @@ namespace ControlSystem.MainApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _accountService.EditChart(chartId, newXmlData);
+                var response = await _chartService.EditChart(chartId, newXmlData);
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
@@ -138,7 +148,7 @@ namespace ControlSystem.MainApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var delResponse = await _accountService.DeleteChart(chartId);
+                var delResponse = await _chartService.DeleteChart(chartId);
 
                 if (delResponse.StatusCode == Domain.Enums.StatusCode.OK)
                 {
@@ -161,6 +171,56 @@ namespace ControlSystem.MainApp.Controllers
                 return Json(xmlChart);
             }
             return BadRequest("Ошибка при импорте файла");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateTicketsFromChartTasks(int workspaceId, int boardId, string xmlChart)
+        {
+            if (ModelState.IsValid)
+            {
+                bool isSuccess = true;
+
+                var getTitlesResponse = _chartService.GetTicketsFromChart(xmlChart);
+
+                if (getTitlesResponse.StatusCode == Domain.Enums.StatusCode.OK)
+                {
+                    foreach (var name in getTitlesResponse!.Data!)
+                    {
+                        var createResponse = await _boardService.CreateTicket(User.Identity!.Name!, name, boardId);
+
+                        if (createResponse.StatusCode != Domain.Enums.StatusCode.OK)
+                        {
+                            isSuccess = false;
+                            break;
+                        }
+                    }
+
+                    if (isSuccess)
+                        return Ok();
+                }
+            }
+            return BadRequest("Произошла ошибка при импорте диаграммы в карточки");
+        }
+
+        private void SetupWorkspacesList()
+        {
+            UserAccount user = _userService.GetUser(User.Identity!.Name!);
+            var workspaces = user.Workspaces
+                                .OrderBy(w => w.Name)
+                                .Select(w => new { w.Id, w.Name })
+                                .ToList();
+
+            var boards = user.Workspaces
+                            .SelectMany(w => w.Boards)
+                            .OrderBy(b => b.Name)
+                            .Select(b => new { b.Id, b.Name, WorkspaceId = b.Workspace.Id })
+                            .ToList();
+
+            string workspacesJson = JsonConvert.SerializeObject(workspaces);
+            string boardsJson = JsonConvert.SerializeObject(boards);
+
+            ViewBag.Workspaces = workspacesJson;
+            ViewBag.Boards = boardsJson;
         }
     }
 }
