@@ -31,6 +31,8 @@
 <body>
     @Html.Hidden("xmlChart", (string)@Html.Raw(ViewBag.Chart).ToString())
     @Html.Hidden("chartId", (int?)ViewBag.Id)
+    @Html.Hidden("workspaces", (string)ViewBag.Workspaces)
+    @Html.Hidden("boards", (string)ViewBag.Boards)
 
     <div id="canvas"></div>
 
@@ -39,6 +41,7 @@
         <button id="saveBpmn">Экспорт в файл</button>
         <button id="export-svg-button">Экспорт в SVG</button>
         <button id="save-to-db">Сохранить в БД</button>
+        <button id="export-to-tickets">Экспорт в задачи</button>
     </div>
 
     <div id="myModal">
@@ -50,5 +53,14 @@
         </form>
     </div>
     <div id="overlay"></div>
+
+    <div id="modalExportToTickets">
+        <p>Выберите рабочее пространство</p>
+        <select id="wList"></select>
+        <p>Выберите статус</p>
+        <select id="bList"></select>        
+        <input id="modalButtonExport" type="submit" value="Создать" />
+    </div>
+    <div id="overlayExport"></div>
 </body>
 </html>

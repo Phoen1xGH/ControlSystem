@@ -236,13 +236,53 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[EditChart]: {ex.Message}");
+                _logger.LogError(ex, $"[DeleteChart]: {ex.Message}");
 
                 return new BaseResponse<bool>()
                 {
                     StatusCode = StatusCode.InternalServerError,
                     Description = ex.Message,
                     Data = false
+                };
+            }
+        }
+
+        public BaseResponse<List<string>> GetTicketsFromChart(string xmlChart)
+        {
+            try
+            {
+                List<string> taskNames = new List<string>();
+
+                XDocument doc = XDocument.Parse(xmlChart);
+
+                // Находим все элементы task в BPMN файле
+                var tasks = doc.Descendants()
+                               .Where(e => e.Name.LocalName == "task");
+
+                foreach (XElement? task in tasks)
+                {
+                    string taskName = task.Attribute("name").Value;
+
+                    if (taskName is not null)
+                        taskNames.Add(taskName);
+                }
+
+                return new BaseResponse<List<string>>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = taskNames
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[GetTicketsFromChart]: {ex.Message}");
+
+                return new BaseResponse<List<string>>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = null
                 };
             }
         }

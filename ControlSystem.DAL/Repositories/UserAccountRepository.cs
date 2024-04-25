@@ -29,7 +29,7 @@ namespace ControlSystem.DAL.Repositories
         {
             return _context.UserAccounts
                 .Include(x => x.Charts)
-                .Include(x => x.Workspaces);
+                .Include(x => x.Workspaces).ThenInclude(x => x.Boards);
         }
 
         public async Task Update(UserAccount entity)

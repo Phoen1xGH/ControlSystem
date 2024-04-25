@@ -16,5 +16,7 @@ namespace ControlSystem.Services.Interfaces
         Task<BaseResponse<bool>> EditChart(int chartI, string newXmlData);
 
         Task<BaseResponse<bool>> DeleteChart(int chartId);
+
+        BaseResponse<List<string>> GetTicketsFromChart(string xmlChart);
     }
 }
