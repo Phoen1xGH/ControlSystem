@@ -17,6 +17,6 @@ namespace ControlSystem.Services.Interfaces
 
         Task<BaseResponse<bool>> DeleteChart(int chartId);
 
-        BaseResponse<List<string>> GetTicketsFromChart(string xmlChart);
+        BaseResponse<List<(string, string)>> GetTicketsFromChart(List<string> selectedTasksIds, string xmlChart);
     }
 }

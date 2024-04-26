@@ -109,6 +109,12 @@ async function exportChartToTickets() {
     var workspaceId = parseInt(document.getElementById('wList').value);
     var boardId = parseInt(document.getElementById('bList').value);
     var xmlData = await bpmnModeler.saveXML({ format: true });
+    var selectedElements = bpmnModeler.get('selection').get();
+
+    var selectedTasksIds = [];
+    selectedElements.forEach(function (element) {
+        selectedTasksIds.push(element.id);
+    });
 
     $.ajax({
         url: '/BPMNCharts/CreateTicketsFromChartTasks',
@@ -116,6 +122,7 @@ async function exportChartToTickets() {
         data: {
             workspaceId: workspaceId,
             boardId: boardId,
+            selectedTasksIds: selectedTasksIds,
             xmlChart: xmlData.xml
         },
         success: function () {
