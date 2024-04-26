@@ -4,6 +4,7 @@ using ControlSystem.Domain.Entities;
 using ControlSystem.Domain.Enums;
 using ControlSystem.Domain.Extensions;
 using ControlSystem.Domain.Models.BPMNComponents;
+using ControlSystem.Domain.Models.BPMNComponents.Elements;
 using ControlSystem.Domain.Response;
 using ControlSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -247,27 +248,55 @@ namespace ControlSystem.Services.Implementations
             }
         }
 
-        public BaseResponse<List<string>> GetTicketsFromChart(string xmlChart)
+        public BaseResponse<List<(string, string)>> GetTicketsFromChart(List<string> selectedTasksIds, string xmlChart)
         {
             try
             {
-                List<string> taskNames = new List<string>();
+                List<(string, string)> taskNames = new List<(string, string)>();
 
                 XDocument doc = XDocument.Parse(xmlChart);
 
-                // Находим все элементы task в BPMN файле
-                var tasks = doc.Descendants()
-                               .Where(e => e.Name.LocalName == "task");
+                var taskElements = doc.Descendants().Where(e => e.Name.LocalName == "task");
 
-                foreach (XElement? task in tasks)
+                if (selectedTasksIds.Count > 0)
+                    taskElements = taskElements.Where(el => selectedTasksIds.Contains(el.Attribute("id")?.Value!));
+
+                // Создаем список для хранения информации о задачах
+                var tasksInfo = new List<BPMNTask>();
+
+                // Добавляем информацию о задачах в список
+                foreach (var taskElement in taskElements)
                 {
-                    string taskName = task.Attribute("name").Value;
+                    var taskId = taskElement.Attribute("id")?.Value;
+                    var taskName = taskElement.Attribute("name")?.Value;
 
-                    if (taskName is not null)
-                        taskNames.Add(taskName);
+                    // Находим входящую и исходящую связь для текущей задачи
+                    var incoming = taskElement.Elements().FirstOrDefault(e => e.Name.LocalName == "incoming")?.Value;
+                    var outgoing = taskElement.Elements().FirstOrDefault(e => e.Name.LocalName == "outgoing")?.Value;
+
+                    tasksInfo.Add(new BPMNTask
+                    {
+                        Name = taskName,
+                        Id = taskId,
+                        Incoming = incoming,
+                        Outgoing = outgoing
+                    });
                 }
 
-                return new BaseResponse<List<string>>
+                for (int i = 0; i < tasksInfo.Count; i++)
+                {
+                    var currentTask = tasksInfo[i];
+
+                    for (int j = 0; j < tasksInfo.Count; j++)
+                    {
+                        var otherTask = tasksInfo[j];
+
+                        if (currentTask.Outgoing == otherTask.Incoming)
+                            taskNames.Add((currentTask.Name, otherTask.Name));
+                    }
+                }
+
+                return new BaseResponse<List<(string, string)>>
                 {
                     StatusCode = StatusCode.OK,
                     Description = StatusCode.OK.GetDescriptionValue(),
@@ -278,7 +307,7 @@ namespace ControlSystem.Services.Implementations
             {
                 _logger.LogError(ex, $"[GetTicketsFromChart]: {ex.Message}");
 
-                return new BaseResponse<List<string>>()
+                return new BaseResponse<List<(string, string)>>()
                 {
                     StatusCode = StatusCode.InternalServerError,
                     Description = ex.Message,

@@ -12,14 +12,17 @@ namespace ControlSystem.MainApp.Controllers
         private readonly IBPMNGenerateService _chartService;
         private readonly IBoardService _boardService;
         private readonly IUserAccountService _userService;
+        private readonly ILinkService _linkService;
 
         public BPMNChartsController(IBPMNGenerateService service,
             IBoardService boardService,
-            IUserAccountService userService) : base()
+            IUserAccountService userService,
+            ILinkService linkService) : base()
         {
             _chartService = service;
             _boardService = boardService;
             _userService = userService;
+            _linkService = linkService;
         }
 
         [HttpGet]
@@ -174,33 +177,99 @@ namespace ControlSystem.MainApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTicketsFromChartTasks(int workspaceId, int boardId, string xmlChart)
+        public async Task<IActionResult> CreateTicketsFromChartTasks(int workspaceId, int boardId, List<string> selectedTasksIds, string xmlChart)
         {
-            if (ModelState.IsValid)
+            //if (ModelState.IsValid)
+            //{
+            //    bool isSuccess;
+
+            //    var getTitlesResponse = _chartService.GetTicketsFromChart(xmlChart);
+
+            //    if (getTitlesResponse.StatusCode == Domain.Enums.StatusCode.OK)
+            //    {
+            //        isSuccess = await CreateTicketsResponseAsync(getTitlesResponse.Data!, boardId);
+
+            //        if (isSuccess)
+            //            isSuccess = await AddLinksToNewTicketsAsync(workspaceId, boardId, getTitlesResponse.Data.Count);
+
+            //        if(isSuccess)
+            //            return Ok();
+
+            //    }
+            //}
+            //return BadRequest("Произошла ошибка при импорте диаграммы в карточки");
+
+            if (!ModelState.IsValid)
+                return BadRequest("Произошла ошибка");
+
+            var getTitlesResponse = _chartService.GetTicketsFromChart(selectedTasksIds, xmlChart);
+            if (getTitlesResponse.StatusCode != Domain.Enums.StatusCode.OK)
+                return BadRequest("Произошла ошибка при обработке диаграммы");
+
+            var tickets = new HashSet<string>();
+
+            getTitlesResponse.Data!.ForEach(tuple =>
             {
-                bool isSuccess = true;
+                tickets.Add(tuple.Item1);
+                tickets.Add(tuple.Item2);
+            });
 
-                var getTitlesResponse = _chartService.GetTicketsFromChart(xmlChart);
+            if (!await CreateTicketsResponseAsync(tickets, boardId) ||
+                !await AddLinksToNewTicketsAsync(workspaceId, boardId, tickets.Count, getTitlesResponse.Data!))
+                return BadRequest("Произошла ошибка при создании карточек или добавлении ссылок");
 
-                if (getTitlesResponse.StatusCode == Domain.Enums.StatusCode.OK)
-                {
-                    foreach (var name in getTitlesResponse!.Data!)
-                    {
-                        var createResponse = await _boardService.CreateTicket(User.Identity!.Name!, name, boardId);
-
-                        if (createResponse.StatusCode != Domain.Enums.StatusCode.OK)
-                        {
-                            isSuccess = false;
-                            break;
-                        }
-                    }
-
-                    if (isSuccess)
-                        return Ok();
-                }
-            }
-            return BadRequest("Произошла ошибка при импорте диаграммы в карточки");
+            return Ok();
         }
+
+
+        private async Task<bool> CreateTicketsResponseAsync(IEnumerable<string> names, int boardId)
+        {
+            foreach (var name in names)
+            {
+                var createResponse = await _boardService.CreateTicket(User.Identity!.Name!, name, boardId);
+
+                if (createResponse.StatusCode != Domain.Enums.StatusCode.OK)
+                    return false;
+            }
+            return true;
+        }
+
+        private async Task<bool> AddLinksToNewTicketsAsync(int workspaceId, int boardId, int ticketsCount, List<(string, string)> ticketsTuple)
+        {
+            var ticketsResponse = _boardService.GetTickets(boardId);
+
+            if (ticketsResponse.StatusCode != Domain.Enums.StatusCode.OK)
+                return false;
+
+            var tickets = ticketsResponse.Data!.TakeLast(ticketsCount).ToList();
+
+            foreach (var currentTicket in tickets)
+            {
+                var linkedTicketTuple = ticketsTuple.FirstOrDefault(t => t.Item1 == currentTicket.Title);
+                if (linkedTicketTuple.Item2 is null)
+                    continue;
+                var linkedTicketName = linkedTicketTuple.Item2;
+
+                var linkedTicket = tickets.FirstOrDefault(t => t.Title == linkedTicketName);
+
+                if (linkedTicket is null)
+                    continue;
+
+                var link = new Link
+                {
+                    Name = $"Следующий этап (Карточка {linkedTicket!.Id})",
+                    Source = $"{HttpContext.Request.Scheme}://{Request.Host}/Workspace/Workspaces/{workspaceId}/{linkedTicket.Id}"
+                };
+
+                var linkResponse = await _linkService.CreateLink(currentTicket!.Id, link);
+
+                if (linkResponse.StatusCode != Domain.Enums.StatusCode.OK)
+                    return false;
+            }
+
+            return true;
+        }
+
 
         private void SetupWorkspacesList()
         {
