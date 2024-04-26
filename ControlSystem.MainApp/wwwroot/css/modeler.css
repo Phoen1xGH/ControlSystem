@@ -120,12 +120,18 @@ button {
 
 #save-to-db {
     border-radius: 0 20px 20px 0;
+    border: 1px solid #3c414a;
 }
 
 #import-file-button {
     border-radius: 20px;
     border: 1px solid black;
     margin-right: 25px;
+}
+
+#export-to-tickets {
+    margin-left: 25px;
+    border-radius: 20px;
 }
 
 select {
