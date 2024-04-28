@@ -1,5 +1,4 @@
 ﻿using ControlSystem.DAL.Interfaces;
-using ControlSystem.DAL.Repositories;
 using ControlSystem.Domain.Entities;
 using ControlSystem.Domain.Enums;
 using ControlSystem.Domain.Extensions;
@@ -75,7 +74,9 @@ namespace ControlSystem.Services.Implementations
                     };
                 }
 
-                await (_userRepository as UserAccountRepository)!.AddChartToUser(user, chart);
+                user.Charts.Add(chart);
+
+                await _userRepository.Update(user);
 
                 return new BaseResponse<bool>
                 {

@@ -1,5 +1,4 @@
 ﻿using ControlSystem.DAL.Interfaces;
-using ControlSystem.DAL.Repositories;
 using ControlSystem.Domain.Entities;
 using ControlSystem.Domain.Enums;
 using ControlSystem.Domain.Extensions;
@@ -32,7 +31,7 @@ namespace ControlSystem.Services.Implementations
         {
             try
             {
-                await (_tagRepository as TagsRepository)!.Create(tag);
+                await _tagRepository.Create(tag);
 
                 return new BaseResponse<bool>
                 {
@@ -70,7 +69,7 @@ namespace ControlSystem.Services.Implementations
                     };
                 }
 
-                await (_tagRepository as TagsRepository)!.Delete(tag);
+                await _tagRepository.Delete(tag);
 
                 return new BaseResponse<bool>
                 {

@@ -179,26 +179,6 @@ namespace ControlSystem.MainApp.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateTicketsFromChartTasks(int workspaceId, int boardId, List<string> selectedTasksIds, string xmlChart)
         {
-            //if (ModelState.IsValid)
-            //{
-            //    bool isSuccess;
-
-            //    var getTitlesResponse = _chartService.GetTicketsFromChart(xmlChart);
-
-            //    if (getTitlesResponse.StatusCode == Domain.Enums.StatusCode.OK)
-            //    {
-            //        isSuccess = await CreateTicketsResponseAsync(getTitlesResponse.Data!, boardId);
-
-            //        if (isSuccess)
-            //            isSuccess = await AddLinksToNewTicketsAsync(workspaceId, boardId, getTitlesResponse.Data.Count);
-
-            //        if(isSuccess)
-            //            return Ok();
-
-            //    }
-            //}
-            //return BadRequest("Произошла ошибка при импорте диаграммы в карточки");
-
             if (!ModelState.IsValid)
                 return BadRequest("Произошла ошибка");
 
@@ -214,34 +194,43 @@ namespace ControlSystem.MainApp.Controllers
                 tickets.Add(tuple.Item2);
             });
 
-            if (!await CreateTicketsResponseAsync(tickets, boardId) ||
-                !await AddLinksToNewTicketsAsync(workspaceId, boardId, tickets.Count, getTitlesResponse.Data!))
+            var createTicketsResponse = await CreateTicketsResponseAsync(tickets, boardId);
+            if (createTicketsResponse == null ||
+                !await AddLinksToNewTicketsAsync(workspaceId, createTicketsResponse, getTitlesResponse.Data!))
                 return BadRequest("Произошла ошибка при создании карточек или добавлении ссылок");
 
             return Ok();
         }
 
 
-        private async Task<bool> CreateTicketsResponseAsync(IEnumerable<string> names, int boardId)
+        private async Task<List<int>?> CreateTicketsResponseAsync(IEnumerable<string> names, int boardId)
         {
+            List<int> ticketIds = new List<int>();
+
             foreach (var name in names)
             {
                 var createResponse = await _boardService.CreateTicket(User.Identity!.Name!, name, boardId);
 
                 if (createResponse.StatusCode != Domain.Enums.StatusCode.OK)
-                    return false;
+                    return null;
+
+                ticketIds.Add(createResponse.Data!);
             }
-            return true;
+            return ticketIds;
         }
 
-        private async Task<bool> AddLinksToNewTicketsAsync(int workspaceId, int boardId, int ticketsCount, List<(string, string)> ticketsTuple)
+        private async Task<bool> AddLinksToNewTicketsAsync(int workspaceId, List<int>? ticketsIds, List<(string, string)> ticketsTuple)
         {
-            var ticketsResponse = _boardService.GetTickets(boardId);
+            var tickets = new List<Ticket>();
+            foreach (int id in ticketsIds)
+            {
+                var ticketResponse = await _boardService.GetTicketById(id);
+                if (ticketResponse.StatusCode != Domain.Enums.StatusCode.OK)
+                    return false;
 
-            if (ticketsResponse.StatusCode != Domain.Enums.StatusCode.OK)
-                return false;
+                tickets.Add(ticketResponse.Data!);
+            }
 
-            var tickets = ticketsResponse.Data!.TakeLast(ticketsCount).ToList();
 
             foreach (var currentTicket in tickets)
             {
