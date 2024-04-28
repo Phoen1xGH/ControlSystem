@@ -1,5 +1,4 @@
 ﻿using ControlSystem.DAL.Interfaces;
-using ControlSystem.DAL.Repositories;
 using ControlSystem.Domain.Entities;
 using ControlSystem.Domain.Enums;
 using ControlSystem.Domain.Extensions;
@@ -80,7 +79,7 @@ namespace ControlSystem.Services.Implementations
 
                 };
 
-                await (_boardRepository as BoardRepository)!.AddTicket(board, ticket);
+
 
                 return new BaseResponse<int>
                 {
@@ -134,12 +133,14 @@ namespace ControlSystem.Services.Implementations
 
                 var ticket = new Ticket { Title = title, Author = author, Participants = participants };
 
-                await (_boardRepository as BoardRepository)!.AddTicket(board, ticket);
+                board.Tickets.Add(ticket);
+
+                await _boardRepository.Update(board);
 
                 return new BaseResponse<int>
                 {
                     StatusCode = StatusCode.OK,
-                    Data = board.Id,
+                    Data = ticket.Id,
                 };
             }
             catch (Exception ex)
