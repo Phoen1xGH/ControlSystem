@@ -29,8 +29,7 @@ namespace ControlSystem.DAL
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Ticket>()
-                .HasMany(t => t.Participants)
-                .WithMany();
+                .HasMany(t => t.Participants).WithMany();
         }
     }
 }
