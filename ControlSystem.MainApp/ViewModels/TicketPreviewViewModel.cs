@@ -1,6 +1,6 @@
 ﻿using ControlSystem.Domain.Entities;
 
-namespace ControlSystem.MainApp.DTO
+namespace ControlSystem.MainApp.ViewModels
 {
     public class TicketPreviewViewModel
     {
