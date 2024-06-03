@@ -1,5 +1,6 @@
 ﻿using ControlSystem.Domain.Entities;
 using ControlSystem.Domain.Response;
+using ControlSystem.Services.Implementations;
 using System.Xml.Linq;
 
 namespace ControlSystem.Services.Interfaces
@@ -17,6 +18,6 @@ namespace ControlSystem.Services.Interfaces
 
         Task<BaseResponse<bool>> DeleteChart(int chartId);
 
-        BaseResponse<List<(string, string)>> GetTicketsFromChart(List<string> selectedTasksIds, string xmlChart);
+        BaseResponse<HashSet<TaskNode>> GetTicketsFromChart(List<string> selectedTasksIds, string xmlChart);
     }
 }
