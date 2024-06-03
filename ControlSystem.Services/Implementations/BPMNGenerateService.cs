@@ -341,7 +341,7 @@ namespace ControlSystem.Services.Implementations
         /// <summary>
         /// Название
         /// </summary>
-        public required string Name { get; init; }
+        public string Name { get; init; }
 
         /// <summary>
         /// Связь с предыдущим этапом
