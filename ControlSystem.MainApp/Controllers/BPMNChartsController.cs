@@ -1,4 +1,5 @@
 ﻿using ControlSystem.Domain.Entities;
+using ControlSystem.Services.Implementations;
 using ControlSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,16 +14,19 @@ namespace ControlSystem.MainApp.Controllers
         private readonly IBoardService _boardService;
         private readonly IUserAccountService _userService;
         private readonly ILinkService _linkService;
+        private readonly IFileService _fileService;
 
         public BPMNChartsController(IBPMNGenerateService service,
             IBoardService boardService,
             IUserAccountService userService,
-            ILinkService linkService) : base()
+            ILinkService linkService,
+            IFileService fileService) : base()
         {
             _chartService = service;
             _boardService = boardService;
             _userService = userService;
             _linkService = linkService;
+            _fileService = fileService;
         }
 
         [HttpGet]
@@ -162,7 +166,10 @@ namespace ControlSystem.MainApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTicketsFromChartTasks(int workspaceId, int boardId, List<string> selectedTasksIds, string xmlChart)
+        public async Task<IActionResult> CreateTicketsFromChartTasks(
+            int workspaceId, int boardId,
+            List<string> selectedTasksIds,
+            string xmlChart, IFormFile svgFile)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Произошла ошибка");
@@ -171,24 +178,23 @@ namespace ControlSystem.MainApp.Controllers
             if (getTitlesResponse.StatusCode != Domain.Enums.StatusCode.OK)
                 return BadRequest("Произошла ошибка при обработке диаграммы");
 
-            var tickets = new HashSet<string>();
-
-            getTitlesResponse.Data!.ForEach(tuple =>
-            {
-                tickets.Add(tuple.Item1);
-                tickets.Add(tuple.Item2);
-            });
+            var tickets = getTitlesResponse.Data!.Select(t => t.Name);
 
             var createTicketsResponse = await CreateTicketsResponseAsync(tickets, boardId);
-            if (createTicketsResponse == null ||
+            if (createTicketsResponse.Count == 0 ||
                 !await AddLinksToNewTicketsAsync(workspaceId, createTicketsResponse, getTitlesResponse.Data!))
                 return BadRequest("Произошла ошибка при создании карточек или добавлении ссылок");
+
+            var fileResponse = await AddFileToTicketsAsync(svgFile, createTicketsResponse);
+
+            if (!fileResponse)
+                return BadRequest("Ошибка при добавлении файла");
 
             return Ok();
         }
 
 
-        private async Task<List<int>?> CreateTicketsResponseAsync(IEnumerable<string> names, int boardId)
+        private async Task<List<int>> CreateTicketsResponseAsync(IEnumerable<string> names, int boardId)
         {
             List<int> ticketIds = new List<int>();
 
@@ -197,14 +203,14 @@ namespace ControlSystem.MainApp.Controllers
                 var createResponse = await _boardService.CreateTicket(User.Identity!.Name!, name, boardId);
 
                 if (createResponse.StatusCode != Domain.Enums.StatusCode.OK)
-                    return null;
+                    return new List<int>(0);
 
                 ticketIds.Add(createResponse.Data!);
             }
             return ticketIds;
         }
 
-        private async Task<bool> AddLinksToNewTicketsAsync(int workspaceId, List<int>? ticketsIds, List<(string, string)> ticketsTuple)
+        private async Task<bool> AddLinksToNewTicketsAsync(int workspaceId, List<int> ticketsIds, HashSet<TaskNode> ticketsSet)
         {
             var tickets = new List<Ticket>();
             foreach (int id in ticketsIds)
@@ -216,34 +222,86 @@ namespace ControlSystem.MainApp.Controllers
                 tickets.Add(ticketResponse.Data!);
             }
 
-
+            // создание ссылок
             foreach (var currentTicket in tickets)
             {
-                var linkedTicketTuple = ticketsTuple.FirstOrDefault(t => t.Item1 == currentTicket.Title);
-                if (linkedTicketTuple.Item2 is null)
-                    continue;
-                var linkedTicketName = linkedTicketTuple.Item2;
+                var linkedTicketNode = ticketsSet.FirstOrDefault(t => t.Name == currentTicket.Title);
 
-                var linkedTicket = tickets.FirstOrDefault(t => t.Title == linkedTicketName);
-
-                if (linkedTicket is null)
+                if (linkedTicketNode is null)
                     continue;
 
-                var link = new Link
+                if (linkedTicketNode.Next is not null)
                 {
-                    Name = $"Следующий этап (Карточка {linkedTicket!.Id})",
-                    Source = $"{HttpContext.Request.Scheme}://{Request.Host}/Workspace/Workspaces/{workspaceId}/{linkedTicket.Id}"
-                };
+                    var linkedTicketName = linkedTicketNode.Next.Name;
 
-                var linkResponse = await _linkService.CreateLink(currentTicket!.Id, link);
+                    var linkedTicket = tickets.FirstOrDefault(t => t.Title == linkedTicketName);
 
-                if (linkResponse.StatusCode != Domain.Enums.StatusCode.OK)
-                    return false;
+                    if (linkedTicket is null)
+                        continue;
+
+                    var link = new Link
+                    {
+                        Name = $"Следующий этап (Карточка {linkedTicket!.Id})",
+                        Source = $"{HttpContext.Request.Scheme}://{Request.Host}/Workspace/Workspaces/{workspaceId}/{linkedTicket.Id}"
+                    };
+
+                    var linkResponse = await _linkService.CreateLink(currentTicket!.Id, link);
+
+                    if (linkResponse.StatusCode != Domain.Enums.StatusCode.OK)
+                        return false;
+                }
+                if (linkedTicketNode.Previous is not null)
+                {
+                    var linkedTicketName = linkedTicketNode.Previous.Name;
+
+                    var linkedTicket = tickets.FirstOrDefault(t => t.Title == linkedTicketName);
+
+                    if (linkedTicket is null)
+                        continue;
+
+                    var link = new Link
+                    {
+                        Name = $"Предыдущий этап (Карточка {linkedTicket!.Id})",
+                        Source = $"{HttpContext.Request.Scheme}://{Request.Host}/Workspace/Workspaces/{workspaceId}/{linkedTicket.Id}"
+                    };
+
+                    var linkResponse = await _linkService.CreateLink(currentTicket!.Id, link);
+
+                    if (linkResponse.StatusCode != Domain.Enums.StatusCode.OK)
+                        return false;
+                }
             }
 
             return true;
         }
 
+        private async Task<bool> AddFileToTicketsAsync(IFormFile formFile, List<int> ticketsIds)
+        {
+            foreach (int id in ticketsIds)
+            {
+                var svgFile = new FileAttachment
+                {
+                    FileName = "Диаграмма процесса",
+                    FileContent = new FileContent
+                    {
+                        Content = GetFileBytes(formFile),
+                    }
+                };
+
+                var fileResponse = await _fileService.CreateFiles(id, new List<FileAttachment>() { svgFile });
+
+                if (fileResponse.StatusCode != Domain.Enums.StatusCode.OK)
+                    return false;
+            }
+
+            return true;
+        }
+        private byte[] GetFileBytes(IFormFile formFile)
+        {
+            using var memoryStream = new MemoryStream();
+            formFile.CopyTo(memoryStream);
+            return memoryStream.ToArray();
+        }
 
         private void SetupWorkspacesList()
         {

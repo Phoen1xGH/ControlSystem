@@ -116,24 +116,36 @@ async function exportChartToTickets() {
         selectedTasksIds.push(element.id);
     });
 
-    $.ajax({
-        url: '/BPMNCharts/CreateTicketsFromChartTasks',
-        method: 'POST',
-        data: {
-            workspaceId: workspaceId,
-            boardId: boardId,
-            selectedTasksIds: selectedTasksIds,
-            xmlChart: xmlData.xml
-        },
-        success: function () {
-            closeModalExport();
-            toastr.success('Успешно экспортировано в карточки');
-        },
-        error: function (xhr, status, error) {
-            toastr.error(xhr.responseText || 'Произошла ошибка!');
+    bpmnModeler.saveSVG((err, svgData) => {
+        if (err) {
+            console.error('Не удалось экспортировать BPMN в SVG:', err);
+        } else {
+            var blob = new Blob([svgData], { type: 'image/svg+xml' });
+
+            var formData = new FormData();
+            formData.append('workspaceId', workspaceId);
+            formData.append('boardId', boardId);
+            selectedTasksIds.forEach(id => {
+                formData.append('selectedTasksIds[]', id);
+            });
+            formData.append('xmlChart', xmlData.xml);
+            formData.append('svgFile', blob, 'diagram.svg');
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/BPMNCharts/CreateTicketsFromChartTasks', true);
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    closeModalExport();
+                    toastr.success('Успешно экспортировано в карточки');
+                } else {
+                    toastr.error('Произошла ошибка!');
+                }
+            };
+            xhr.send(formData);
         }
     });
 }
+
 
 function openModalExportToTickets() {
     var workspaces = JSON.parse(document.getElementById('workspaces').value);

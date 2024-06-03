@@ -249,12 +249,10 @@ namespace ControlSystem.Services.Implementations
             }
         }
 
-        public BaseResponse<List<(string, string)>> GetTicketsFromChart(List<string> selectedTasksIds, string xmlChart)
+        public BaseResponse<HashSet<TaskNode>> GetTicketsFromChart(List<string> selectedTasksIds, string xmlChart)
         {
             try
             {
-                List<(string, string)> taskNames = new List<(string, string)>();
-
                 XDocument doc = XDocument.Parse(xmlChart);
 
                 var taskElements = doc.Descendants().Where(e => e.Name.LocalName == "task");
@@ -284,31 +282,48 @@ namespace ControlSystem.Services.Implementations
                     });
                 }
 
+                HashSet<TaskNode> tasksNodes = new();
+
                 for (int i = 0; i < tasksInfo.Count; i++)
                 {
                     var currentTask = tasksInfo[i];
+                    var currentNode = new TaskNode { Name = currentTask.Name };
+                    tasksNodes.Add(currentNode);
 
                     for (int j = 0; j < tasksInfo.Count; j++)
                     {
                         var otherTask = tasksInfo[j];
 
+                        if (currentTask.Id == otherTask.Id)
+                            continue;
+
+                        var otherNode = new TaskNode { Name = otherTask.Name };
+
                         if (currentTask.Outgoing == otherTask.Incoming)
-                            taskNames.Add((currentTask.Name, otherTask.Name));
+                        {
+                            currentNode.Next = otherNode;
+                            otherNode.Previous = currentNode;
+                        }
+                        if (currentTask.Incoming == otherTask.Outgoing)
+                        {
+                            otherNode.Next = currentNode;
+                            currentNode.Previous = otherNode;
+                        }
                     }
                 }
 
-                return new BaseResponse<List<(string, string)>>
+                return new BaseResponse<HashSet<TaskNode>>
                 {
                     StatusCode = StatusCode.OK,
                     Description = StatusCode.OK.GetDescriptionValue(),
-                    Data = taskNames
+                    Data = tasksNodes
                 };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"[GetTicketsFromChart]: {ex.Message}");
 
-                return new BaseResponse<List<(string, string)>>()
+                return new BaseResponse<HashSet<TaskNode>>()
                 {
                     StatusCode = StatusCode.InternalServerError,
                     Description = ex.Message,
@@ -316,5 +331,26 @@ namespace ControlSystem.Services.Implementations
                 };
             }
         }
+    }
+
+    /// <summary>
+    /// Узел этапа диаграммы
+    /// </summary>
+    public class TaskNode
+    {
+        /// <summary>
+        /// Название
+        /// </summary>
+        public required string Name { get; init; }
+
+        /// <summary>
+        /// Связь с предыдущим этапом
+        /// </summary>
+        public TaskNode? Previous { get; set; }
+
+        /// <summary>
+        /// Связь со следующим этапом
+        /// </summary>
+        public TaskNode? Next { get; set; }
     }
 }
