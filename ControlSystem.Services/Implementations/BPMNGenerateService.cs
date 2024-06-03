@@ -308,7 +308,6 @@ namespace ControlSystem.Services.Implementations
                         {
                             otherNode.Next = currentNode;
                             currentNode.Previous = otherNode;
-
                         }
                     }
                 }
