@@ -17,7 +17,8 @@ services:
         - control-system-dev
     depends_on:
         - postgres_db
-
+    environment:
+        - ASPNETCORE_ENVIRONMENT=Docker
   # DB
   postgres_db:
     container_name: postgres

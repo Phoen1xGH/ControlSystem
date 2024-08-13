@@ -8,7 +8,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-string connectionToDb = builder.Configuration.GetConnectionString("DefaultDatabase")!;
+builder.Configuration.AddEnvironmentVariables();
+
+string connectionStringName = builder.Environment.GetDbConnectionString();
+string connectionToDb = builder.Configuration.GetConnectionString(connectionStringName)!;
+
 builder.Services.AddDbContext<ControlSystemContext>(options => options.UseNpgsql(connectionToDb));
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
