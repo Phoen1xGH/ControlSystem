@@ -1,0 +1,37 @@
+version: "3.9"
+
+networks:
+  control-system-dev:
+    driver: bridge
+
+services:
+  # WEB-APP    
+  web_app:
+    container_name: control-system-web
+    build: 
+        context: .
+        dockerfile: Dockerfile
+    ports:
+        - "80:80"
+    networks:
+        - control-system-dev
+    depends_on:
+        - postgres_db
+
+  # DB
+  postgres_db:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_DB: ControlSystemDB
+    ports:
+        - "5432:5432"
+    networks: 
+        - control-system-dev
+    volumes:
+        - postgres-data:/var/lib/postgresql/data
+
+volumes:
+    postgres-data:

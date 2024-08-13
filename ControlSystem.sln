@@ -11,7 +11,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ControlSystem.Services", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ControlSystem.DAL", "ControlSystem.DAL\ControlSystem.DAL.csproj", "{B9AA7358-6BAE-42A9-87D6-89A3DEB8FBF9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlSystem.Tests", "ControlSystem.Tests\ControlSystem.Tests.csproj", "{3491D9A1-0D69-41B0-922E-E41FEC2E0545}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ControlSystem.Tests", "ControlSystem.Tests\ControlSystem.Tests.csproj", "{3491D9A1-0D69-41B0-922E-E41FEC2E0545}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решения", "Элементы решения", "{EEBE64A6-5F47-4C13-8EF2-BC5D801513FE}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+		Dockerfile = Dockerfile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
