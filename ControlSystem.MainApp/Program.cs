@@ -1,7 +1,9 @@
 using ControlSystem.DAL;
+using ControlSystem.MainApp.Options;
 using ControlSystem.MainApp.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,10 +12,8 @@ builder.Services.AddControllersWithViews();
 
 builder.Configuration.AddEnvironmentVariables();
 
-string connectionStringName = builder.Environment.GetDbConnectionString();
-string connectionToDb = builder.Configuration.GetConnectionString(connectionStringName)!;
-
-builder.Services.AddDbContext<ControlSystemContext>(options => options.UseNpgsql(connectionToDb));
+builder.Configuration.InitializeDockerSecrets();
+builder.InitializeDbConnection();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -49,5 +49,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+await app.Services.MigrateDb();
 
 app.Run();
