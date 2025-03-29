@@ -6,8 +6,8 @@ EXPOSE 80
 EXPOSE 443
 
 # Устанавливаем часовой пояс 
-RUN apt-get update && apt-get install -y tzdata
-ENV TZ=Europe/Moscow
+#RUN apt-get update && apt-get install -y tzdata
+#ENV TZ=Europe/Moscow
 
 # Сборка
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
