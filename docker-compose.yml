@@ -7,7 +7,6 @@ networks:
 services:
   # WEB-APP    
   web_app:
-    container_name: control-system-web
     image: control-system-web-app:latest
     ports:
         - "80:80"
@@ -17,12 +16,9 @@ services:
         - postgres_db
     secrets:
         - db_config.json
-    environment:
-        - ASPNETCORE_ENVIRONMENT=Docker
   
   # DB
   postgres_db:
-    container_name: postgres
     image: postgres:latest
     ports:
         - "5434:5432"
