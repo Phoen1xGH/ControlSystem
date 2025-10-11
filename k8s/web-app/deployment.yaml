@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+  namespace: control-system
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+        - name: web-app
+          image: control-system-web-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Production"
+            - name: ASPNETCORE_URLS
+              value: "http://+:80"
+          volumeMounts:
+            - name: db-config
+              mountPath: "/config/secrets"
+              readOnly: true
+            - name: dataprotection
+              mountPath: "/keys"  
+      volumes:
+        - name: db-config
+          secret:
+            secretName: db-config
+        - name: dataprotection
+          persistentVolumeClaim:
+            claimName: dataprotection-pvc

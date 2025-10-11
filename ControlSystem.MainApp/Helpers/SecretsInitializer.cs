@@ -4,7 +4,7 @@ namespace ControlSystem.MainApp.Helpers
 {
     public static class SecretsInitializer
     {
-        const string _secretsDirectory = "/run/secrets/";
+        const string _secretsDirectory = "/config/secrets/";
 
         public static IConfigurationBuilder InitializeDockerSecrets(this IConfigurationBuilder configuration) 
         {
@@ -13,7 +13,7 @@ namespace ControlSystem.MainApp.Helpers
                 foreach (string secret in Directory.EnumerateFiles(_secretsDirectory, "*.json", SearchOption.AllDirectories))
                     configuration.AddJsonFile(secret);
 
-                configuration.AddKeyPerFile(_secretsDirectory, false);
+               // configuration.AddKeyPerFile(_secretsDirectory, false);
             }
 
             return configuration;
