@@ -1,6 +1,7 @@
 using ControlSystem.MainApp.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +10,13 @@ builder.Services.AddControllersWithViews();
 
 builder.Configuration.AddEnvironmentVariables();
 
-builder.Configuration.InitializeDockerSecrets();
+if (builder.Environment.IsProduction())
+{
+    builder.Configuration.InitializeProductionSecrets();
+
+    await builder.InitializeRedisConnectionAsync();
+}
+
 builder.InitializeDbConnection();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -18,9 +25,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LoginPath = new PathString("/Account/Login");
         options.AccessDeniedPath = new PathString("/Account/Login");
     });
-builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo("/keys"))
-    .SetApplicationName("TimeSenseWorkflow");
+
+
 
 builder.Services.InitializeRepositories();
 builder.Services.InitializeServices();
@@ -50,6 +56,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-await app.Services.MigrateDb();
+await app.Services.MigrateDbAsync();
 
 app.Run();

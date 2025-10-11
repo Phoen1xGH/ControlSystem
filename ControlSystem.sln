@@ -33,9 +33,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "database", "database", "{5D
 		k8s\database\pg-cluster.yaml = k8s\database\pg-cluster.yaml
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pvcs", "pvcs", "{2732D218-8DD4-465E-A0B9-B7F51CCDBA9B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "redis", "redis", "{C86FD952-4760-43E8-86C5-597654F1D79C}"
 	ProjectSection(SolutionItems) = preProject
-		k8s\pvcs\dataprotection-pvc.yaml = k8s\pvcs\dataprotection-pvc.yaml
+		k8s\redis\deployment.yaml = k8s\redis\deployment.yaml
+		k8s\redis\service.yaml = k8s\redis\service.yaml
 	EndProjectSection
 EndProject
 Global
@@ -67,7 +68,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{5203B55E-3463-4DF3-845E-127EC1112E92} = {ED33B308-A2CA-4BD9-834C-151577122D82}
 		{5D08199B-BE1D-4599-847E-D1B3A182AE0C} = {ED33B308-A2CA-4BD9-834C-151577122D82}
-		{2732D218-8DD4-465E-A0B9-B7F51CCDBA9B} = {ED33B308-A2CA-4BD9-834C-151577122D82}
+		{C86FD952-4760-43E8-86C5-597654F1D79C} = {ED33B308-A2CA-4BD9-834C-151577122D82}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {281B37B6-0D74-4D7E-BDE1-A310999FB927}

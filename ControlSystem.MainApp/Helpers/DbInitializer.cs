@@ -1,7 +1,9 @@
 ﻿using ControlSystem.DAL;
 using ControlSystem.MainApp.Options;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using StackExchange.Redis;
 
 namespace ControlSystem.MainApp.Helpers
 {
@@ -34,7 +36,7 @@ namespace ControlSystem.MainApp.Helpers
             builder.Services.AddDbContext<ControlSystemContext>(options => options.UseNpgsql(dbStringBuilder.ConnectionString));
         }
 
-        public static async Task MigrateDb(this IServiceProvider provider)
+        public static async Task MigrateDbAsync(this IServiceProvider provider)
         {
             using var scope = provider.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<ControlSystemContext>();

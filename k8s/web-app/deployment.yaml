@@ -26,14 +26,15 @@ spec:
               value: "http://+:80"
           volumeMounts:
             - name: db-config
-              mountPath: "/config/secrets"
+              mountPath: "/config/secrets/db"
               readOnly: true
-            - name: dataprotection
-              mountPath: "/keys"  
+            - name: redis-config
+              mountPath: "/config/secrets/redis"
+              readOnly: true 
       volumes:
         - name: db-config
           secret:
             secretName: db-config
-        - name: dataprotection
-          persistentVolumeClaim:
-            claimName: dataprotection-pvc
+        - name: redis-config
+          secret:
+            secretName: redis-config
