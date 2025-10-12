@@ -1,15 +1,23 @@
-using ControlSystem.DAL;
 using ControlSystem.MainApp.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-string connectionToDb = builder.Configuration.GetConnectionString("DefaultDatabase")!;
-builder.Services.AddDbContext<ControlSystemContext>(options => options.UseNpgsql(connectionToDb));
+builder.Configuration.AddEnvironmentVariables();
+
+if (builder.Environment.IsProduction())
+{
+    builder.Configuration.InitializeProductionSecrets();
+
+    await builder.InitializeRedisConnectionAsync();
+}
+
+builder.InitializeDbConnection();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -18,9 +26,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = new PathString("/Account/Login");
     });
 
+
+
 builder.Services.InitializeRepositories();
 builder.Services.InitializeServices();
-
 
 var app = builder.Build();
 
@@ -31,7 +40,6 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
@@ -47,5 +55,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+await app.Services.MigrateDbAsync();
 
 app.Run();

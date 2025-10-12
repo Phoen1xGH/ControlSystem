@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+  namespace: control-system
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+        - name: web-app
+          image: control-system-web-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Production"
+            - name: ASPNETCORE_URLS
+              value: "http://+:80"
+          volumeMounts:
+            - name: db-config
+              mountPath: "/config/secrets/db"
+              readOnly: true
+            - name: redis-config
+              mountPath: "/config/secrets/redis"
+              readOnly: true 
+      volumes:
+        - name: db-config
+          secret:
+            secretName: db-config
+        - name: redis-config
+          secret:
+            secretName: redis-config

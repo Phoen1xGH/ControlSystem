@@ -11,7 +11,33 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ControlSystem.Services", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ControlSystem.DAL", "ControlSystem.DAL\ControlSystem.DAL.csproj", "{B9AA7358-6BAE-42A9-87D6-89A3DEB8FBF9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlSystem.Tests", "ControlSystem.Tests\ControlSystem.Tests.csproj", "{3491D9A1-0D69-41B0-922E-E41FEC2E0545}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решения", "Элементы решения", "{EEBE64A6-5F47-4C13-8EF2-BC5D801513FE}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+		Dockerfile = Dockerfile
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "k8s", "k8s", "{ED33B308-A2CA-4BD9-834C-151577122D82}"
+	ProjectSection(SolutionItems) = preProject
+		k8s\namespaces.yaml = k8s\namespaces.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "web-app", "web-app", "{5203B55E-3463-4DF3-845E-127EC1112E92}"
+	ProjectSection(SolutionItems) = preProject
+		k8s\web-app\deployment.yaml = k8s\web-app\deployment.yaml
+		k8s\web-app\service.yaml = k8s\web-app\service.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "database", "database", "{5D08199B-BE1D-4599-847E-D1B3A182AE0C}"
+	ProjectSection(SolutionItems) = preProject
+		k8s\database\pg-cluster.yaml = k8s\database\pg-cluster.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "redis", "redis", "{C86FD952-4760-43E8-86C5-597654F1D79C}"
+	ProjectSection(SolutionItems) = preProject
+		k8s\redis\deployment.yaml = k8s\redis\deployment.yaml
+		k8s\redis\service.yaml = k8s\redis\service.yaml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,13 +61,14 @@ Global
 		{B9AA7358-6BAE-42A9-87D6-89A3DEB8FBF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9AA7358-6BAE-42A9-87D6-89A3DEB8FBF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9AA7358-6BAE-42A9-87D6-89A3DEB8FBF9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3491D9A1-0D69-41B0-922E-E41FEC2E0545}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3491D9A1-0D69-41B0-922E-E41FEC2E0545}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3491D9A1-0D69-41B0-922E-E41FEC2E0545}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3491D9A1-0D69-41B0-922E-E41FEC2E0545}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5203B55E-3463-4DF3-845E-127EC1112E92} = {ED33B308-A2CA-4BD9-834C-151577122D82}
+		{5D08199B-BE1D-4599-847E-D1B3A182AE0C} = {ED33B308-A2CA-4BD9-834C-151577122D82}
+		{C86FD952-4760-43E8-86C5-597654F1D79C} = {ED33B308-A2CA-4BD9-834C-151577122D82}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {281B37B6-0D74-4D7E-BDE1-A310999FB927}
