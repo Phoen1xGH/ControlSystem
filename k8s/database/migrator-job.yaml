@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrator
+  namespace: control-system
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrator
+          image: controlsystem-migrator:v1.0.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DOTNET_ENVIRONMENT
+              value: "Production"
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              # Ждём, пока Postgres будет готов
+              until pg_isready -h controlsystem-pg-rw.control-system.svc.cluster.local -p 5432; do sleep 5; done
+              # Запуск миграций
+              dotnet /app/ControlSystem.Migrator.dll
+          volumeMounts:
+            - name: db-config
+              mountPath: /config/secrets/db
+              readOnly: true
+          resources:             # <-- здесь внутри контейнера
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+      volumes:
+        - name: db-config
+          secret:
+            secretName: db-config

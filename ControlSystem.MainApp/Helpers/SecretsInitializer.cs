@@ -1,12 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace ControlSystem.MainApp.Helpers
+﻿namespace ControlSystem.MainApp.Helpers
 {
     public static class SecretsInitializer
     {
         const string _secretsDirectory = "/config/secrets/";
 
-        public static IConfigurationBuilder InitializeProductionSecrets(this IConfigurationBuilder configuration) 
+        public static IConfigurationBuilder InitializeProductionSecrets(this IConfigurationBuilder configuration)
         {
             if (Directory.Exists(_secretsDirectory))
             {

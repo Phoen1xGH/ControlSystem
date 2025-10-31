@@ -7,9 +7,6 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Копирование файлов решения
-COPY ControlSystem.sln ./
-
 # Копируем проектные файлы
 COPY ControlSystem.Domain/*.csproj ./ControlSystem.Domain/
 COPY ControlSystem.Services/*.csproj ./ControlSystem.Services/
@@ -17,10 +14,13 @@ COPY ControlSystem.DAL/*.csproj ./ControlSystem.DAL/
 COPY ControlSystem.MainApp/*.csproj ./ControlSystem.MainApp/
 
 # Восстановление зависимостей для всех проектов
-RUN dotnet restore 
+RUN dotnet restore "./ControlSystem.MainApp/ControlSystem.MainApp.csproj"
 
-# Копирование остальные файлы
-COPY . .
+# Копирование исходники только нужных проектов
+COPY ControlSystem.MainApp/ ControlSystem.MainApp/
+COPY ControlSystem.DAL/ ControlSystem.DAL/
+COPY ControlSystem.Services/ ControlSystem.Services/
+COPY ControlSystem.Domain/ ControlSystem.Domain/
 
 # Релизная сборкка проекта
 WORKDIR "/src/ControlSystem.MainApp"

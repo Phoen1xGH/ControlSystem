@@ -26,6 +26,8 @@ namespace ControlSystem.MainApp.Helpers
 
             var redis = await ConnectionMultiplexer.ConnectAsync(options);
 
+            builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
+
             builder.Services.AddDataProtection()
                 .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys")
                 .SetApplicationName("TimeSenseWorkflow");

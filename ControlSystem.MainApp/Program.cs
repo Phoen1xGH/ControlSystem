@@ -1,7 +1,6 @@
 using ControlSystem.MainApp.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.DataProtection;
-using StackExchange.Redis;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,12 +25,13 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = new PathString("/Account/Login");
     });
 
-
-
 builder.Services.InitializeRepositories();
 builder.Services.InitializeServices();
+builder.Services.AddHealthCheck();
 
 var app = builder.Build();
+
+app.MapHealthCheck();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -56,6 +56,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-await app.Services.MigrateDbAsync();
+//await app.Services.MigrateDbAsync();
 
 app.Run();

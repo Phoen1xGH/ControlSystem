@@ -30,13 +30,27 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "web-app", "web-app", "{5203
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "database", "database", "{5D08199B-BE1D-4599-847E-D1B3A182AE0C}"
 	ProjectSection(SolutionItems) = preProject
+		k8s\database\manual-backup.yaml = k8s\database\manual-backup.yaml
+		k8s\database\object-store.yaml = k8s\database\object-store.yaml
 		k8s\database\pg-cluster.yaml = k8s\database\pg-cluster.yaml
+		k8s\database\migrator-job.yaml = k8s\database\migrator-job.yaml
+		k8s\database\scheduled-backup.yaml = k8s\database\scheduled-backup.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "redis", "redis", "{C86FD952-4760-43E8-86C5-597654F1D79C}"
 	ProjectSection(SolutionItems) = preProject
 		k8s\redis\deployment.yaml = k8s\redis\deployment.yaml
+		k8s\redis\redis-pvc.yaml = k8s\redis\redis-pvc.yaml
 		k8s\redis\service.yaml = k8s\redis\service.yaml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlSystem.Migrator", "ControlSystem.Migrator\ControlSystem.Migrator.csproj", "{CE2D755B-2ACB-4B02-8DB4-E7A702AD53BF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "object-storage", "object-storage", "{C6C28ADD-E13A-41B7-A35F-6CF7364F83AC}"
+	ProjectSection(SolutionItems) = preProject
+		k8s\object-storage\deployment.yaml = k8s\object-storage\deployment.yaml
+		k8s\object-storage\service.yaml = k8s\object-storage\service.yaml
+		k8s\object-storage\minio-pvc.yaml = k8s\object-storage\minio-pvc.yaml
 	EndProjectSection
 EndProject
 Global
@@ -61,6 +75,10 @@ Global
 		{B9AA7358-6BAE-42A9-87D6-89A3DEB8FBF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9AA7358-6BAE-42A9-87D6-89A3DEB8FBF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9AA7358-6BAE-42A9-87D6-89A3DEB8FBF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE2D755B-2ACB-4B02-8DB4-E7A702AD53BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE2D755B-2ACB-4B02-8DB4-E7A702AD53BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE2D755B-2ACB-4B02-8DB4-E7A702AD53BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE2D755B-2ACB-4B02-8DB4-E7A702AD53BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,6 +87,7 @@ Global
 		{5203B55E-3463-4DF3-845E-127EC1112E92} = {ED33B308-A2CA-4BD9-834C-151577122D82}
 		{5D08199B-BE1D-4599-847E-D1B3A182AE0C} = {ED33B308-A2CA-4BD9-834C-151577122D82}
 		{C86FD952-4760-43E8-86C5-597654F1D79C} = {ED33B308-A2CA-4BD9-834C-151577122D82}
+		{C6C28ADD-E13A-41B7-A35F-6CF7364F83AC} = {ED33B308-A2CA-4BD9-834C-151577122D82}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {281B37B6-0D74-4D7E-BDE1-A310999FB927}

@@ -4,19 +4,36 @@ metadata:
   name: controlsystem-pg
   namespace: control-system
 spec:
-  instances: 3                     # 1 primary + 2 реплики
+  instances: 2                     
   imageName: ghcr.io/cloudnative-pg/postgresql:16
   primaryUpdateStrategy: unsupervised
 
   storage:
     size: 1Gi
 
+  resources: 
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "1"
+      memory: "1.5Gi"
+
+  superuserSecret:
+    name: superuser-secret
+  
   bootstrap:
     initdb:
-      database: postgres
-      owner: postgres
-      secret:
-        name: pg-secret
+      postInitApplicationSQLRefs:
+        secretRefs:
+          - name: init-db-secret
+            key: init-db.sql
+
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: minio-barman
 
   monitoring:
     enablePodMonitor: false
