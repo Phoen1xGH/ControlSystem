@@ -1,0 +1,32 @@
+name: Time Sense Workflow CI/CD
+
+on:
+  push:
+    branches: [ release/main ]
+  pull_request:
+    branches: [ release/main ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build WebApp
+        run: dotnet build ControlSystem.MainApp/ControlSystem.MainApp.csproj --no-restore -c Release
+
+      - name: Build Tests
+        run: dotnet build ControlSystem.Tests/ControlSystem.Tests.csproj --no-restore -c Release
+
+      - name: Run Test
+        run: dotnet test ControlSystem.Tests/ControlSystem.Tests.csproj --no-build -c Release
