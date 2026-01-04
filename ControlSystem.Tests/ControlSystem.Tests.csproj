@@ -22,4 +22,13 @@
     <ProjectReference Include="..\ControlSystem.Services\ControlSystem.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="BpmnDiagrams\correctDiagram.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="BpmnDiagrams\unCorrectDiagram.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

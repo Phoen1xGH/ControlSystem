@@ -83,8 +83,8 @@
             // Arrange
 
             var chartService = CreateService();
-            var filesDirectory = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory())!.Parent!.Parent + @"\BpmnDiagrams");
-            var xml = File.ReadAllText(filesDirectory + @"\correctDiagram.json");
+            var path = Path.Combine(AppContext.BaseDirectory, "BpmnDiagrams", "correctDiagram.json");
+            var xml = File.ReadAllText(path);
 
             // Act
 
@@ -102,8 +102,8 @@
             // Arrange
 
             var chartService = CreateService();
-            var filesDirectory = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory())!.Parent!.Parent + @"\BpmnDiagrams");
-            var xml = File.ReadAllText(filesDirectory + @"\unCorrectDiagram.json");
+            var path = Path.Combine(AppContext.BaseDirectory, "BpmnDiagrams", "unCorrectDiagram.json");
+            var xml = File.ReadAllText(path);
 
             // Act
 
