@@ -1,0 +1,46 @@
+image: mcr.microsoft.com/dotnet/sdk:8.0
+
+variables:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+  CONFIGURATION: Release
+
+stages:
+  - restore
+  - build
+  - test
+
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "release/main"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+cache:
+  key: nuget
+  paths:
+    - ~/.nuget/packages/
+
+restore:
+  stage: restore
+  script:
+    - dotnet restore
+
+build:webapp:
+  stage: build
+  script:
+    - dotnet build ControlSystem.MainApp/ControlSystem.MainApp.csproj --no-restore -c $CONFIGURATION
+  needs: [restore]
+
+build:tests:
+  stage: build
+  script:
+    - dotnet build ControlSystem.Tests/ControlSystem.Tests.csproj --no-restore -c $CONFIGURATION
+  needs: [restore]
+
+test:
+  stage: test
+  script:
+    - dotnet test ControlSystem.Tests/ControlSystem.Tests.csproj --no-build -c $CONFIGURATION
+  needs:
+    - build:webapp
+    - build:tests
