@@ -12,8 +12,16 @@ stages:
 
 workflow:
   rules:
+    # Запуск на пуш в release/main
     - if: '$CI_COMMIT_BRANCH == "release/main"'
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+
+    # Запуск на MR в release/main
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release/main"'
+      when: always
+
+    # Во всех остальных случаях pipeline не запускается
+    - when: never
 
 cache:
   key: nuget
