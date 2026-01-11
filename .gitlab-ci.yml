@@ -48,6 +48,8 @@ build:webapp:
   script:
     - dotnet build ControlSystem.MainApp/ControlSystem.MainApp.csproj --no-restore -c $CONFIGURATION
   needs: [restore]
+  dependencies:
+    - restore 
   artifacts:
     paths:
       - ControlSystem.MainApp/bin/
@@ -60,6 +62,8 @@ build:tests:
   script:
     - dotnet build ControlSystem.Tests/ControlSystem.Tests.csproj --no-restore -c $CONFIGURATION
   needs: [restore]
+  dependencies:
+    - restore 
   artifacts:
     paths:
       - ControlSystem.Tests/bin/
