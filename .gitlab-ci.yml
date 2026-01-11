@@ -38,7 +38,8 @@ restore:
     - dotnet restore
   artifacts:
     paths:
-      - "**/obj/project.assets.json"
+      - ControlSystem.MainApp/obj/project.assets.json
+      - ControlSystem.Tests/obj/project.assets.json
     expire_in: 1h 
 
 build:webapp:
