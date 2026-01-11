@@ -4,49 +4,70 @@ variables:
   DOTNET_CLI_TELEMETRY_OPTOUT: "1"
   DOTNET_NOLOGO: "1"
   CONFIGURATION: Release
+  CI_BRANCH: "release/main"
 
 stages:
   - restore
   - build
   - test
 
-workflow:
+# =========================
+# RULES
+# =========================
+.ci_rules:
   rules:
-    # Запуск на пуш в release/main
-    - if: '$CI_COMMIT_BRANCH == "release/main"'
-      when: always
-
-    # Запуск на MR в release/main
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release/main"'
-      when: always
-
-    # Во всех остальных случаях pipeline не запускается
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "$CI_BRANCH"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "$CI_BRANCH"'
     - when: never
 
+# =========================
+# CACHE
+# =========================
 cache:
   key: nuget
   paths:
-    - ~/.nuget/packages/
+    - /root/.nuget/packages/
 
+# =========================
+# JOBS
+# =========================
 restore:
   stage: restore
+  extends: .ci_rules
   script:
     - dotnet restore
+  artifacts:
+    paths:
+      - "**/obj/project.assets.json"
+    expire_in: 1h 
 
 build:webapp:
   stage: build
+  extends: .ci_rules
   script:
     - dotnet build ControlSystem.MainApp/ControlSystem.MainApp.csproj --no-restore -c $CONFIGURATION
   needs: [restore]
+  artifacts:
+    paths:
+      - ControlSystem.MainApp/bin/
+      - ControlSystem.MainApp/obj/
+    expire_in: 1h 
 
 build:tests:
   stage: build
+  extends: .ci_rules
   script:
     - dotnet build ControlSystem.Tests/ControlSystem.Tests.csproj --no-restore -c $CONFIGURATION
   needs: [restore]
+  artifacts:
+    paths:
+      - ControlSystem.Tests/bin/
+      - ControlSystem.Tests/obj/
+    expire_in: 1h 
 
 test:
   stage: test
+  extends: .ci_rules
   script:
     - dotnet test ControlSystem.Tests/ControlSystem.Tests.csproj --no-build -c $CONFIGURATION
   needs:
