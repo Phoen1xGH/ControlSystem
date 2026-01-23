@@ -6,7 +6,6 @@ variables:
   CONFIGURATION: Release
 
 stages:
-  - restore
   - build
   - test
 
@@ -27,14 +26,10 @@ cache:
   paths:
     - /root/.nuget/packages/
 
-# =========================
-# RESTORE
-# =========================
-restore:
-  stage: restore
-  extends: .ci_rules
-  script:
-    - dotnet restore ControlSystem.sln
+before_script:
+  - dotnet restore ControlSystem.DAL/ControlSystem.DAL.csproj
+  - dotnet restore ControlSystem.Domain/ControlSystem.Domain.csproj
+  - dotnet restore ControlSystem.Services/ControlSystem.Services.csproj
 
 # =========================
 # BUILD
@@ -52,4 +47,5 @@ test:
   stage: test
   extends: .ci_rules
   script:
+    - dotnet restore ControlSystem.Tests/ControlSystem.Tests.csproj
     - dotnet test ControlSystem.Tests/ControlSystem.Tests.csproj -c $CONFIGURATION --no-restore
