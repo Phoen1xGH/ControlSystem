@@ -46,4 +46,4 @@ test:
   extends: .ci_rules
   script:
     - dotnet restore ControlSystem.sln
-    - dotnet test ControlSystem.Tests/ControlSystem.Tests.csproj -c $CONFIGURATION --no-build
+    - dotnet test ControlSystem.Tests/ControlSystem.Tests.csproj -c $CONFIGURATION
