@@ -4,7 +4,6 @@ variables:
   DOTNET_CLI_TELEMETRY_OPTOUT: "1"
   DOTNET_NOLOGO: "1"
   CONFIGURATION: Release
-  CI_BRANCH: "release/main"
 
 stages:
   - restore
@@ -16,8 +15,8 @@ stages:
 # =========================
 .ci_rules:
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_BRANCH'
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
     - when: never
 
 # =========================
@@ -29,13 +28,20 @@ cache:
     - /root/.nuget/packages/
 
 # =========================
+# RESTORE
+# =========================
+restore:
+  stage: restore
+  script:
+    - dotnet restore ControlSystem.sln
+
+# =========================
 # BUILD
 # =========================
 build:
   stage: build
   extends: .ci_rules
   script:
-    - dotnet restore ControlSystem.sln
     - dotnet build ControlSystem.sln -c $CONFIGURATION --no-restore
 
 # =========================
@@ -45,5 +51,4 @@ test:
   stage: test
   extends: .ci_rules
   script:
-    - dotnet restore ControlSystem.sln
-    - dotnet test ControlSystem.Tests/ControlSystem.Tests.csproj -c $CONFIGURATION
+    - dotnet test ControlSystem.Tests/ControlSystem.Tests.csproj -c $CONFIGURATION --no-restore
