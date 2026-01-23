@@ -16,8 +16,10 @@ stages:
 # =========================
 .ci_rules:
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "$CI_BRANCH"'
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "$CI_BRANCH"'
+     # MR â release/main
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "$CI_BRANCH"'
+    # Push â release/main  
+    - if: '$CI_COMMIT_BRANCH == "$CI_BRANCH"'
     - when: never
 
 # =========================
