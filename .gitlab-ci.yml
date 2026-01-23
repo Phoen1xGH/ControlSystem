@@ -32,6 +32,7 @@ cache:
 # =========================
 restore:
   stage: restore
+  extends: .ci_rules
   script:
     - dotnet restore ControlSystem.sln
 
