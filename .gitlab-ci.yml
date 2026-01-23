@@ -38,7 +38,9 @@ build:
   stage: build
   extends: .ci_rules
   script:
-    - dotnet build ControlSystem.sln -c $CONFIGURATION --no-restore
+    - dotnet build ControlSystem.DAL/ControlSystem.DAL.csproj -c $CONFIGURATION --no-restore
+    - dotnet build ControlSystem.Domain/ControlSystem.Domain.csproj -c $CONFIGURATION --no-restore
+    - dotnet build ControlSystem.Services/ControlSystem.Services.csproj -c $CONFIGURATION --no-restore
 
 # =========================
 # TEST
