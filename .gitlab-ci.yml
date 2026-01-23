@@ -29,52 +29,23 @@ cache:
     - /root/.nuget/packages/
 
 # =========================
-# JOBS
+# BUILD
 # =========================
-restore:
-  stage: restore
-  extends: .ci_rules
-  script:
-    - dotnet restore
-  artifacts:
-    paths:
-      - ControlSystem.MainApp/obj/
-      - ControlSystem.Tests/obj/
-    expire_in: 1h 
-
-build:webapp:
+build:
   stage: build
   extends: .ci_rules
   script:
-    - dotnet build ControlSystem.MainApp/ControlSystem.MainApp.csproj --no-restore -c $CONFIGURATION
-  needs: [restore]
-  dependencies:
-    - restore 
-  artifacts:
-    paths:
-      - ControlSystem.MainApp/bin/
-      - ControlSystem.MainApp/obj/
-    expire_in: 1h 
+    - dotnet restore ControlSystem.sln
+    - dotnet build ControlSystem.sln -c $CONFIGURATION --no-restore
 
-build:tests:
-  stage: build
-  extends: .ci_rules
-  script:
-    - dotnet build ControlSystem.Tests/ControlSystem.Tests.csproj --no-restore -c $CONFIGURATION
-  needs: [restore]
-  dependencies:
-    - restore 
-  artifacts:
-    paths:
-      - ControlSystem.Tests/bin/
-      - ControlSystem.Tests/obj/
-    expire_in: 1h 
-
+# =========================
+# TEST
+# =========================
 test:
   stage: test
   extends: .ci_rules
   script:
-    - dotnet test ControlSystem.Tests/ControlSystem.Tests.csproj --no-build -c $CONFIGURATION
-  needs:
-    - build:webapp
-    - build:tests
+    - dotnet restore ControlSystem.sln
+    - dotnet test ControlSystem.Tests/ControlSystem.Tests.csproj \
+        -c $CONFIGURATION \
+        --no-build
