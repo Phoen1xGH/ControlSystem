@@ -9,43 +9,25 @@ stages:
   - build
   - test
 
-# =========================
-# RULES
-# =========================
 .ci_rules:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
     - when: never
 
-# =========================
-# CACHE
-# =========================
 cache:
   key: nuget
   paths:
     - /root/.nuget/packages/
 
-before_script:
-  - dotnet restore ControlSystem.DAL/ControlSystem.DAL.csproj
-  - dotnet restore ControlSystem.Domain/ControlSystem.Domain.csproj
-  - dotnet restore ControlSystem.Services/ControlSystem.Services.csproj
-
-# =========================
-# BUILD
-# =========================
 build:
   stage: build
   extends: .ci_rules
   script:
-    - dotnet build ControlSystem.Services/ControlSystem.Services.csproj -c $CONFIGURATION --no-restore
+    - dotnet build ControlSystem.Services/ControlSystem.MainApp.csproj -c $CONFIGURATION
 
-# =========================
-# TEST
-# =========================
 test:
   stage: test
   extends: .ci_rules
   script:
-    - dotnet restore ControlSystem.Tests/ControlSystem.Tests.csproj
-    - dotnet test ControlSystem.Tests/ControlSystem.Tests.csproj -c $CONFIGURATION --no-restore
+    - dotnet test ControlSystem.Tests/ControlSystem.Tests.csproj -c $CONFIGURATION
