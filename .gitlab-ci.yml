@@ -1,0 +1,33 @@
+image: mcr.microsoft.com/dotnet/sdk:8.0
+
+variables:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+  CONFIGURATION: Release
+
+stages:
+  - build
+  - test
+
+.ci_rules:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+    - when: never
+
+cache:
+  key: nuget
+  paths:
+    - /root/.nuget/packages/
+
+build:
+  stage: build
+  extends: .ci_rules
+  script:
+    - dotnet build ControlSystem.MainApp/ControlSystem.MainApp.csproj -c $CONFIGURATION
+
+test:
+  stage: test
+  extends: .ci_rules
+  script:
+    - dotnet test ControlSystem.Tests/ControlSystem.Tests.csproj -c $CONFIGURATION
