@@ -24,7 +24,7 @@ build:
   stage: build
   extends: .ci_rules
   script:
-    - dotnet build ControlSystem.Services/ControlSystem.MainApp.csproj -c $CONFIGURATION
+    - dotnet build ControlSystem.MainApp/ControlSystem.MainApp.csproj -c $CONFIGURATION
 
 test:
   stage: test
