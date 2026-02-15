@@ -26,7 +26,7 @@ spec:
             - name: db-config
               mountPath: /config/secrets/db
               readOnly: true
-          resources:             # <-- здесь внутри контейнера
+          resources:
             requests:
               cpu: "250m"
               memory: "512Mi"

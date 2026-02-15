@@ -57,6 +57,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlSystem.Tests", "ControlSystem.Tests\ControlSystem.Tests.csproj", "{A6DC788C-BB04-D2A1-BC1F-4ED1DA44D96A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ingress", "ingress", "{BB9488DF-0ACD-48B8-8894-743110124001}"
+	ProjectSection(SolutionItems) = preProject
+		k8s\ingress\nginx-ingress-controller.yaml = k8s\ingress\nginx-ingress-controller.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -96,6 +101,7 @@ Global
 		{5D08199B-BE1D-4599-847E-D1B3A182AE0C} = {ED33B308-A2CA-4BD9-834C-151577122D82}
 		{C86FD952-4760-43E8-86C5-597654F1D79C} = {ED33B308-A2CA-4BD9-834C-151577122D82}
 		{C6C28ADD-E13A-41B7-A35F-6CF7364F83AC} = {ED33B308-A2CA-4BD9-834C-151577122D82}
+		{BB9488DF-0ACD-48B8-8894-743110124001} = {ED33B308-A2CA-4BD9-834C-151577122D82}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {281B37B6-0D74-4D7E-BDE1-A310999FB927}
