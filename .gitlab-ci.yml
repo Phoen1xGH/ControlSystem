@@ -44,8 +44,7 @@ push_image:
       - docker login registry.git.pve.drasill.ru -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
       - docker build -t $CONTAINER_RELEASE_IMAGE .
       - docker push $CONTAINER_RELEASE_IMAGE
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+
 #deploy:
 #  stage: deploy
 #  image: bitnami/kubectl:1.27
