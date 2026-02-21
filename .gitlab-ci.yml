@@ -5,7 +5,7 @@ variables:
   DOTNET_NOLOGO: "1"
   CONFIGURATION: Release
   CONTAINER_RELEASE_IMAGE: timesense/controlsystem:$CI_COMMIT_TAG
-  CI_REGISTRY: registry.git.pve.drasill.ru:5005
+  CI_REGISTRY: registry.git.pve.drasill.ru
   
 stages:
   - build
