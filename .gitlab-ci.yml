@@ -47,7 +47,7 @@ push_image:
       - if: '$CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+$/'
     script:
       - docker login registry.git.pve.drasill.ru -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
-      - docker build -t CI_REGISTRY/$CONTAINER_RELEASE_IMAGE .
+      - docker build -t $CI_REGISTRY/$CONTAINER_RELEASE_IMAGE .
       - docker push $CI_REGISTRY/$CONTAINER_RELEASE_IMAGE
 
 #deploy:
