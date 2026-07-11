@@ -1,0 +1,6 @@
+# Конфиг GitLab Agent for Kubernetes.
+# Режим ci_access: даёт CI-джобам этого проекта доступ к кластеру через агент
+# (заменяет KUBE_CONFIG). Никаких кред кластера в GitLab при этом не хранится.
+ci_access:
+  projects:
+    - id: timesense/controlsystem

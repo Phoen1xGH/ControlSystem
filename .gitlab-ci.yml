@@ -19,6 +19,7 @@ stages:
   - build
   - test
   - push
+  - deploy
 
 .ci_rules:
   rules:
@@ -52,7 +53,7 @@ push:
   variables:
     DOCKER_TLS_CERTDIR: ""
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+$/'
+    - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
   script:
     - docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
 
@@ -63,3 +64,32 @@ push:
     
     - docker build -f $MIGRATOR_DOCKERFILE -t $MIGRATOR_RELEASE_IMAGE:$CI_COMMIT_TAG .
     - docker push $MIGRATOR_RELEASE_IMAGE:$CI_COMMIT_TAG
+
+deploy:
+  stage: deploy
+  # Публичный образ с kubectl + kustomize + helm (Docker Hub). Минор = версия кластера (1.35).
+  image: alpine/k8s:1.35.6
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
+  script:
+    # Доступ к кластеру через GitLab Agent (agentk). Контекст = <путь_проекта>:<имя_агента>.
+    # Никакого KUBE_CONFIG и открытого API k3s наружу не нужно.
+    - kubectl config use-context timesense/controlsystem:k3s
+    - cd k8s
+
+    # Подставляем тег коммита в оба образа
+    - kustomize edit set image control-system-web-app=$APP_RELEASE_IMAGE:$CI_COMMIT_TAG
+    - kustomize edit set image controlsystem-migrator=$MIGRATOR_RELEASE_IMAGE:$CI_COMMIT_TAG
+
+    # Проверяем, что подстановка реально произошла (иначе задеплоится старый образ)
+    - kustomize build . | grep -E 'image: .*:'"$CI_COMMIT_TAG"
+
+    # Job миграций иммутабелен — пересоздаём перед применением
+    - kubectl delete job migrator -n control-system --ignore-not-found
+
+    - kubectl apply -k .
+
+    # Ждём миграции, затем раскатку приложения.
+    # 300s — на первый деплой CNPG поднимает Postgres с нуля (образ + initdb), это долго.
+    - kubectl wait --for=condition=complete job/migrator -n control-system --timeout=300s
+    - kubectl rollout status deployment/web-app -n control-system --timeout=300s

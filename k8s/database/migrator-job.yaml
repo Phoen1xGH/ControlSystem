@@ -8,9 +8,11 @@ spec:
   template:
     spec:
       restartPolicy: OnFailure
+      imagePullSecrets:
+        - name: gitlab-registry
       containers:
         - name: migrator
-          image: controlsystem-migrator:v1.0.0
+          image: controlsystem-migrator
           imagePullPolicy: IfNotPresent
           env:
             - name: DOTNET_ENVIRONMENT
@@ -18,9 +20,9 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
-              # Ждём, пока Postgres будет готов
+              # Р–РґС‘Рј, РїРѕРєР° Postgres Р±СѓРґРµС‚ РіРѕС‚РѕРІ
               until pg_isready -h controlsystem-pg-rw.control-system.svc.cluster.local -p 5432; do sleep 5; done
-              # Запуск миграций
+              # Р—Р°РїСѓСЃРєР°РµРј РјРёРіСЂР°С†РёРё
               dotnet /app/ControlSystem.Migrator.dll
           volumeMounts:
             - name: db-config
