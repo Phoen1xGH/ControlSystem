@@ -14,6 +14,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "k8s", "k8s", "{ED33B308-A2CA-4BD9-834C-151577122D82}"
 	ProjectSection(SolutionItems) = preProject
 		k8s\namespaces.yaml = k8s\namespaces.yaml
+		k8s\kustomization.yaml = k8s\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "web-app", "web-app", "{5203B55E-3463-4DF3-845E-127EC1112E92}"
@@ -57,9 +58,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlSystem.Tests", "ControlSystem.Tests\ControlSystem.Tests.csproj", "{A6DC788C-BB04-D2A1-BC1F-4ED1DA44D96A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ingress", "ingress", "{BB9488DF-0ACD-48B8-8894-743110124001}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ingress", "ingress", "{4E7A008A-73AD-4DCE-9D1E-1E2F59C85976}"
 	ProjectSection(SolutionItems) = preProject
-		k8s\ingress\nginx-ingress-controller.yaml = k8s\ingress\nginx-ingress-controller.yaml
+		k8s\ingress\ingress.yaml = k8s\ingress\ingress.yaml
 	EndProjectSection
 EndProject
 Global
@@ -101,7 +102,7 @@ Global
 		{5D08199B-BE1D-4599-847E-D1B3A182AE0C} = {ED33B308-A2CA-4BD9-834C-151577122D82}
 		{C86FD952-4760-43E8-86C5-597654F1D79C} = {ED33B308-A2CA-4BD9-834C-151577122D82}
 		{C6C28ADD-E13A-41B7-A35F-6CF7364F83AC} = {ED33B308-A2CA-4BD9-834C-151577122D82}
-		{BB9488DF-0ACD-48B8-8894-743110124001} = {ED33B308-A2CA-4BD9-834C-151577122D82}
+		{4E7A008A-73AD-4DCE-9D1E-1E2F59C85976} = {ED33B308-A2CA-4BD9-834C-151577122D82}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {281B37B6-0D74-4D7E-BDE1-A310999FB927}

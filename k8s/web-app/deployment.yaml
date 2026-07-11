@@ -13,9 +13,11 @@ spec:
       labels:
         app: web-app
     spec:
+      imagePullSecrets:
+        - name: gitlab-registry
       containers:
         - name: web-app
-          image: control-system-web-app:v1.0.0
+          image: control-system-web-app
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80

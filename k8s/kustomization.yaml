@@ -1,0 +1,38 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Namespace создаётся первым ресурсом в списке.
+resources:
+  - namespaces.yaml
+
+  # PostgreSQL (CloudNativePG)
+  - database/pg-cluster.yaml
+  - database/object-store.yaml
+  - database/scheduled-backup.yaml
+  - database/migrator-job.yaml
+  # database/manual-backup.yaml намеренно НЕ включён — запускается вручную по требованию.
+
+  # Object storage (MinIO)
+  - object-storage/minio-pvc.yaml
+  - object-storage/deployment.yaml
+  - object-storage/service.yaml
+
+  # Redis
+  - redis/redis-pvc.yaml
+  - redis/deployment.yaml
+  - redis/service.yaml
+
+  # Web app
+  - web-app/deployment.yaml
+  - web-app/service.yaml
+  - ingress/ingress.yaml
+
+# Подмена образов. Ключ (name) совпадает с image: в манифесте.
+# newTag здесь — заглушка; в CI перезаписывается через kustomize edit set image.
+images:
+  - name: control-system-web-app
+    newName: registry.git.pve.drasill.ru/timesense/controlsystem
+    newTag: 0.0.0-SET-BY-CI
+  - name: controlsystem-migrator
+    newName: registry.git.pve.drasill.ru/timesense/controlsystem/migrator
+    newTag: 0.0.0-SET-BY-CI
