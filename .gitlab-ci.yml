@@ -71,7 +71,8 @@ deploy:
   rules:
     - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
   script:
-    - kubectl config use-context timesense/controlsystem:k3s
+    - kubectl config get-contexts
+    - 'kubectl config use-context "$(kubectl config get-contexts -o name | grep -i k3s | head -1)"'
     - cd k8s
     - kustomize edit set image control-system-web-app=$APP_RELEASE_IMAGE:$CI_COMMIT_TAG
     - kustomize edit set image controlsystem-migrator=$MIGRATOR_RELEASE_IMAGE:$CI_COMMIT_TAG
