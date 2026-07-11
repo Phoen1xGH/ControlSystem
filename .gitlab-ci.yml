@@ -82,7 +82,7 @@ deploy:
     - kustomize edit set image controlsystem-migrator=$MIGRATOR_RELEASE_IMAGE:$CI_COMMIT_TAG
 
     # Проверяем, что подстановка реально произошла (иначе задеплоится старый образ)
-    - kustomize build . | grep -E 'image: .*:'"$CI_COMMIT_TAG"
+    - 'kustomize build . | grep -E "image: .*:$CI_COMMIT_TAG"'
 
     # Job миграций иммутабелен — пересоздаём перед применением
     - kubectl delete job migrator -n control-system --ignore-not-found
