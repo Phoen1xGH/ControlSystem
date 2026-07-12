@@ -4,16 +4,16 @@ metadata:
   name: controlsystem-pg
   namespace: control-system
 spec:
-  instances: 2                     
+  instances: 2
   imageName: ghcr.io/cloudnative-pg/postgresql:16
   primaryUpdateStrategy: unsupervised
 
   storage:
     size: 1Gi
 
-  resources: 
+  resources:
     requests:
-      cpu: "500m"
+      cpu: "250m"
       memory: "1Gi"
     limits:
       cpu: "1"
@@ -21,7 +21,7 @@ spec:
 
   superuserSecret:
     name: superuser-secret
-  
+
   bootstrap:
     initdb:
       postInitApplicationSQLRefs:
