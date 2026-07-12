@@ -4,6 +4,7 @@ metadata:
   name: minio-barman
   namespace: control-system
 spec:
+  retentionPolicy: "3d"
   configuration:
     destinationPath: s3://pg-backups
     endpointURL: http://minio.control-system.svc.cluster.local:9000

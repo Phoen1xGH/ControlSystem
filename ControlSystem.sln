@@ -30,6 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "database", "database", "{5D
 		k8s\database\object-store.yaml = k8s\database\object-store.yaml
 		k8s\database\pg-cluster.yaml = k8s\database\pg-cluster.yaml
 		k8s\database\scheduled-backup.yaml = k8s\database\scheduled-backup.yaml
+		k8s\database\recovery-cluster.yaml = k8s\database\recovery-cluster.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "redis", "redis", "{C86FD952-4760-43E8-86C5-597654F1D79C}"

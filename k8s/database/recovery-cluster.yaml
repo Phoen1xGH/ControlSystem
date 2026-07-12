@@ -1,0 +1,37 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: controlsystem-pg-restore
+  namespace: control-system
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:16
+
+  storage:
+    size: 1Gi
+    
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+
+  superuserSecret:
+    name: superuser-secret
+
+  bootstrap:
+    recovery:
+      source: source-backup
+      # --- PITR: восстановить на конкретный момент. Без этого блока — до конца доступного WAL. ---
+      # recoveryTarget:
+      #   targetTime: "2026-07-11 14:37:00+03"
+
+  externalClusters:
+    - name: source-backup
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: minio-barman
+          serverName: controlsystem-pg
