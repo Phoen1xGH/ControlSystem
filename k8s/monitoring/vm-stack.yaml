@@ -1,0 +1,37 @@
+# VictoriaMetrics stack через встроенный в k3s helm-controller.
+# Ставится как обычный манифест: kubectl apply -f (или через kustomize в пайплайне).
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: victoria-metrics-k8s-stack
+  namespace: kube-system
+spec:
+  repo: https://victoriametrics.github.io/helm-charts/
+  chart: victoria-metrics-k8s-stack
+  version: "0.86.0"          # запинено: чарт → фиксирует и версии всех образов внутри
+  targetNamespace: monitoring
+  createNamespace: true
+  valuesContent: |-
+    vmsingle:
+      spec:
+        retentionPeriod: "7d"
+        storage:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 5Gi
+
+    # vmagent скрейпит ВСЕ мониторы в кластере, а не только со своей меткой.
+    # Без этого PodMonitor от CNPG (и будущий от web-app) будут проигнорированы.
+    vmagent:
+      spec:
+        selectAllByDefault: true
+
+    # Алертинг на старте выключен — включим отдельно, когда понадобится.
+    alertmanager:
+      enabled: false
+    vmalert:
+      enabled: false
+
+    grafana:
+      enabled: true
