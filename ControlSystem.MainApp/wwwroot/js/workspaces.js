@@ -522,7 +522,7 @@ function cancelNewPrio() {
 
 function acceptNewPrio(ticketId) {
     var priority = {
-        ColorHex: $(".color-input").val(),
+        ColorHex: $("#prio-data-div .color-input").val(),
         Name: $("#prio-name").val()
     };
 
@@ -657,7 +657,7 @@ function cancelNewTag() {
 function acceptNewTag(ticketId) {
 
     var tagData = {
-        ColorHex: $(".color-input").val(),
+        ColorHex: $("#tag-data-div .color-input").val(),
         Name: $("#tag-name").val()
     };
 
