@@ -1,9 +1,9 @@
 ﻿using ControlSystem.DAL.Interfaces;
-using ControlSystem.DAL.Repositories;
 using ControlSystem.Domain.Entities;
 using ControlSystem.Domain.Enums;
 using ControlSystem.Domain.Extensions;
 using ControlSystem.Domain.Models.BPMNComponents;
+using ControlSystem.Domain.Models.BPMNComponents.Elements;
 using ControlSystem.Domain.Response;
 using ControlSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -74,7 +74,9 @@ namespace ControlSystem.Services.Implementations
                     };
                 }
 
-                await (_userRepository as UserAccountRepository)!.AddChartToUser(user, chart);
+                user.Charts.Add(chart);
+
+                await _userRepository.Update(user);
 
                 return new BaseResponse<bool>
                 {
@@ -236,7 +238,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[EditChart]: {ex.Message}");
+                _logger.LogError(ex, $"[DeleteChart]: {ex.Message}");
 
                 return new BaseResponse<bool>()
                 {
@@ -246,5 +248,109 @@ namespace ControlSystem.Services.Implementations
                 };
             }
         }
+
+        public BaseResponse<HashSet<TaskNode>> GetTicketsFromChart(List<string> selectedTasksIds, string xmlChart)
+        {
+            try
+            {
+                XDocument doc = XDocument.Parse(xmlChart);
+
+                var taskElements = doc.Descendants().Where(e => e.Name.LocalName == "task");
+
+                if (selectedTasksIds.Count > 0)
+                    taskElements = taskElements.Where(el => selectedTasksIds.Contains(el.Attribute("id")?.Value!));
+
+                // Создаем список для хранения информации о задачах
+                var tasksInfo = new List<BPMNTask>();
+
+                // Добавляем информацию о задачах в список
+                foreach (var taskElement in taskElements)
+                {
+                    var taskId = taskElement.Attribute("id")?.Value;
+                    var taskName = taskElement.Attribute("name")?.Value;
+
+                    // Находим входящую и исходящую связь для текущей задачи
+                    var incoming = taskElement.Elements().FirstOrDefault(e => e.Name.LocalName == "incoming")?.Value;
+                    var outgoing = taskElement.Elements().FirstOrDefault(e => e.Name.LocalName == "outgoing")?.Value;
+
+                    tasksInfo.Add(new BPMNTask
+                    {
+                        Name = taskName,
+                        Id = taskId,
+                        Incoming = incoming,
+                        Outgoing = outgoing
+                    });
+                }
+
+                HashSet<TaskNode> tasksNodes = new();
+
+                for (int i = 0; i < tasksInfo.Count; i++)
+                {
+                    var currentTask = tasksInfo[i];
+                    var currentNode = new TaskNode { Name = currentTask.Name };
+                    tasksNodes.Add(currentNode);
+
+                    for (int j = 0; j < tasksInfo.Count; j++)
+                    {
+                        var otherTask = tasksInfo[j];
+
+                        if (currentTask.Id == otherTask.Id)
+                            continue;
+
+                        var otherNode = new TaskNode { Name = otherTask.Name };
+
+                        if (currentTask.Outgoing == otherTask.Incoming)
+                        {
+                            currentNode.Next = otherNode;
+                            otherNode.Previous = currentNode;
+                        }
+                        if (currentTask.Incoming == otherTask.Outgoing)
+                        {
+                            otherNode.Next = currentNode;
+                            currentNode.Previous = otherNode;
+                        }
+                    }
+                }
+
+                return new BaseResponse<HashSet<TaskNode>>
+                {
+                    StatusCode = StatusCode.OK,
+                    Description = StatusCode.OK.GetDescriptionValue(),
+                    Data = tasksNodes
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[GetTicketsFromChart]: {ex.Message}");
+
+                return new BaseResponse<HashSet<TaskNode>>()
+                {
+                    StatusCode = StatusCode.InternalServerError,
+                    Description = ex.Message,
+                    Data = null
+                };
+            }
+        }
+    }
+
+    /// <summary>
+    /// Узел этапа диаграммы
+    /// </summary>
+    public class TaskNode
+    {
+        /// <summary>
+        /// Название
+        /// </summary>
+        public required string Name { get; init; }
+
+        /// <summary>
+        /// Связь с предыдущим этапом
+        /// </summary>
+        public TaskNode? Previous { get; set; }
+
+        /// <summary>
+        /// Связь со следующим этапом
+        /// </summary>
+        public TaskNode? Next { get; set; }
     }
 }

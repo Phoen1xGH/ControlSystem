@@ -104,6 +104,94 @@ async function openDiagram(bpmnXML) {
     }
 }
 
+async function exportChartToTickets() {
+
+    var workspaceId = parseInt(document.getElementById('wList').value);
+    var boardId = parseInt(document.getElementById('bList').value);
+    var xmlData = await bpmnModeler.saveXML({ format: true });
+    var selectedElements = bpmnModeler.get('selection').get();
+
+    var selectedTasksIds = [];
+    selectedElements.forEach(function (element) {
+        selectedTasksIds.push(element.id);
+    });
+
+    bpmnModeler.saveSVG((err, svgData) => {
+        if (err) {
+            console.error('Не удалось экспортировать BPMN в SVG:', err);
+        } else {
+            var blob = new Blob([svgData], { type: 'image/svg+xml' });
+
+            var formData = new FormData();
+            formData.append('workspaceId', workspaceId);
+            formData.append('boardId', boardId);
+            selectedTasksIds.forEach(id => {
+                formData.append('selectedTasksIds[]', id);
+            });
+            formData.append('xmlChart', xmlData.xml);
+            formData.append('svgFile', blob, 'diagram.svg');
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/BPMNCharts/CreateTicketsFromChartTasks', true);
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    closeModalExport();
+                    toastr.success('Успешно экспортировано в карточки');
+                } else {
+                    toastr.error('Произошла ошибка!');
+                }
+            };
+            xhr.send(formData);
+        }
+    });
+}
+
+
+function openModalExportToTickets() {
+    var workspaces = JSON.parse(document.getElementById('workspaces').value);
+    var workspacesSelectList = document.getElementById('wList');
+
+    fillSelectList(workspacesSelectList, workspaces);
+
+    var boards = JSON.parse(document.getElementById('boards').value);
+    var boardsSelectList = document.getElementById('bList');
+
+    var filteredBoards = boards.filter(function (board) {
+        return board.WorkspaceId == workspaces[0].Id;
+    });
+
+    fillSelectList(boardsSelectList, filteredBoards);
+
+    document.getElementById('modalExportToTickets').style.display = 'block';
+    document.getElementById('overlayExport').style.display = 'block';
+}
+
+function fillSelectList(selectList, options) {
+    options.forEach(function (option) {
+        var optionElement = document.createElement('option');
+        optionElement.value = option.Id;
+        optionElement.textContent = option.Name;
+        selectList.appendChild(optionElement);
+    });
+
+    if (selectList.options.length > 0) {
+        selectList.selectedIndex = 0;
+    }
+}
+
+document.getElementById('wList').addEventListener('change', function () {
+    var workspaceId = parseInt(this.value);
+
+    $('#bList').empty();
+    var boards = JSON.parse(document.getElementById('boards').value);
+    var filteredBoards = boards.filter(function (board) {
+        return board.WorkspaceId == workspaceId;
+    });
+
+    // Заполняем список досок
+    fillSelectList(document.getElementById('bList'), filteredBoards);
+});
+
 // wire save button
 $('#save-button').click(exportDiagram);
 $('#saveBpmn').click(saveDiagramBpmn);
@@ -111,6 +199,9 @@ $('#export-svg-button').click(exportSvg);
 $('#import-file-button').click(uploadFile);
 $('#save-to-db').click(doChartOperation);
 $('#overlay').click(closeModal);
+$('#overlayExport').click(closeModalExport);
+$('#export-to-tickets').click(openModalExportToTickets);
+$('#modalButtonExport').click(exportChartToTickets);
 
 function doChartOperation() {
     var isEdit = document.getElementById('chartId').value != '' ? true : false;
@@ -139,9 +230,6 @@ async function editChart(chartId) {
     });
 }
 
-
-
-
 function openModal() {
     document.getElementById('myModal').style.display = 'block';
     document.getElementById('overlay').style.display = 'block';
@@ -150,6 +238,14 @@ function openModal() {
 function closeModal() {
     document.getElementById('myModal').style.display = 'none';
     document.getElementById('overlay').style.display = 'none';
+}
+
+function closeModalExport() {
+    document.getElementById('modalExportToTickets').style.display = 'none';
+    document.getElementById('overlayExport').style.display = 'none';
+
+    $('#bList').empty();
+    $('#wList').empty();
 }
 
 document.getElementById("modalButton").addEventListener("click", async function () {

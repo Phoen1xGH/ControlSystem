@@ -298,7 +298,7 @@ namespace ControlSystem.Services.Implementations
         {
             try
             {
-                var boards = _workspaceRepository.GetAll().FirstOrDefault(x => x.Id == workspaceId)!.Boards.ToList();
+                var boards = _workspaceRepository.GetAll().FirstOrDefault(x => x.Id == workspaceId)!.Boards.OrderBy(b => b.Id).ToList();
 
                 return new BaseResponse<List<Board>>()
                 {

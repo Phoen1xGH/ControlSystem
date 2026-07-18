@@ -29,7 +29,7 @@ namespace ControlSystem.DAL.Repositories
         {
             return _context.UserAccounts
                 .Include(x => x.Charts)
-                .Include(x => x.Workspaces);
+                .Include(x => x.Workspaces).ThenInclude(x => x.Boards);
         }
 
         public async Task Update(UserAccount entity)
@@ -37,11 +37,7 @@ namespace ControlSystem.DAL.Repositories
             _context.UserAccounts.Update(entity);
             await _context.SaveChangesAsync();
         }
-        public async Task AddChartToUser(UserAccount entity, Chart chart)
-        {
-            entity.Charts.Add(chart);
-            await _context.SaveChangesAsync();
-        }
+
         public async Task AddWorkspaceToUser(UserAccount entity, Workspace workspace)
         {
             entity.Workspaces.Add(workspace);

@@ -1,4 +1,5 @@
 ﻿using ControlSystem.Domain.Entities;
+using ControlSystem.Services.Implementations;
 using ControlSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,11 +10,23 @@ namespace ControlSystem.MainApp.Controllers
     [Authorize]
     public class BPMNChartsController : BaseController
     {
-        private readonly IBPMNGenerateService _accountService;
+        private readonly IBPMNGenerateService _chartService;
+        private readonly IBoardService _boardService;
+        private readonly IUserAccountService _userService;
+        private readonly ILinkService _linkService;
+        private readonly IFileService _fileService;
 
-        public BPMNChartsController(IBPMNGenerateService service) : base()
+        public BPMNChartsController(IBPMNGenerateService service,
+            IBoardService boardService,
+            IUserAccountService userService,
+            ILinkService linkService,
+            IFileService fileService) : base()
         {
-            _accountService = service;
+            _chartService = service;
+            _boardService = boardService;
+            _userService = userService;
+            _linkService = linkService;
+            _fileService = fileService;
         }
 
         [HttpGet]
@@ -25,7 +38,7 @@ namespace ControlSystem.MainApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = _accountService.GenerateProcess(allData);
+                var response = _chartService.GenerateProcess(allData);
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
@@ -45,13 +58,13 @@ namespace ControlSystem.MainApp.Controllers
             if (ModelState.IsValid)
             {
                 var currentUserName = User.Identity!.Name!;
-                var response = await _accountService.SaveBPMNToDB(currentUserName, chart);
+                var response = await _chartService.SaveBPMNToDB(currentUserName, chart);
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
                     ViewBag.Chart = chart.XmlData;
 
-                    var charts = await _accountService.GetAllChartsByUser(currentUserName);
+                    var charts = await _chartService.GetAllChartsByUser(currentUserName);
                     ViewBag.Id = charts.Data!.OrderBy(ch => ch.Id).Last().Id;
 
                     return View("Modeler");
@@ -80,6 +93,9 @@ namespace ControlSystem.MainApp.Controllers
                 </bpmn:definitions>
                 
                 """;
+
+            SetupWorkspacesList();
+
             return View();
         }
 
@@ -88,12 +104,13 @@ namespace ControlSystem.MainApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _accountService.GetChartById(chartId);
+                var response = await _chartService.GetChartById(chartId);
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
                     ViewBag.Chart = response.Data!.XmlData;
                     ViewBag.Id = response.Data!.Id;
+                    SetupWorkspacesList();
                     return View("Modeler");
                 }
             }
@@ -105,7 +122,7 @@ namespace ControlSystem.MainApp.Controllers
         {
             var username = User.Identity!.Name!;
 
-            var response = await _accountService.GetAllChartsByUser(username);
+            var response = await _chartService.GetAllChartsByUser(username);
 
             if (response.StatusCode == Domain.Enums.StatusCode.OK)
             {
@@ -122,7 +139,7 @@ namespace ControlSystem.MainApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _accountService.EditChart(chartId, newXmlData);
+                var response = await _chartService.EditChart(chartId, newXmlData);
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
                 {
@@ -138,7 +155,7 @@ namespace ControlSystem.MainApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var delResponse = await _accountService.DeleteChart(chartId);
+                var delResponse = await _chartService.DeleteChart(chartId);
 
                 if (delResponse.StatusCode == Domain.Enums.StatusCode.OK)
                 {
@@ -161,6 +178,165 @@ namespace ControlSystem.MainApp.Controllers
                 return Json(xmlChart);
             }
             return BadRequest("Ошибка при импорте файла");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateTicketsFromChartTasks(
+            int workspaceId, int boardId,
+            List<string> selectedTasksIds,
+            string xmlChart, IFormFile svgFile)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Произошла ошибка");
+
+            var getTitlesResponse = _chartService.GetTicketsFromChart(selectedTasksIds, xmlChart);
+            if (getTitlesResponse.StatusCode != Domain.Enums.StatusCode.OK)
+                return BadRequest("Произошла ошибка при обработке диаграммы");
+
+            var tickets = getTitlesResponse.Data!.Select(t => t.Name);
+
+            var createTicketsResponse = await CreateTicketsResponseAsync(tickets, boardId);
+            if (createTicketsResponse.Count == 0 ||
+                !await AddLinksToNewTicketsAsync(workspaceId, createTicketsResponse, getTitlesResponse.Data!))
+                return BadRequest("Произошла ошибка при создании карточек или добавлении ссылок");
+
+            var fileResponse = await AddFileToTicketsAsync(svgFile, createTicketsResponse);
+
+            if (!fileResponse)
+                return BadRequest("Ошибка при добавлении файла");
+
+            return Ok();
+        }
+
+
+        private async Task<List<int>> CreateTicketsResponseAsync(IEnumerable<string> names, int boardId)
+        {
+            List<int> ticketIds = new List<int>();
+
+            foreach (var name in names)
+            {
+                var createResponse = await _boardService.CreateTicket(User.Identity!.Name!, name, boardId);
+
+                if (createResponse.StatusCode != Domain.Enums.StatusCode.OK)
+                    return new List<int>(0);
+
+                ticketIds.Add(createResponse.Data!);
+            }
+            return ticketIds;
+        }
+
+        private async Task<bool> AddLinksToNewTicketsAsync(int workspaceId, List<int> ticketsIds, HashSet<TaskNode> ticketsSet)
+        {
+            var tickets = new List<Ticket>();
+            foreach (int id in ticketsIds)
+            {
+                var ticketResponse = await _boardService.GetTicketById(id);
+                if (ticketResponse.StatusCode != Domain.Enums.StatusCode.OK)
+                    return false;
+
+                tickets.Add(ticketResponse.Data!);
+            }
+
+            // создание ссылок
+            foreach (var currentTicket in tickets)
+            {
+                var linkedTicketNode = ticketsSet.FirstOrDefault(t => t.Name == currentTicket.Title);
+
+                if (linkedTicketNode is null)
+                    continue;
+
+                if (linkedTicketNode.Next is not null)
+                {
+                    var linkedTicketName = linkedTicketNode.Next.Name;
+
+                    var linkedTicket = tickets.FirstOrDefault(t => t.Title == linkedTicketName);
+
+                    if (linkedTicket is null)
+                        continue;
+
+                    var link = new Link
+                    {
+                        Name = $"Следующий этап (Карточка {linkedTicket!.Id})",
+                        Source = $"{HttpContext.Request.Scheme}://{Request.Host}/Workspace/Workspaces/{workspaceId}/{linkedTicket.Id}"
+                    };
+
+                    var linkResponse = await _linkService.CreateLink(currentTicket!.Id, link);
+
+                    if (linkResponse.StatusCode != Domain.Enums.StatusCode.OK)
+                        return false;
+                }
+                if (linkedTicketNode.Previous is not null)
+                {
+                    var linkedTicketName = linkedTicketNode.Previous.Name;
+
+                    var linkedTicket = tickets.FirstOrDefault(t => t.Title == linkedTicketName);
+
+                    if (linkedTicket is null)
+                        continue;
+
+                    var link = new Link
+                    {
+                        Name = $"Предыдущий этап (Карточка {linkedTicket!.Id})",
+                        Source = $"{HttpContext.Request.Scheme}://{Request.Host}/Workspace/Workspaces/{workspaceId}/{linkedTicket.Id}"
+                    };
+
+                    var linkResponse = await _linkService.CreateLink(currentTicket!.Id, link);
+
+                    if (linkResponse.StatusCode != Domain.Enums.StatusCode.OK)
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        private async Task<bool> AddFileToTicketsAsync(IFormFile formFile, List<int> ticketsIds)
+        {
+            foreach (int id in ticketsIds)
+            {
+                var svgFile = new FileAttachment
+                {
+                    FileName = "Диаграмма процесса",
+                    FileContent = new FileContent
+                    {
+                        Content = GetFileBytes(formFile),
+                    }
+                };
+
+                var fileResponse = await _fileService.CreateFiles(id, new List<FileAttachment>() { svgFile });
+
+                if (fileResponse.StatusCode != Domain.Enums.StatusCode.OK)
+                    return false;
+            }
+
+            return true;
+        }
+        private byte[] GetFileBytes(IFormFile formFile)
+        {
+            using var memoryStream = new MemoryStream();
+            formFile.CopyTo(memoryStream);
+            return memoryStream.ToArray();
+        }
+
+        private void SetupWorkspacesList()
+        {
+            UserAccount user = _userService.GetUser(User.Identity!.Name!);
+            var workspaces = user.Workspaces
+                                .OrderBy(w => w.Name)
+                                .Select(w => new { w.Id, w.Name })
+                                .ToList();
+
+            var boards = user.Workspaces
+                            .SelectMany(w => w.Boards)
+                            .OrderBy(b => b.Name)
+                            .Select(b => new { b.Id, b.Name, WorkspaceId = b.Workspace.Id })
+                            .ToList();
+
+            string workspacesJson = JsonConvert.SerializeObject(workspaces);
+            string boardsJson = JsonConvert.SerializeObject(boards);
+
+            ViewBag.Workspaces = workspacesJson;
+            ViewBag.Boards = boardsJson;
         }
     }
 }

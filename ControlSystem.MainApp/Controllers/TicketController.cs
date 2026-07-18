@@ -1,4 +1,4 @@
-﻿using ControlSystem.MainApp.DTO;
+﻿using ControlSystem.MainApp.ViewModels;
 using ControlSystem.Services.DTO;
 using ControlSystem.Services.Implementations;
 using ControlSystem.Services.Interfaces;
@@ -6,10 +6,26 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ControlSystem.MainApp.Controllers
 {
+    /// <summary>
+    /// Контроллер для управления карточками
+    /// </summary>
     public class TicketController : Controller
     {
+        #region fields
+
+        /// <summary>
+        /// Сервис досок
+        /// </summary>
         private readonly IBoardService _boardService;
+
+        /// <summary>
+        /// Сервис рабочих пространств
+        /// </summary>
         private readonly IWorkspaceService _workspaceService;
+
+        #endregion
+
+        #region constructors
 
         public TicketController(IBoardService boardService,
             IWorkspaceService workspaceService)
@@ -18,6 +34,16 @@ namespace ControlSystem.MainApp.Controllers
             _workspaceService = workspaceService;
         }
 
+        #endregion
+
+        #region actions
+
+        /// <summary>
+        /// Создать карточку
+        /// </summary>
+        /// <param name="title">заголовок</param>
+        /// <param name="boardId">идентификатор доски</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult> CreateTicket(string title, int boardId)
         {
@@ -47,7 +73,12 @@ namespace ControlSystem.MainApp.Controllers
             return BadRequest("Ошибка при создании тикета");
         }
 
-
+        /// <summary>
+        /// Удалить карточку
+        /// </summary>
+        /// <param name="ticketId">идентификатор карточки</param>
+        /// <param name="boardId">идентификатор доски</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult> DeleteTicket(int ticketId, int boardId)
         {
@@ -63,6 +94,11 @@ namespace ControlSystem.MainApp.Controllers
             return BadRequest("Ошибка при удалении тикета");
         }
 
+        /// <summary>
+        /// Редактировать карточку
+        /// </summary>
+        /// <param name="newTicketData">новые данные</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult> EditTicket(TicketDTO newTicketData)
         {
@@ -70,7 +106,13 @@ namespace ControlSystem.MainApp.Controllers
 
             if (ModelState.IsValid)
             {
-                var ticketData = new TicketChangesDTO { Id = newTicketData.Id, Title = newTicketData.Title, Description = newTicketData.Description };
+                var ticketData = new TicketChangesDTO
+                {
+                    Id = newTicketData.Id,
+                    Title = newTicketData.Title,
+                    Description = newTicketData.Description
+                };
+
                 var response = await _boardService.EditTicket(newTicketData.Id, ticketData);
 
                 if (response.StatusCode == Domain.Enums.StatusCode.OK)
@@ -94,6 +136,12 @@ namespace ControlSystem.MainApp.Controllers
             return BadRequest("Ошибка при редактировании тикета");
         }
 
+        /// <summary>
+        /// Получить содержимое карточки
+        /// </summary>
+        /// <param name="workspaceId">идентификатор пространства</param>
+        /// <param name="ticketId">идентификатор карточки</param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult> TicketDetails(int workspaceId, int ticketId)
         {
@@ -157,6 +205,12 @@ namespace ControlSystem.MainApp.Controllers
             return BadRequest("Произошла ошибка при открытии задачи");
         }
 
+        /// <summary>
+        /// Добавить исполнителя
+        /// </summary>
+        /// <param name="ticketId">идентификатор карточки</param>
+        /// <param name="userId">идентификатор пользователя</param>
+        /// <returns></returns>
         public async Task<ActionResult> AddExecutor(int ticketId, int userId)
         {
             if (ModelState.IsValid)
@@ -172,6 +226,12 @@ namespace ControlSystem.MainApp.Controllers
             return BadRequest("Ошибка при добавлении ответственного");
         }
 
+        /// <summary>
+        /// Удалить пользователя из участников карточки
+        /// </summary>
+        /// <param name="ticketId">идентификатор карточки</param>
+        /// <param name="participantId">идентификатор участника</param>
+        /// <returns></returns>
         public async Task<ActionResult> RemoveParticipant(int ticketId, int participantId)
         {
             if (ModelState.IsValid)
@@ -187,6 +247,12 @@ namespace ControlSystem.MainApp.Controllers
             return BadRequest("Ошибка при удалении участника");
         }
 
+        /// <summary>
+        /// Сменить статус карточки
+        /// </summary>
+        /// <param name="ticketId">идентификатор карточки</param>
+        /// <param name="boardId">идентификатор нового статуса</param>
+        /// <returns></returns>
         public async Task<ActionResult> ChangeStatus(int ticketId, int boardId)
         {
             if (ModelState.IsValid)
@@ -226,6 +292,8 @@ namespace ControlSystem.MainApp.Controllers
             }
             return BadRequest("Ошибка при смене статуса");
         }
+
+        #endregion
 
         public void AddPartsToAllTicket()
         {
