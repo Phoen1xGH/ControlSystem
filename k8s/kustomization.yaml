@@ -34,6 +34,7 @@ resources:
   - logging/namespace.yaml
   - logging/clickhouse-statefulset.yaml
   - logging/clickhouse-service.yaml
+  - logging/vector.yaml
 
 # ConfigMap с init-скриптом ClickHouse генерится из настоящего .sql-файла.
 configMapGenerator:

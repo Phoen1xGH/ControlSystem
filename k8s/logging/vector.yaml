@@ -1,0 +1,112 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: vector
+  namespace: kube-system
+spec:
+  repo: https://helm.vector.dev
+  chart: vector
+  version: "0.57.0"
+  targetNamespace: logging
+  createNamespace: true
+  valuesContent: |-
+    role: Agent
+
+    # Пароль ClickHouse из секрета (тот же, что у StatefulSet).
+    env:
+      - name: CLICKHOUSE_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: clickhouse-secret
+            key: password
+
+    customConfig:
+      data_dir: /vector-data-dir
+      api:
+        enabled: false
+
+      sources:
+        k8s:
+          type: kubernetes_logs
+          # только namespace control-system
+          extra_field_selector: metadata.namespace=control-system
+
+      transforms:
+        # Общие метаданные + попытка распарсить CLEF-JSON приложения.
+        parse:
+          type: remap
+          inputs: [k8s]
+          source: |
+            .namespace = to_string(.kubernetes.pod_namespace) ?? ""
+            .pod = to_string(.kubernetes.pod_name) ?? ""
+            .container = to_string(.kubernetes.container_name) ?? ""
+            .raw = to_string(.message) ?? ""
+            parsed, err = parse_json(.raw)
+            .is_app = err == null && is_object(parsed)
+            if .is_app { .clef = parsed }
+
+        # Разветвление: app (распарсился JSON) vs всё остальное (_unmatched).
+        route:
+          type: route
+          inputs: [parse]
+          route:
+            app: '.is_app == true'
+
+        # Строки под таблицу app_logs.
+        to_app:
+          type: remap
+          inputs: [route.app]
+          source: |
+            clef = object(.clef) ?? {}
+            . = {
+              "timestamp": to_string(clef."@t") ?? "",
+              "level": to_string(clef."@l") ?? "Information",
+              "message": to_string(clef."@m") ?? "",
+              "template": to_string(clef."@mt") ?? "",
+              "source_context": to_string(clef.SourceContext) ?? "",
+              "operation": to_string(clef.Operation) ?? "",
+              "request_id": to_string(clef.RequestId) ?? "",
+              "request_path": to_string(clef.RequestPath) ?? "",
+              "exception": to_string(clef."@x") ?? "",
+              "namespace": .namespace,
+              "pod": .pod,
+              "container": .container
+            }
+
+        # Строки под таблицу infra_logs (сырой текст Postgres/Redis/MinIO).
+        to_infra:
+          type: remap
+          inputs: [route._unmatched]
+          source: |
+            . = {
+              "timestamp": format_timestamp(.timestamp, "%Y-%m-%d %H:%M:%S%.3f") ?? format_timestamp(now(), "%Y-%m-%d %H:%M:%S%.3f") ?? "",
+              "namespace": .namespace,
+              "pod": .pod,
+              "container": .container,
+              "message": .raw
+            }
+
+      sinks:
+        ch_app:
+          type: clickhouse
+          inputs: [to_app]
+          endpoint: http://clickhouse.logging.svc.cluster.local:8123
+          database: logs
+          table: app_logs
+          skip_unknown_fields: true
+          auth:
+            strategy: basic
+            user: logs_writer
+            password: "${CLICKHOUSE_PASSWORD}"
+
+        ch_infra:
+          type: clickhouse
+          inputs: [to_infra]
+          endpoint: http://clickhouse.logging.svc.cluster.local:8123
+          database: logs
+          table: infra_logs
+          skip_unknown_fields: true
+          auth:
+            strategy: basic
+            user: logs_writer
+            password: "${CLICKHOUSE_PASSWORD}"
