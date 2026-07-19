@@ -58,7 +58,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[CreateWorkspace]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "CreateWorkspace");
 
                 return new BaseResponse<bool>()
                 {
@@ -97,7 +97,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[RenameWorkspace]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "RenameWorkspace");
 
                 return new BaseResponse<bool>()
                 {
@@ -136,7 +136,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[CreateBoard]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "CreateBoard");
 
                 return new BaseResponse<bool>()
                 {
@@ -176,7 +176,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[EditBoard]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "EditBoard");
 
                 return new BaseResponse<int>()
                 {
@@ -221,7 +221,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[DeleteWorkspace]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "DeleteWorkspace");
 
                 return new BaseResponse<bool>()
                 {
@@ -258,7 +258,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[DeleteBoard]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "DeleteBoard");
 
                 return new BaseResponse<int>()
                 {
@@ -284,7 +284,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GetWorkspaces]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GetWorkspaces");
 
                 return new BaseResponse<List<Workspace>>()
                 {
@@ -309,7 +309,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GetBoards]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GetBoards");
 
                 return new BaseResponse<List<Board>>()
                 {
@@ -359,7 +359,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[AddWorkspaceToUser]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "AddWorkspaceToUser");
 
                 return new BaseResponse<bool>()
                 {
@@ -395,7 +395,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GetWorkspaceById]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GetWorkspaceById");
 
                 return new BaseResponse<Workspace>()
                 {

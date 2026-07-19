@@ -43,7 +43,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[AddUpdateInfo]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "AddUpdateInfo");
 
                 return new BaseResponse<bool>()
                 {
@@ -81,7 +81,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[DeleteUpdateInfo]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "DeleteUpdateInfo");
 
                 return new BaseResponse<bool>()
                 {
@@ -107,7 +107,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GetUpdatesInfo]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GetUpdatesInfo");
 
                 return new BaseResponse<List<UpdateInfo>>()
                 {

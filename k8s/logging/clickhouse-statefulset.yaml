@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: clickhouse
+  namespace: logging
+spec:
+  serviceName: clickhouse
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clickhouse
+  template:
+    metadata:
+      labels:
+        app: clickhouse
+    spec:
+      containers:
+        - name: clickhouse
+          image: clickhouse/clickhouse-server:24.8
+          env:
+            - name: CLICKHOUSE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: clickhouse-secret
+                  key: username
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: clickhouse-secret
+                  key: password
+          ports:
+            - name: http
+              containerPort: 8123
+            - name: native
+              containerPort: 9000
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/clickhouse
+            - name: init
+              mountPath: /docker-entrypoint-initdb.d
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "2Gi"
+      volumes:
+        - name: init
+          configMap:
+            name: clickhouse-init
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi

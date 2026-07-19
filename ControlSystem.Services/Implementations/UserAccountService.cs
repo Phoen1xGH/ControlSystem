@@ -57,7 +57,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[Login]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "Login");
 
                 return new BaseResponse<ClaimsIdentity>()
                 {
@@ -102,7 +102,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[Register]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "Register");
 
                 return new BaseResponse<ClaimsIdentity>()
                 {

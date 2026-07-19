@@ -90,7 +90,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[CreateTicket]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "CreateTicket");
 
                 return new BaseResponse<int>()
                 {
@@ -145,7 +145,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[CreateTicket]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "CreateTicket");
 
                 return new BaseResponse<int>()
                 {
@@ -183,7 +183,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[DeleteTicket]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "DeleteTicket");
 
                 return new BaseResponse<bool>()
                 {
@@ -213,7 +213,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GetTickets]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GetTickets");
 
                 return new BaseResponse<List<Ticket>>()
                 {
@@ -256,7 +256,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[EditTicket]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "EditTicket");
 
                 return new BaseResponse<bool>()
                 {
@@ -296,7 +296,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[AddTicketPriority]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "AddTicketPriority");
 
                 return new BaseResponse<bool>()
                 {
@@ -336,7 +336,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[AddTicketTags]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "AddTicketTags");
 
                 return new BaseResponse<bool>()
                 {
@@ -377,7 +377,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[AddTicketLink]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "AddTicketLink");
 
                 return new BaseResponse<bool>()
                 {
@@ -430,7 +430,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[AddTicketComment]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "AddTicketComment");
 
                 return new BaseResponse<bool>()
                 {
@@ -467,7 +467,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GetTicketById]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GetTicketById");
 
                 return new BaseResponse<Ticket>()
                 {
@@ -519,7 +519,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[RemoveParticipant]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "RemoveParticipant");
 
                 return new BaseResponse<bool>()
                 {
@@ -574,7 +574,7 @@ namespace ControlSystem.Services.Implementations
             catch (Exception ex)
             {
 
-                _logger.LogError(ex, $"[AddExecutorToTicket]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "AddExecutorToTicket");
 
                 return new BaseResponse<UserAccount>()
                 {
@@ -626,7 +626,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[ChangeStatus]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "ChangeStatus");
 
                 return new BaseResponse<int>()
                 {
@@ -663,7 +663,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GetWorkspaceId]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GetWorkspaceId");
 
                 return new BaseResponse<int>()
                 {
