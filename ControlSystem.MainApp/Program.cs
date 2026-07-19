@@ -1,10 +1,15 @@
 using ControlSystem.MainApp.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Prometheus;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Serilog настраивается целиком из appsettings.json (секция "Serilog").
+builder.Host.UseSerilog((context, services, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services));
+
 builder.Services.AddControllersWithViews();
 
 builder.Configuration.AddEnvironmentVariables();
@@ -31,13 +36,14 @@ builder.Services.AddHealthCheck();
 
 var app = builder.Build();
 
+app.UseStructuredRequestLogging();
+
 app.MapHealthCheck();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -49,17 +55,17 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Метрики HTTP-запросов (rate, latency, коды ответов) с метками маршрута.
 app.UseHttpMetrics();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Эндпоинт /metrics для скрейпа (VMPodScrape ходит на него).
 app.MapMetrics();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-//await app.Services.MigrateDbAsync();
 
 app.Run();

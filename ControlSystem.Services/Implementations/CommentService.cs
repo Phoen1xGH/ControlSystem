@@ -72,7 +72,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[CreateComment]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "CreateComment");
 
                 return new BaseResponse<CommentDTO>()
                 {
@@ -110,7 +110,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[DeleteComment]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "DeleteComment");
 
                 return new BaseResponse<bool>()
                 {
@@ -155,7 +155,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[EditComment]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "EditComment");
 
                 return new BaseResponse<CommentDTO>()
                 {

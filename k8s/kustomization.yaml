@@ -1,7 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# Namespace создаётся первым ресурсом в списке.
 resources:
   - namespaces.yaml
 
@@ -10,7 +9,6 @@ resources:
   - database/object-store.yaml
   - database/scheduled-backup.yaml
   - database/migrator-job.yaml
-  # database/manual-backup.yaml намеренно НЕ включён — запускается вручную по требованию.
 
   # Object storage (MinIO)
   - object-storage/minio-pvc.yaml
@@ -27,13 +25,23 @@ resources:
   - web-app/service.yaml
   - ingress/ingress.yaml
 
-  # Monitoring (VictoriaMetrics stack через k3s helm-controller)
+  # Monitoring (VictoriaMetrics stack + scrapes)
   - monitoring/vm-stack.yaml
   - monitoring/pg-vmpodscrape.yaml
   - monitoring/webapp-vmpodscrape.yaml
 
-# Подмена образов. Ключ (name) совпадает с image: в манифесте.
-# newTag здесь — заглушка; в CI перезаписывается через kustomize edit set image.
+  # Logging (ClickHouse хранилище; Vector добавим отдельно)
+  - logging/namespace.yaml
+  - logging/clickhouse-statefulset.yaml
+  - logging/clickhouse-service.yaml
+
+# ConfigMap с init-скриптом ClickHouse генерится из настоящего .sql-файла.
+configMapGenerator:
+  - name: clickhouse-init
+    namespace: logging
+    files:
+      - logging/init.sql
+
 images:
   - name: control-system-web-app
     newName: registry.git.pve.drasill.ru/timesense/controlsystem

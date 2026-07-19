@@ -71,6 +71,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "monitoring", "monitoring", 
 		k8s\monitoring\webapp-vmpodscrape.yaml = k8s\monitoring\webapp-vmpodscrape.yaml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "logging", "logging", "{25D2284B-0B53-437A-AF53-A5B4CDA5AF13}"
+	ProjectSection(SolutionItems) = preProject
+		k8s\logging\namespace.yaml = k8s\logging\namespace.yaml
+		k8s\logging\clickhouse-service.yaml = k8s\logging\clickhouse-service.yaml
+		k8s\logging\clickhouse-statefulset.yaml = k8s\logging\clickhouse-statefulset.yaml
+		k8s\logging\init.sql = k8s\logging\init.sql
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -112,6 +120,7 @@ Global
 		{C6C28ADD-E13A-41B7-A35F-6CF7364F83AC} = {ED33B308-A2CA-4BD9-834C-151577122D82}
 		{4E7A008A-73AD-4DCE-9D1E-1E2F59C85976} = {ED33B308-A2CA-4BD9-834C-151577122D82}
 		{4845DB15-032D-45F4-904A-C563620C224F} = {ED33B308-A2CA-4BD9-834C-151577122D82}
+		{25D2284B-0B53-437A-AF53-A5B4CDA5AF13} = {ED33B308-A2CA-4BD9-834C-151577122D82}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {281B37B6-0D74-4D7E-BDE1-A310999FB927}

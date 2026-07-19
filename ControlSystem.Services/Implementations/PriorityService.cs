@@ -41,7 +41,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[CreatePriority]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "CreatePriority");
 
                 return new BaseResponse<bool>()
                 {
@@ -79,7 +79,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[DeletePriority]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "DeletePriority");
 
                 return new BaseResponse<bool>()
                 {
@@ -105,7 +105,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GetPriorities]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GetPriorities");
 
                 return new BaseResponse<List<Priority>>()
                 {
@@ -141,7 +141,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GetPriorityByTicket]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GetPriorityByTicket");
 
                 return new BaseResponse<Priority>()
                 {
@@ -179,7 +179,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[EditPriority]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "EditPriority");
 
                 return new BaseResponse<bool>()
                 {
@@ -229,7 +229,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[AddPriorityToTicket]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "AddPriorityToTicket");
 
                 return new BaseResponse<Priority>()
                 {

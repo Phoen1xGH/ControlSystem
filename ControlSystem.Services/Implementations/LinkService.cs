@@ -55,7 +55,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[CreateLink]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "CreateLink");
 
                 return new BaseResponse<bool>()
                 {
@@ -94,7 +94,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[DeleteLink]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "DeleteLink");
 
                 return new BaseResponse<bool>()
                 {
@@ -135,7 +135,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[EditLink]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "EditLink");
 
                 return new BaseResponse<bool>()
                 {
@@ -162,7 +162,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GetLinks]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GetLinks");
 
                 return new BaseResponse<List<Link>>()
                 {
@@ -198,7 +198,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GetLinksByTicket]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GetLinksByTicket");
 
                 return new BaseResponse<List<Link>>()
                 {

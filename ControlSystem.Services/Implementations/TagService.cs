@@ -42,7 +42,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[CreateTag]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "CreateTag");
 
                 return new BaseResponse<bool>()
                 {
@@ -80,7 +80,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[DeleteTag]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "DeleteTag");
 
                 return new BaseResponse<bool>()
                 {
@@ -121,7 +121,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[EditTag]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "EditTag");
 
                 return new BaseResponse<bool>()
                 {
@@ -147,7 +147,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GetAllTags]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GetAllTags");
 
                 return new BaseResponse<List<Tag>>()
                 {
@@ -185,7 +185,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GetTagsByTicket]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GetTagsByTicket");
 
                 return new BaseResponse<List<Tag>>()
                 {
@@ -230,7 +230,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[AddTagsToTicket]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "AddTagsToTicket");
 
                 return new BaseResponse<List<Tag>>()
                 {
@@ -280,7 +280,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[AddTagToTicket]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "AddTagToTicket");
 
                 return new BaseResponse<Tag>()
                 {
@@ -330,7 +330,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[RemoveTagFromTicket]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "RemoveTagFromTicket");
 
                 return new BaseResponse<Tag>()
                 {

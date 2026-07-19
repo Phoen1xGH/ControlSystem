@@ -56,7 +56,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[CreateFiles]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "CreateFiles");
 
                 return new BaseResponse<bool>()
                 {
@@ -94,7 +94,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[DeleteFile]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "DeleteFile");
 
                 return new BaseResponse<bool>()
                 {
@@ -132,7 +132,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GetFilesByTicket]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GetFilesByTicket");
 
                 return new BaseResponse<List<FileDTO>>()
                 {
@@ -170,7 +170,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GetFilesByTicket]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GetFilesByTicket");
 
                 return new BaseResponse<FileAttachment>()
                 {

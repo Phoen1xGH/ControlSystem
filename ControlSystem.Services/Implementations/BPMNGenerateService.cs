@@ -48,7 +48,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GenerateProcess]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GenerateProcess");
 
                 return new BaseResponse<XDocument>()
                 {
@@ -86,7 +86,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[SaveBPMNToDB]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "SaveBPMNToDB");
 
                 return new BaseResponse<bool>()
                 {
@@ -124,7 +124,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GetAllChartsByUser]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GetAllChartsByUser");
 
                 return new BaseResponse<List<Chart>>()
                 {
@@ -160,7 +160,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GetChartById]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GetChartById");
 
                 return new BaseResponse<Chart>()
                 {
@@ -200,7 +200,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[EditChart]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "EditChart");
 
                 return new BaseResponse<bool>()
                 {
@@ -238,7 +238,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[DeleteChart]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "DeleteChart");
 
                 return new BaseResponse<bool>()
                 {
@@ -321,7 +321,7 @@ namespace ControlSystem.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[GetTicketsFromChart]: {ex.Message}");
+                _logger.LogError(ex, "Ошибка операции {Operation}", "GetTicketsFromChart");
 
                 return new BaseResponse<HashSet<TaskNode>>()
                 {
