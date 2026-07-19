@@ -36,4 +36,4 @@ spec:
         barmanObjectName: minio-barman
 
   monitoring:
-    enablePodMonitor: true
+    enablePodMonitor: false

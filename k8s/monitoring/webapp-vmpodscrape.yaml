@@ -1,0 +1,12 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMPodScrape
+metadata:
+  name: web-app
+  namespace: control-system
+spec:
+  selector:
+    matchLabels:
+      app: web-app
+  podMetricsEndpoints:
+    - targetPort: 80
+      path: /metrics

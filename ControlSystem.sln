@@ -67,6 +67,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "monitoring", "monitoring", "{4845DB15-032D-45F4-904A-C563620C224F}"
 	ProjectSection(SolutionItems) = preProject
 		k8s\monitoring\vm-stack.yaml = k8s\monitoring\vm-stack.yaml
+		k8s\monitoring\pg-vmpodscrape.yaml = k8s\monitoring\pg-vmpodscrape.yaml
+		k8s\monitoring\webapp-vmpodscrape.yaml = k8s\monitoring\webapp-vmpodscrape.yaml
 	EndProjectSection
 EndProject
 Global

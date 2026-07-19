@@ -29,6 +29,8 @@ resources:
 
   # Monitoring (VictoriaMetrics stack через k3s helm-controller)
   - monitoring/vm-stack.yaml
+  - monitoring/pg-vmpodscrape.yaml
+  - monitoring/webapp-vmpodscrape.yaml
 
 # Подмена образов. Ключ (name) совпадает с image: в манифесте.
 # newTag здесь — заглушка; в CI перезаписывается через kustomize edit set image.

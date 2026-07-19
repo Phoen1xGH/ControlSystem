@@ -1,6 +1,6 @@
 using ControlSystem.MainApp.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,8 +49,12 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseHttpMetrics();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapMetrics();
 
 app.MapControllerRoute(
     name: "default",
