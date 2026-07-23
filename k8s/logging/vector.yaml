@@ -10,25 +10,31 @@ spec:
   targetNamespace: logging
   createNamespace: true
   valuesContent: |-
+    # Agent = DaemonSet на каждой ноде, тейлит логи контейнеров через kubernetes_logs.
     role: Agent
 
-    env:
-      - name: CH_USER
-        valueFrom:
-          secretKeyRef:
-            name: clickhouse-secret
-            key: username
-      - name: CH_PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: clickhouse-secret
-            key: password
+    # Секрет ClickHouse монтируем как файлы: /secrets/username, /secrets/password.
+    # Vector читает их через secret-бэкенд directory (не через ${ENV}, т.к.
+    # интерполяция env в этом образе не срабатывает — Vector слал литерал ${CH_USER}).
+    extraVolumes:
+      - name: ch-secret
+        secret:
+          secretName: clickhouse-secret
+    extraVolumeMounts:
+      - name: ch-secret
+        mountPath: /secrets
+        readOnly: true
 
     customConfig:
       data_dir: /vector-data-dir
       api:
         enabled: true
         address: 0.0.0.0:8686
+      # Бэкенд секретов: каждый файл в /secrets = секрет (имя файла = ключ).
+      secret:
+        ch:
+          type: directory
+          path: /secrets
       sources:
         k8s:
           type: kubernetes_logs
@@ -91,8 +97,8 @@ spec:
           skip_unknown_fields: true
           auth:
             strategy: basic
-            user: ${CH_USER}
-            password: ${CH_PASSWORD}
+            user: "SECRET[ch.username]"
+            password: "SECRET[ch.password]"
         ch_infra:
           type: clickhouse
           inputs: [to_infra]
@@ -102,5 +108,5 @@ spec:
           skip_unknown_fields: true
           auth:
             strategy: basic
-            user: ${CH_USER}
-            password: ${CH_PASSWORD}
+            user: "SECRET[ch.username]"
+            password: "SECRET[ch.password]"
