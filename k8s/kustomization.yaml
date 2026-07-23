@@ -44,6 +44,10 @@ configMapGenerator:
     namespace: logging
     files:
       - logging/init.sql
+  - name: clickhouse-config
+    namespace: logging
+    files:
+      - logging/clickhouse-config.xml
 
 images:
   - name: control-system-web-app
