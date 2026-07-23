@@ -30,13 +30,15 @@ resources:
   - monitoring/pg-vmpodscrape.yaml
   - monitoring/webapp-vmpodscrape.yaml
 
-  # Logging (ClickHouse хранилище; Vector добавим отдельно)
+  # Logging (ClickHouse хранилище)
   - logging/namespace.yaml
   - logging/clickhouse-statefulset.yaml
   - logging/clickhouse-service.yaml
   - logging/vector.yaml
 
-# ConfigMap с init-скриптом ClickHouse генерится из настоящего .sql-файла.
+  # Logging (Vector — обычные манифесты, без Helm)
+
+# ConfigMap'ы генерятся из файлов (init.sql для ClickHouse, конфиг Vector).
 configMapGenerator:
   - name: clickhouse-init
     namespace: logging
