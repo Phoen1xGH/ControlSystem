@@ -1,0 +1,11 @@
+<clickhouse>
+    <!-- ClickHouse по умолчанию считает доступную память от RAM хоста (15Gi)
+         и не учитывает cgroup-лимит контейнера, из-за чего на старте вылезает
+         за лимит и его убивает OOM. Явно ограничиваем сервер ниже лимита (4Gi). -->
+    <max_server_memory_usage>3221225472</max_server_memory_usage>
+
+    <!-- Дефолтные кэши рассчитаны на большую машину (mark cache — 5Gi).
+         Режем под небольшой контейнер логов. -->
+    <mark_cache_size>536870912</mark_cache_size>
+    <uncompressed_cache_size>0</uncompressed_cache_size>
+</clickhouse>
