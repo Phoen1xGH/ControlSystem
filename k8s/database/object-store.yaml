@@ -1,19 +1,19 @@
 apiVersion: barmancloud.cnpg.io/v1
 kind: ObjectStore
 metadata:
-  name: minio-barman
+  name: rustfs-barman
   namespace: control-system
 spec:
   retentionPolicy: "3d"
   configuration:
     destinationPath: s3://pg-backups
-    endpointURL: http://minio.control-system.svc.cluster.local:9000
+    endpointURL: http://rustfs.control-system.svc.cluster.local:9000
     s3Credentials:
       accessKeyId:
-        name: minio-secret
+        name: rustfs-secret
         key: access_key
       secretAccessKey:
-        name: minio-secret
+        name: rustfs-secret
         key: secret_key
     wal:
       compression: gzip

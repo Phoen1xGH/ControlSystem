@@ -10,8 +10,8 @@ resources:
   - database/scheduled-backup.yaml
   - database/migrator-job.yaml
 
-  # Object storage (MinIO)
-  - object-storage/minio-pvc.yaml
+  # Object storage (RustFS)
+  - object-storage/rustfs-pvc.yaml
   - object-storage/deployment.yaml
   - object-storage/service.yaml
 
