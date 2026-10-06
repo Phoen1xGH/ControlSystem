@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: minio-pvc
+  name: rustfs-pvc
   namespace: control-system
 spec:
   accessModes:

@@ -45,7 +45,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "object-storage", "object-storage", "{C6C28ADD-E13A-41B7-A35F-6CF7364F83AC}"
 	ProjectSection(SolutionItems) = preProject
 		k8s\object-storage\deployment.yaml = k8s\object-storage\deployment.yaml
-		k8s\object-storage\minio-pvc.yaml = k8s\object-storage\minio-pvc.yaml
+		k8s\object-storage\rustfs-pvc.yaml = k8s\object-storage\rustfs-pvc.yaml
 		k8s\object-storage\service.yaml = k8s\object-storage\service.yaml
 	EndProjectSection
 EndProject
