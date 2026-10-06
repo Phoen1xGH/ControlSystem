@@ -20,7 +20,7 @@ ENGINE = MergeTree
 ORDER BY (timestamp)
 TTL toDateTime(timestamp) + INTERVAL 3 DAY;
 
--- Сырые логи инфраструктуры (Postgres/Redis/MinIO — свой текстовый формат).
+-- Сырые логи инфраструктуры (Postgres/Valkey/RustFS — свой текстовый формат).
 CREATE TABLE IF NOT EXISTS logs.infra_logs
 (
     timestamp DateTime64(3) DEFAULT now64(3),

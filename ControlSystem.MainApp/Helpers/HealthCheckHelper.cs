@@ -10,7 +10,7 @@ namespace ControlSystem.MainApp.Helpers
         {
             services.AddHealthChecks()
                 .AddDbContextCheck<ControlSystemContext>("postgres")
-                .AddCheck<RedisHealthCheck>("redis");
+                .AddCheck<ValkeyHealthCheck>("valkey");
 
             return services;
         }

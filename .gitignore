@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 secrets/
+# Локальные секреты и заметки по кластеру
+.secrets/
