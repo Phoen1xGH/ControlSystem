@@ -18,7 +18,7 @@ if (builder.Environment.IsProduction())
 {
     builder.Configuration.InitializeProductionSecrets();
 
-    await builder.InitializeRedisConnectionAsync();
+    await builder.InitializeValkeyConnectionAsync();
 }
 
 builder.InitializeDbConnection();

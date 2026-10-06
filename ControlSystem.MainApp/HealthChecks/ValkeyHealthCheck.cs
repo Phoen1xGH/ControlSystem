@@ -3,13 +3,13 @@ using StackExchange.Redis;
 
 namespace ControlSystem.MainApp.HealthChecks
 {
-    public class RedisHealthCheck : IHealthCheck
+    public class ValkeyHealthCheck : IHealthCheck
     {
-        private readonly IConnectionMultiplexer _redis;
+        private readonly IConnectionMultiplexer _valkey;
 
-        public RedisHealthCheck(IConnectionMultiplexer redis)
+        public ValkeyHealthCheck(IConnectionMultiplexer valkey)
         {
-            _redis = redis;
+            _valkey = valkey;
         }
 
         public async Task<HealthCheckResult> CheckHealthAsync(
@@ -18,13 +18,13 @@ namespace ControlSystem.MainApp.HealthChecks
         {
             try
             {
-                var db = _redis.GetDatabase();
+                var db = _valkey.GetDatabase();
                 var pong = await db.PingAsync();
-                return HealthCheckResult.Healthy("Redis is OK");
+                return HealthCheckResult.Healthy("Valkey is OK");
             }
             catch (Exception ex)
             {
-                return HealthCheckResult.Unhealthy("Redis is down", ex);
+                return HealthCheckResult.Unhealthy("Valkey is down", ex);
             }
         }
     }

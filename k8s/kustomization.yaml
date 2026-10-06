@@ -15,10 +15,10 @@ resources:
   - object-storage/deployment.yaml
   - object-storage/service.yaml
 
-  # Redis
-  - redis/redis-pvc.yaml
-  - redis/deployment.yaml
-  - redis/service.yaml
+  # Valkey
+  - valkey/valkey-pvc.yaml
+  - valkey/deployment.yaml
+  - valkey/service.yaml
 
   # Web app
   - web-app/deployment.yaml

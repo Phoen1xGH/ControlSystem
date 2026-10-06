@@ -1,8 +1,8 @@
 ﻿namespace ControlSystem.MainApp.Options
 {
-    public class ProjectRedisOptions
+    public class ProjectValkeyOptions
     {
-        public const string Section = "REDIS";
+        public const string Section = "VALKEY";
 
         public string HOST { get; set; } = string.Empty;
 

@@ -33,11 +33,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "database", "database", "{5D
 		k8s\database\recovery-cluster.yaml = k8s\database\recovery-cluster.yaml
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "redis", "redis", "{C86FD952-4760-43E8-86C5-597654F1D79C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "valkey", "valkey", "{C86FD952-4760-43E8-86C5-597654F1D79C}"
 	ProjectSection(SolutionItems) = preProject
-		k8s\redis\deployment.yaml = k8s\redis\deployment.yaml
-		k8s\redis\redis-pvc.yaml = k8s\redis\redis-pvc.yaml
-		k8s\redis\service.yaml = k8s\redis\service.yaml
+		k8s\valkey\deployment.yaml = k8s\valkey\deployment.yaml
+		k8s\valkey\valkey-pvc.yaml = k8s\valkey\valkey-pvc.yaml
+		k8s\valkey\service.yaml = k8s\valkey\service.yaml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlSystem.Migrator", "ControlSystem.Migrator\ControlSystem.Migrator.csproj", "{CE2D755B-2ACB-4B02-8DB4-E7A702AD53BF}"
